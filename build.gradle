@@ -3,8 +3,8 @@ plugins {
   id 'war'
 }
 
-group 'com.DTeam0928'
-version '1.0-SNAPSHOT'
+group = 'com.dteam0928.sangsae'
+version = '1.0-SNAPSHOT'
 
 repositories {
   mavenCentral()
