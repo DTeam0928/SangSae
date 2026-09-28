@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JSP - Hello World</title>
+  <title>상새 - 일상을 새롭게</title>
 </head>
 <body>
-<h1><%= "Hello World!" %></h1>
+<h1>상새 (SangSae)</h1>
+<p>일상을 새롭게</p>
 <br/>
 <a href="hello-servlet">Hello Servlet</a>
 </body>
