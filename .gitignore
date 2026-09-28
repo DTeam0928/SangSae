@@ -8,34 +8,12 @@ build/
 !**/src/test/**/build/
 .kotlin/
 
-<<<<<<< Updated upstream
 ### IntelliJ IDEA ###
 .idea
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
-=======
-# Compiled class & log files
-*.class
-*.log
-*.ctxt
-.mtj.tmp/
-
-# Package files (keep gradle wrapper jar)
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# ==========================================
-# IntelliJ IDEA
-# ==========================================
-.idea/
->>>>>>> Stashed changes
 *.iws
 *.iml
 *.ipr
@@ -86,13 +64,6 @@ ehthumbs_vista.db
 $RECYCLE.BIN/
 *.lnk
 
-# ==========================================
-# Environment & Sensitive Configs
-# ==========================================
-*.env
-.env
-.env.*
-!*.env.example
-local.properties
-secrets.properties
-application-local.properties
+### Mac OS ###
+.DS_Store
+/.idea
