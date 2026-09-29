@@ -1,4 +1,4 @@
-package com.dteam0928.sangsae.quest;
+package com.dteam0928.sangsae.quest.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
