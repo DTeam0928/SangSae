@@ -29,8 +29,16 @@ dependencies {
   implementation('org.glassfish.jaxb:jaxb-runtime:4.0.9')
   implementation('org.hibernate.validator:hibernate-validator:8.0.5.Final')
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+  // JSON 파싱 (카카오 REST API 응답 파싱 및 서블릿 비동기 통신용)
+  implementation('com.google.code.gson:gson:2.11.0')
+
+  // JSP JSTL 태그 라이브러리 (Jakarta EE 10 / Tomcat 10.1+ 호환)
+  implementation('jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0')
+  implementation('org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1')
+
+  testImplementation(platform("org.junit:junit-bom:5.11.4"))
+  testImplementation("org.junit.jupiter:junit-jupiter")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 test {

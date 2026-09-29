@@ -67,9 +67,8 @@ $RECYCLE.BIN/
 ### Mac OS ###
 .DS_Store
 /.idea
-/.idea
 
 #env
 .env
-/.idea
-/.idea
+geminiAsist.md
+GEMINI.md
