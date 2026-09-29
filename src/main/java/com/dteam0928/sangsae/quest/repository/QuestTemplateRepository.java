@@ -1,8 +1,10 @@
-package com.dteam0928.sangsae.quest;
+package com.dteam0928.sangsae.quest.repository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 
 public class QuestTemplateRepository {
 	
