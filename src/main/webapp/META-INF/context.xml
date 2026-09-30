@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- 세션 쿠키(JSESSIONID)에 SameSite=Lax 를 붙여 다른 사이트에서 보낸 POST 에 세션이 실리지 않게 한다 (CSRF 완화) -->
+    <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor" sameSiteCookies="lax"/>
+</Context>
