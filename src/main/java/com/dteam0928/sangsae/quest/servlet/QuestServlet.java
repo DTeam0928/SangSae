@@ -35,7 +35,9 @@ public class QuestServlet extends HttpServlet {
 		    	return;
 		    }
 		    List<UserQuest> userQuests = questService.getUserQuests();
+		    com.dteam0928.sangsae.common.map.dto.PlaceResponseDto place = questService.getPlaceForQuest(quest);
 		    request.setAttribute("quest", quest);
+		    request.setAttribute("place", place);
 		    request.setAttribute("userQuests", userQuests);
 		    request.getRequestDispatcher("/views/quest/detail.jsp").forward(request, response);
 		    return;

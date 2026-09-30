@@ -19,13 +19,23 @@ public class QuestService {
     private final QuestTemplateRepository questRepository;
     private final UserQuestRepository userQuestRepository;
     private final QuestLogRepository questLogRepository;
-    private final UserQuestBookmarkRepository bookmarkRepository;    
-    
+    private final UserQuestBookmarkRepository bookmarkRepository;
+    private final com.dteam0928.sangsae.common.map.service.PlaceService placeService;
+
     public QuestService() {
-        this.questRepository = new QuestTemplateRepository();
-        this.userQuestRepository = new UserQuestRepository();
-        this.questLogRepository = new QuestLogRepository();
-        this.bookmarkRepository = new UserQuestBookmarkRepository();
+        this(new QuestTemplateRepository(), new UserQuestRepository(), new QuestLogRepository(), new UserQuestBookmarkRepository(), new com.dteam0928.sangsae.common.map.service.PlaceService());
+    }
+
+    public QuestService(QuestTemplateRepository questRepository,
+                        UserQuestRepository userQuestRepository,
+                        QuestLogRepository questLogRepository,
+                        UserQuestBookmarkRepository bookmarkRepository,
+                        com.dteam0928.sangsae.common.map.service.PlaceService placeService) {
+        this.questRepository = questRepository;
+        this.userQuestRepository = userQuestRepository;
+        this.questLogRepository = questLogRepository;
+        this.bookmarkRepository = bookmarkRepository;
+        this.placeService = placeService;
     }
 
     //공개된 퀘스트 전체 조회
@@ -99,10 +109,21 @@ public class QuestService {
                         scheduledDate
                 );
     }
-    //퀘스트 완료 처리 및 저장
+    // 퀘스트 완료 처리 및 저장 (기존 호출부 호환용)
     public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText) {
+        return completeQuest(userQuestId, userId, proofImageUrl, proofText, null, null);
+    }
+
+    // 퀘스트 완료 처리 및 저장 (위치 인증 시 반경 50m GPS 거리 검증 포함)
+    public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText, Double userLat, Double userLng) {
         UserQuest userQuest = userQuestRepository.findById(userQuestId);
         if (userQuest == null) return null;
+
+        // 사유: 기획서 비즈니스 규칙 상 위치 인증(LOCATION) 퀘스트는 지정된 장소 반경 50m 이내 현장 방문 시에만 완료 승인.
+        if ("LOCATION".equalsIgnoreCase(userQuest.getAuthType())) {
+            validateLocationAuthentication(userQuest, userLat, userLng);
+        }
+
         LocalDateTime completedAt = LocalDateTime.now();
         userQuest.setStatus("COMPLETED");
         userQuest.setCompletedAt(completedAt);
@@ -117,6 +138,40 @@ public class QuestService {
                 userQuest.getRewardXp()
         );
         return questLogRepository.save(questLog);
+    }
+
+    public com.dteam0928.sangsae.common.map.dto.PlaceResponseDto getPlaceForQuest(QuestTemplate quest) {
+        if (quest == null || quest.getPlaceId() == null || quest.getPlaceId() <= 0) {
+            return null;
+        }
+        return placeService.getPlaceById(quest.getPlaceId());
+    }
+
+    private void validateLocationAuthentication(UserQuest userQuest, Double userLat, Double userLng) {
+        if (userLat == null || userLng == null || userLat == 0.0 || userLng == 0.0) {
+            throw new IllegalArgumentException("위치 인증 퀘스트는 사용자의 현재 GPS 좌표가 필수입니다.");
+        }
+
+        Long placeId = userQuest.getPlaceId();
+        if (placeId == null || placeId <= 0) {
+            return;
+        }
+
+        com.dteam0928.sangsae.common.map.dto.PlaceResponseDto place = placeService.getPlaceById(placeId);
+        if (place == null) {
+            return;
+        }
+
+        int distance = com.dteam0928.sangsae.common.map.service.PlaceSearchService
+                .calculateDistanceInMeters(userLat, userLng, place.latitude(), place.longitude());
+
+        final int MAX_ALLOWED_DISTANCE_METERS = 50;
+        if (distance > MAX_ALLOWED_DISTANCE_METERS) {
+            throw new IllegalStateException(String.format(
+                "지정된 장소 반경 %dm 이내에서만 퀘스트를 인증할 수 있습니다. (현재 거리: %dm)",
+                MAX_ALLOWED_DISTANCE_METERS, distance
+            ));
+        }
     }
     // 퀘스트 북마크 저장
     public UserQuestBookmark addBookmark(Long userId, Long questTemplateId, String folderName) {
