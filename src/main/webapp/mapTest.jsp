@@ -275,19 +275,37 @@
     });
   }
 
-  function selectPlace(place) {
+  async function selectPlace(place) {
     var box = document.getElementById('selected-place-box');
     box.className = 'selected-box';
+    box.innerHTML = '<div style="color:#64748b;">DB 장소 저장 및 PK 발급 중...</div>';
+
     var addr = place.roadAddress || place.address || '';
     var regions = [place.region1Depth, place.region2Depth, place.region3Depth].filter(Boolean).join(' ');
     var distHtml = place.distanceInMeters ? '<br><small style="color:#15803d;">내 위치와의 거리: <b>' + place.distanceInMeters + 'm</b></small>' : '';
 
-    box.innerHTML =
-      '<strong>' + place.name + '</strong> (' + place.themeName + ')<br>' +
-      '<small style="color:#15803d;">도로명: ' + addr + '</small><br>' +
-      '<small style="color:#15803d;">행정구역: ' + regions + '</small><br>' +
-      '<small style="color:#15803d;">좌표: (' + place.latitude.toFixed(6) + ', ' + place.longitude.toFixed(6) + ')</small>' +
-      distHtml;
+    try {
+      var res = await MapUtil.selectPlace(place);
+      var placeId = (res && res.data && res.data.placeId) ? res.data.placeId : '미발급';
+
+      box.innerHTML =
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+          '<strong>' + place.name + '</strong>' +
+          '<span style="background:#16a34a; color:white; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:10px;">DB place_id: #' + placeId + '</span>' +
+        '</div>' +
+        '<small style="color:#15803d;">테마: ' + place.themeName + ' (' + place.themeCode + ')</small><br>' +
+        '<small style="color:#15803d;">도로명: ' + addr + '</small><br>' +
+        '<small style="color:#15803d;">행정구역: ' + regions + '</small><br>' +
+        '<small style="color:#15803d;">좌표: (' + place.latitude.toFixed(6) + ', ' + place.longitude.toFixed(6) + ')</small>' +
+        distHtml +
+        '<div style="margin-top:8px; font-size:11px; color:#15803d; background:#dcfce7; padding:6px 8px; border-radius:4px;">' +
+          '✅ DB 저장 완료! 퀘스트/루틴 생성 시 <code>place_id: ' + placeId + '</code>를 바로 사용할 수 있습니다.' +
+        '</div>';
+    } catch (e) {
+      box.innerHTML =
+        '<strong>' + place.name + '</strong><br>' +
+        '<small style="color:#dc2626;">DB 저장 실패: ' + (e.message || e) + '</small>';
+    }
   }
 
   function clearAllMarkers() {

@@ -180,6 +180,28 @@ const MapUtil = (function () {
         return searchPlaces({ type, query });
     }
 
+    // 사유: 프론트에서 장소 선택 확정 시 백엔드 DB(places)에 Get-or-Create 저장하고 발급된 placeId를 즉시 획득.
+    async function selectPlace(placeDto) {
+        if (!placeDto) {
+            throw new Error('선택할 장소 정보가 없습니다.');
+        }
+
+        const response = await fetch('/api/place/select', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: JSON.stringify(placeDto)
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => null);
+            throw new Error((err && err.message) || `장소 저장 실패 (HTTP ${response.status})`);
+        }
+
+        return await response.json();
+    }
+
     function renderPlaceMarkers(map, placeList = [], options = {}) {
         if (!map) return [];
 
@@ -317,6 +339,7 @@ const MapUtil = (function () {
         calculateDistance: calculateDistance,
         searchPlaces: searchPlaces,
         searchViaServer: searchViaServer,
+        selectPlace: selectPlace,
         renderPlaceMarkers: renderPlaceMarkers,
         clearMarkers: clearMarkers
     };
