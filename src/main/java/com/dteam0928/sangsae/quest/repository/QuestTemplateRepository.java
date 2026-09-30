@@ -70,4 +70,10 @@ public class QuestTemplateRepository {
 	            .findFirst()
 	            .orElse(null);
 	}
+	
+	public List<QuestTemplate> findByIds(List<Long> ids) {
+		return quests.stream()
+				.filter(quest -> ids.contains(quest.getId()))
+				.toList();
+	}
 }

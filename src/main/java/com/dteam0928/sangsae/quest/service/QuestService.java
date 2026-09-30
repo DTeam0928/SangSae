@@ -144,18 +144,42 @@ public class QuestService {
         return bookmarkRepository.save(bookmark);
     }
     
-    // 사용자가 저장한 퀘스트 북마크 조회
+    //사용자가 저장한 퀘스트 북마크 조회
     public List<UserQuestBookmark> getBookmarksByUserId(Long userId) {
         return bookmarkRepository.findByUserId(userId);
     }
 
-    // 퀘스트 북마크 여부 확인
+    //퀘스트 북마크 여부 확인
     public boolean isBookmarked(Long userId, Long questTemplateId) {
         return bookmarkRepository.findByUserIdAndQuestTemplateId(userId, questTemplateId) != null;
     }
 
-    // 퀘스트 북마크 삭제
+    //퀘스트 북마크 삭제
     public boolean removeBookmark(Long userId, Long questTemplateId) {
         return bookmarkRepository.delete(userId, questTemplateId);
+    }
+    
+    public List<QuestTemplate> getBookmarkedQuests(Long userId) {
+    	List<UserQuestBookmark> bookmarks = bookmarkRepository.findByUserId(userId);
+    	List<Long> questTemplateIds = bookmarks.stream()
+    			.map(UserQuestBookmark::getQuestTemplateId)
+    			.toList();
+    	return questRepository.findByIds(questTemplateIds);
+    }
+    
+    //특정 폴더에 북마크한 퀘스트 목록 조회
+    public List<QuestTemplate> getBookmarkedQuestsByFolder(Long userId, String folderName) {
+    	List<UserQuestBookmark> bookmarks =
+    			bookmarkRepository.findByUserIdAndFolderName(userId, folderName);
+    	List<Long> questTemplateIds = bookmarks.stream()
+    			.map(UserQuestBookmark::getQuestTemplateId)
+    			.toList();
+    	return questRepository.findByIds(questTemplateIds);
+    }
+    
+    //북마크를 다른 폴더로 이동
+    public boolean moveBookmarkToFolder(Long userId, Long questTemplateId, String folderName) {
+        if (folderName == null || folderName.isBlank()) folderName = "기본";
+        return bookmarkRepository.moveToFolder(userId, questTemplateId, folderName);
     }
 }
