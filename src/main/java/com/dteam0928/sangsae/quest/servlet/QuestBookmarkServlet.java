@@ -1,8 +1,10 @@
 package com.dteam0928.sangsae.quest.servlet;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.dteam0928.sangsae.quest.dto.UserQuestBookmark;
+import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 import com.dteam0928.sangsae.quest.service.QuestService;
 
 import jakarta.servlet.ServletException;
@@ -17,6 +19,17 @@ public class QuestBookmarkServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private final QuestService questService = new QuestService();
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    		throws ServletException, IOException {
+    	Long userId = Long.parseLong(request.getParameter("userId"));
+    	List<QuestTemplate> bookmarkQuests = 
+    			questService.getBookmarkedQuests(userId);
+    	request.setAttribute("bookmarkedQuests", bookmarkQuests);
+    	//경로는 추후 만들어지고 나면 변경
+    	request.getRequestDispatcher("/views/quest/list.jsp").forward(request, response);
+    }
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
