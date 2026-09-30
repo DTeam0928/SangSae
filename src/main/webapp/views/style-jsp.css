@@ -1,0 +1,238 @@
+/* ---------- 0. 외부 구글 폰트 로드 ---------- */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap');
+
+/* ---------- 1. 폰트 정의 (fonts) ---------- */
+@font-face {
+    font-family: 'NalnaRiji';
+    src: url('./common/nelnalizzychae2020.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* ---------- 2. 디자인 정의 (style guide) ---------- */
+:root {
+    /* 컬러 팔레트 */
+    /* 1. 핵심 포인트 컬러 (요청하신 톤 유지) */
+    --color-primary: #BDDEDD;     /* 메인 포인트 / 연한 민트 */
+    --color-dark: #87BBBE;        /* 프라이머리 다크 버전 / 버튼 호버용 */
+    --color-bg: #EFFAFA;          /* 기본 배경색 / 매우 연한 민트빛 화이트 */
+
+    /* 2. 조화로운 서브 및 배경 컬러 */
+    --color-main: #E2F5F5;        /* 기존 메인 컬러를 배경 톤에 맞게 은은하게 조율 */
+    --color-sub-bg: #E8F4F4;      /* 배경 박스 및 연한 서브 배경 */
+    --color-white: #ffffff;       /* 카드 및 컴포넌트 흰색 배경 */
+
+    /* 3. 텍스트 및 보조 컬러 (민트 톤과 어울리는 차분한 차콜/그레이) */
+    --color-text: #2C3E42;        /* 기본 텍스트 (너무 진한 블랙 대신 푸른빛이 감도는 다크 톤) */
+    --color-muted: #6C8287;       /* 보조 텍스트 (톤 다운된 그레이민트) */
+
+    /* 4. 테두리 및 경계선 */
+    --color-border: #D1E5E5;      /* 기본 테두리 (민트빛이 살짝 감도는 부드러운 선) */
+    --color-border2: #D8ECEC;     /* 헤더 등 보조 테두리 */
+
+    /* 5. 강조, 뱃지 및 상태 컬러 */
+    --color-accent: #E59B21;      /* 경고/뱃지/보조 포인트 (따뜻한 오렌지/골드 톤으로 포인트) */
+    --color-danger: #E56B6F;      /* 삭제/에러 (채도를 살짝 낮춘 세련된 레드) */
+    --color-danger-bg: #FDE8E8;   /* 에러 배경 연한 톤 */
+    --color-success: #2A9D8F;     /* 성공/완료 (민트 계열과 찰떡궁합인 딥 그린) */
+
+    --font-logo: 'NalnaRiji', 'Pretendard', sans-serif;
+    --font-body: 'IBM Plex Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* 타이포그래피 스케일 */
+    --fs-a: 128px;
+    --fs-b: 36px;
+    --fs-h1: 25px;  --fw-h1: 850;
+    --fs-h2: 19px;  --fw-h2: 800;
+    --fs-h3: 15.5px; --fw-h3: 730;
+    --fs-body: 14px; --fw-body: 450; --lh-body: 1.5;
+    --fs-small: 12px; --fw-small: 600;
+
+    /* 라운드/그림자 */
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-card: 0 4px 20px rgba(30, 70, 90, 0.04);
+}
+
+/* ---------- 3. 바디 기본 세팅 (body) ---------- */
+* { box-sizing: border-box; font-family: var(--font-body); color: var(--color-text); }
+html, body { margin: 0; padding: 0; }
+a { color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* ---------- 4. 헤더 스타일 (header) ---------- */
+        .header {
+            height: 74px;
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border2);
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-logo);
+            font-size: 30px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            color: var(--color-dark);
+            margin-right: 90px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 32px;
+            width: auto;
+            margin-right: 10px;
+            object-fit: contain;
+        }
+        .nav { display: flex; gap: 38px; height: 100%; align-items: center; font-family: var(--font-body);}
+        .nav a {
+            color: var(--color-text);
+            text-decoration: none;
+            font-size: var(--fs-body);
+            font-weight: var(--fw-body);
+        }
+        .nav a.active { color: var(--color-dark); font-weight: var(--fw-h2); }
+
+/* --------- 4. 공통 폼 요소 (form) ---------- */
+.form-input, .form-select {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  outline: none;
+  font-size: var(--fs-body);
+  background: var(--color-white);
+}
+.form-input:focus, .form-select:focus { border-color: var(--color-dark); }
+.form-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-text); }
+
+/*-- 임시 --*/
+
+.container {
+  width: min(1080px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 38px 0 80px;
+}
+
+.section-title {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-h2);
+  margin-bottom: 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/*--정렬됨--*/
+
+
+.dash-card, .full-card, .card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+.dash-card { display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; }
+.dash-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.dash-title, .card-title { font-size: var(--fs-h3); font-weight: var(--fw-h3); }
+
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  background: var(--color-sub-bg);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+}
+.stat-num { font-size: 20px; font-weight: 800; color: var(--color-primary); margin-top: 4px; }
+.stat-label { font-size: var(--fs-small); color: var(--color-muted); }
+
+/*--카드 생김--*/
+
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--color-main);
+  color: var(--color-primary);
+  font-weight: 750;
+  display: inline-block;
+}
+.badge.orange { color: #C77A00; background: #FFF4E5; }
+.badge.green  { color: #138151; background: #EAFBF3; }
+
+/*--진행중여행 등 상태--*/
+
+
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(20,30,40,.45);
+  display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  width: min(400px, 100%); background: var(--color-white); border-radius: var(--radius-lg); padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18); text-align: center;
+}
+.modal-title { font-size: var(--fs-h3); font-weight: 800; margin-bottom: 10px; }
+.modal-desc { font-size: var(--fs-body); color: var(--color-muted); margin-bottom: 20px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 12px; border-radius: var(--radius-sm); font-weight: 700; border: none; }
+.btn-cancel { background: var(--color-sub-bg); color: #555; }
+.btn-confirm { background: var(--color-danger); color: var(--color-white); }
+
+/* ---------- 삭제 컨펌 모달 ---------- */
+
+/* ---------- 7. 공통 버튼 ---------- */
+.btn, .detail-btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 15px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: var(--fs-body);
+  transition: background .15s, transform .15s;
+}
+.btn-primary, .detail-btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  width: 100%;
+  display: block;
+  margin-top: 16px;
+}
+.btn-primary:hover, .detail-btn:hover { background: #0087dc; }
+.btn-secondary {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  color: #52616A;
+}
+.btn-secondary:hover { background: #f8fafc; }
+.btn-danger { background: var(--color-danger); color: var(--color-white); }
+
+.small-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #52616A;
+}
+.small-btn.danger { border-color: var(--color-danger-bg); color: var(--color-danger); }
+/* ---------- 7. 공통 버튼 ---------- */
+
+/* 타이포그래피 클래스 (typography) */
+
+.title { font-size: var(--fs-h2); font-weight: var(--fw-h2); } /* 탭 타이틀, 콘텐츠 타이틀 */
+.subtitle { font-size: var(--fs-h3); font-weight: var(--fw-h3); } /* 콘텐츠 내부 타이틀 */
+.desc { font-size: var(--fs-small); font-weight: var(--fw-body); } /* 콘텐츠 내부 작은 글씨 */
