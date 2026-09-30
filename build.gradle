@@ -29,9 +29,22 @@ dependencies {
   implementation('org.glassfish.jaxb:jaxb-runtime:4.0.9')
   implementation('org.hibernate.validator:hibernate-validator:8.0.5.Final')
 
+  // ---- [인증/온보딩] 추가 ----
+  runtimeOnly('com.mysql:mysql-connector-j:8.4.0')                          // MySQL 드라이버
+  implementation('com.zaxxer:HikariCP:5.1.0')                                // 커넥션 풀
+  implementation('org.mindrot:jbcrypt:0.4')                                  // 비밀번호 BCrypt 해시
+  implementation('com.fasterxml.jackson.core:jackson-databind:2.17.2')       // AJAX JSON 응답, OAuth 응답 파싱
+  implementation('jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0') // JSTL 3.0 (Tomcat 10.1 용)
+  implementation('org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1')
+  runtimeOnly('org.slf4j:slf4j-simple:2.0.13')                               // HikariCP 로그 출력
+  // ---- [인증/온보딩] 끝 ----
+
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
 
 test {
-useJUnitPlatform()}
+  useJUnitPlatform()
+  // 통합 테스트용 DB 정보 전달: gradlew test -Dit.db.url=... -Dit.db.username=... -Dit.db.password=...
+  systemProperties System.getProperties().findAll { it.key.toString().startsWith('it.') }
+}
