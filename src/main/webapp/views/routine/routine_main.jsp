@@ -1,16 +1,18 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: dita_810
-  Date: 26. 9. 30.
-  Time: 오후 2:31
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-  <head>
-    <title>Title</title>
-  </head>
-  <body>
-  
-  </body>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상새 - 루틴</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/views/style-jsp.css">
+</head>
+<body>
+    <!-- 공통 헤더 불러오기 -->
+    <%@ include file="/views/common/header.jsp" %>
+    <div style="padding: 40px; text-align: center;">
+        <h2>환영합니다! 상새 대시보드 (테스트)입니다.</h2>
+        <p>상단 헤더가 정상적으로 출력되는지 확인해보세요.</p>
+    </div>
+</body>
 </html>

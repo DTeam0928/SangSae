@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상새 - 메인</title>
+    <title>test</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/views/style-jsp.css">
 </head>
 <body>
