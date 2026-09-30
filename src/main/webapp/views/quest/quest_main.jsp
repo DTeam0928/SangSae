@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QUESTRIP - 퀘스트</title>
+    <title>상새 - 퀘스트</title>
 
     <!-- 공통 CSS 로드 -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style-jsp.css">
