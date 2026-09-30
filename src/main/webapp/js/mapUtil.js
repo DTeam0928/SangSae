@@ -76,7 +76,7 @@ const MapUtil = (function () {
                     alert('현재 위치 정보를 가져올 수 없습니다. 브라우저 위치 권한을 확인하세요.');
                 }
             },
-            // 사유: 퀘스트 위치 인증 시 캐시된 좌표 재사용으로 인한 위치 스푸핑/부정 인증을 방지하기 위해 maximumAge: 0 및 고정밀 GPS 강제.
+            // 퀘스트 위치 인증 시 캐시된 좌표 재사용으로 인한 위치 스푸핑/부정 인증을 방지하기 위해 maximumAge: 0 및 고정밀 GPS 강제.
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
     }
@@ -180,6 +180,28 @@ const MapUtil = (function () {
         return searchPlaces({ type, query });
     }
 
+    // 프론트에서 장소 선택 확정 시 백엔드 DB(places)에 Get-or-Create 저장하고 발급된 placeId를 즉시 획득.
+    async function selectPlace(placeDto) {
+        if (!placeDto) {
+            throw new Error('선택할 장소 정보가 없습니다.');
+        }
+
+        const response = await fetch('/api/place/select', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: JSON.stringify(placeDto)
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => null);
+            throw new Error((err && err.message) || `장소 저장 실패 (HTTP ${response.status})`);
+        }
+
+        return await response.json();
+    }
+
     function renderPlaceMarkers(map, placeList = [], options = {}) {
         if (!map) return [];
 
@@ -252,7 +274,7 @@ const MapUtil = (function () {
 
             const selectBtn = infoContent.querySelector('.btn-select-place');
             selectBtn.addEventListener('click', function (e) {
-                // 사유: 장소 선택 버튼 클릭 시 부모 지도 레이어로 클릭 이벤트가 전파되어 인포윈도우가 닫히거나 지도가 클릭되는 현상 방지.
+                // 장소 선택 버튼 클릭 시 부모 지도 레이어로 클릭 이벤트가 전파되어 인포윈도우가 닫히거나 지도가 클릭되는 현상 방지.
                 e.stopPropagation();
                 if (typeof options.onSelect === 'function') {
                     options.onSelect(place);
@@ -317,6 +339,7 @@ const MapUtil = (function () {
         calculateDistance: calculateDistance,
         searchPlaces: searchPlaces,
         searchViaServer: searchViaServer,
+        selectPlace: selectPlace,
         renderPlaceMarkers: renderPlaceMarkers,
         clearMarkers: clearMarkers
     };

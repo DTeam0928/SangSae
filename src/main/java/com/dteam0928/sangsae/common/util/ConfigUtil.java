@@ -46,7 +46,7 @@ public final class ConfigUtil {
         candidates.add(new File("C:/Dev/Sangsae/.env"));
         candidates.add(new File("C:\\Dev\\Sangsae\\.env"));
 
-        // 사유: Tomcat 배포 구동 시 user.dir이 프로젝트 루트가 아닌 CATALINA_BASE/bin을 가리키므로,
+        // Tomcat 배포 구동 시 user.dir이 프로젝트 루트가 아닌 CATALINA_BASE/bin을 가리키므로,
         // 로컬 실행 및 다양한 배포 환경에서 프로젝트 루트 .env를 정상 감지하기 위해 상위 디렉터리 역추적 탐색 수행.
         String userDir = System.getProperty("user.dir");
         if (userDir != null) {
@@ -99,7 +99,7 @@ public final class ConfigUtil {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 
-                // 사유: Windows 텍스트 에디터(메모장 등)가 파일 선두에 UTF-8 BOM(\uFEFF)을 삽입하여 첫 번째 키 매칭이 실패하는 현상 방지.
+                // Windows 텍스트 에디터(메모장 등)가 파일 선두에 UTF-8 BOM(\uFEFF)을 삽입하여 첫 번째 키 매칭이 실패하는 현상 방지.
                 if (line.startsWith("\uFEFF")) {
                     line = line.substring(1).trim();
                 }

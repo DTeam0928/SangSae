@@ -192,6 +192,7 @@ erDiagram
         varchar content "Task 내용"
         time default_time "권장 시간"
         varchar category "세부 카테고리"
+        int reward_xp "완료 시 획득 XP"
         int sort_order
     }
 
@@ -215,6 +216,7 @@ erDiagram
         varchar category "카테고리"
         varchar repeat_type "DAILY/WEEKDAY/WEEKEND/CUSTOM"
         time alert_time "알림 시간"
+        int reward_xp "완료 시 획득할 XP"
         varchar memo
         boolean is_active
     }
@@ -232,6 +234,7 @@ erDiagram
         date log_date "IDX_user_log_date (2)"
         time completed_at
         point authenticated_location "인증 GPS (Nullable)"
+        int earned_xp "적립된 XP"
         boolean is_success "성공 여부"
     }
 
@@ -441,6 +444,7 @@ erDiagram
 | `content`             | VARCHAR(150) |    NO    |  -  |       -        | 세부 Task 내용 (예: '물 500ml 마시기', '조깅 30분') |
 | `default_time`        | TIME         |    NO    |  -  |   '07:00:00'   | 권장 실천 시간                                      |
 | `category`            | VARCHAR(50)  |    NO    |  -  |       -        | 세부 카테고리                                       |
+| `reward_xp`           | INT          |    NO    |  -  |       10       | Task 완료 시 획득 XP                                |
 | `sort_order`          | SMALLINT     |    NO    |  -  |       1        | 패키지 내 순서                                      |
 
 #### 12. `user_routines` (내 활성 루틴 패키지 - Fork 인스턴스)
@@ -473,6 +477,7 @@ erDiagram
 | `category`                | VARCHAR(50)  |    NO    |  -  |         -         | 카테고리 (`운동`, `자기계발`, `건강`, `공부`)               |
 | `repeat_type`             | VARCHAR(20)  |    NO    |  -  |      'DAILY'      | 반복 유형 (`DAILY`, `WEEKDAY`, `WEEKEND`, `CUSTOM`, `ONCE`) |
 | `alert_time`              | TIME         |   YES    |  -  |       NULL        | 푸시 알림 희망 시간                                         |
+| `reward_xp`               | INT          |    NO    |  -  |        10         | Task 완료 시 획득할 XP                                      |
 | `memo`                    | VARCHAR(255) |   YES    |  -  |       NULL        | 개인 메모                                                   |
 | `is_active`               | BOOLEAN      |    NO    |  -  |       TRUE        | 활성 여부                                                   |
 | `created_at`              | DATETIME     |    NO    |  -  | CURRENT_TIMESTAMP | 생성 일시                                                   |
@@ -503,6 +508,7 @@ erDiagram
 | `log_date`               | DATE        |    NO    |  -  |       -        | 실천 일자 (연속 달성일 산출 기준)                |
 | `completed_at`           | TIME        |    NO    |  -  |       -        | 완료 처리 시각                                   |
 | `authenticated_location` | POINT       |   YES    |  -  |      NULL      | 인증 시점의 사용자 GPS 좌표 (GPS 루틴일 때 기록) |
+| `earned_xp`              | INT         |    NO    |  -  |       10       | 실천 완료 시 적립된 XP (중복 적립 방지 원장)     |
 | `is_success`             | BOOLEAN     |    NO    |  -  |      TRUE      | 성공 여부                                        |
 
 #### 16. `quest_logs` (퀘스트 완료 및 인증 원장)
@@ -530,16 +536,16 @@ erDiagram
 * **목적**: 3NF 원칙을 지키면서 `H-00` 홈 대시보드 카드의 5대 지표를 실시간 계산 제공
 * **원천 테이블**: `trips`, `user_quests`, `user_routines`, `user_routine_tasks`, `routine_task_logs`, `quest_logs`
 
-| 출력 필드명             | 데이터 타입 | 설명 / 산출 수식                                                         |
-|:------------------------|:------------|:-------------------------------------------------------------------------|
-| `user_id`               | BIGINT      | 사용자 식별자                                                            |
-| `ongoing_trip_count`    | INT         | 현재 진행 중인 여행 수 (`status = 'ONGOING'`)                            |
-| `active_routine_count`  | INT         | 활성 루틴 패키지 수 (`is_active = TRUE`)                                 |
-| `completed_quest_count` | INT         | 달성한 퀘스트 총 개수 (`quest_logs` 기반 `COUNT`)                        |
-| `remaining_quest_count` | INT         | 예정된 남은 퀘스트 수 (`user_quests`의 `status = 'TODO'`)                |
-| `today_done_tasks`      | INT         | 오늘 완료한 루틴 할 일 수 (`routine_task_logs`의 `log_date = CURDATE()`) |
-| `today_remaining_tasks` | INT         | 오늘 남은 루틴 할 일 수 (오늘 예정 Task 수 - 완료 수)                    |
-| `total_earned_xp`       | INT         | 총 누적 획득 XP (`quest_logs.earned_xp`의 `SUM`)                         |
+| 출력 필드명             | 데이터 타입 | 설명 / 산출 수식                                                                         |
+|:------------------------|:------------|:-----------------------------------------------------------------------------------------|
+| `user_id`               | BIGINT      | 사용자 식별자                                                                            |
+| `ongoing_trip_count`    | INT         | 현재 진행 중인 여행 수 (`status = 'ONGOING'`)                                            |
+| `active_routine_count`  | INT         | 활성 루틴 패키지 수 (`is_active = TRUE`)                                                 |
+| `completed_quest_count` | INT         | 달성한 퀘스트 총 개수 (`quest_logs` 기반 `COUNT`)                                        |
+| `remaining_quest_count` | INT         | 예정된 남은 퀘스트 수 (`user_quests`의 `status = 'TODO'`)                                |
+| `today_done_tasks`      | INT         | 오늘 완료한 루틴 할 일 수 (`routine_task_logs`의 `log_date = CURDATE()`)                 |
+| `today_remaining_tasks` | INT         | 오늘 남은 루틴 할 일 수 (오늘 예정 Task 수 - 완료 수)                                    |
+| `total_earned_xp`       | INT         | 총 누적 획득 XP (`quest_logs.earned_xp`의 `SUM` + `routine_task_logs.earned_xp`의 `SUM`) |
 
 #### 18. `user_daily_aggregates` (일일/누적 요약 집계 테이블)
 * **테이블 유형**: 집계/요약 테이블
