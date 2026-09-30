@@ -39,8 +39,9 @@ dependencies {
   runtimeOnly('org.slf4j:slf4j-simple:2.0.13')                               // HikariCP 로그 출력
   // ---- [인증/온보딩] 끝 ----
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+  testImplementation(platform("org.junit:junit-bom:${junitVersion}"))   // JUnit 부품 버전을 한 번에 맞춤
+  testImplementation('org.junit.jupiter:junit-jupiter')
+  testRuntimeOnly('org.junit.platform:junit-platform-launcher')        // 테스트 실행기도 같은 버전으로
 }
 
 test {
