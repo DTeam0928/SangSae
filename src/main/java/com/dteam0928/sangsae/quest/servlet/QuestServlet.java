@@ -14,15 +14,13 @@ import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
 
+//공개 퀘스트를 조회, 상세조회, 일정에 등록
+//QuestTemplate 조회, UserQuest에 등록
 @WebServlet("/quests")
 public class QuestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private final QuestService questService = new QuestService();
-       
-    public QuestServlet() {
-        super();
-    }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -37,6 +35,7 @@ public class QuestServlet extends HttpServlet {
 		    List<UserQuest> userQuests = questService.getUserQuests();
 		    request.setAttribute("quest", quest);
 		    request.setAttribute("userQuests", userQuests);
+		    //경로는 추후 통합되고 나면 수정
 		    request.getRequestDispatcher("/views/quest/detail.jsp").forward(request, response);
 		    return;
 		}
@@ -48,6 +47,7 @@ public class QuestServlet extends HttpServlet {
 			quests = questService.getPublicQuestsByCategory(category);
 		}
 		request.setAttribute("quests", quests);
+		//경로는 추후 통합되고 나면 수정
 		request.getRequestDispatcher("/views/quest/list.jsp").forward(request, response);
 	}
 	
@@ -57,7 +57,10 @@ public class QuestServlet extends HttpServlet {
 	    request.setCharacterEncoding("UTF-8");
 	    Long templateId = Long.parseLong(request.getParameter("templateId"));
 	    Long userId = Long.parseLong(request.getParameter("userId"));
-	    Long tripId = Long.parseLong(request.getParameter("tripId"));
+	    String tripIdParam = request.getParameter("tripId");
+	    Long tripId = (tripIdParam == null || tripIdParam.isBlank())
+	            ? null
+	            : Long.parseLong(tripIdParam);
 	    LocalDate scheduledDate = LocalDate.parse(request.getParameter("scheduledDate"));
 	    String targetTimeParam = request.getParameter("targetTime");
 	    LocalTime targetTime = null;

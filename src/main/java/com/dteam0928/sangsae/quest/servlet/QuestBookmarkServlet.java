@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+//퀘스트 북마크 관리
+//UserQuestBookmark를 추가, 삭제, 조회
 @WebServlet("/quest-bookmarks")
 public class QuestBookmarkServlet extends HttpServlet {
 
