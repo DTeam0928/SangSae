@@ -3,6 +3,7 @@ package com.dteam0928.sangsae.quest.repository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 
@@ -27,7 +28,7 @@ public class UserQuestRepository {
 
         return userQuests.stream()
                 .filter(quest -> quest.getUserId().equals(userId))
-                .filter(quest -> quest.getTripId().equals(tripId))
+                .filter(quest -> Objects.equals(quest.getTripId(), tripId))
                 .filter(quest -> quest.getScheduledDate().equals(scheduledDate))
                 .toList();
     }

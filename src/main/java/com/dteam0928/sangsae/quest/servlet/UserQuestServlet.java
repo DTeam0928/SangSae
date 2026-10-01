@@ -12,20 +12,21 @@ import java.util.List;
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
 
+//사용자가 공개 퀘스트에서 등록한 퀘스트들을 조회
+//UserQuest 조회
 @WebServlet("/user-quests")
 public class UserQuestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final QuestService questService = new QuestService();
 
-    public UserQuestServlet() {
-        super();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Long userId = Long.parseLong(request.getParameter("userId"));
-        Long tripId = Long.parseLong(request.getParameter("tripId"));
+        String tripIdParam = request.getParameter("tripId");
+        Long tripId = (tripIdParam == null || tripIdParam.isBlank())
+                ? null
+                : Long.parseLong(tripIdParam);
         LocalDate scheduledDate = LocalDate.parse(request.getParameter("date"));
         List<UserQuest> userQuests = questService.getUserQuestsByDate(
                         userId,
@@ -33,6 +34,7 @@ public class UserQuestServlet extends HttpServlet {
                         scheduledDate
                 );
         request.setAttribute("userQuests", userQuests);
+        //추후 통합되면 경로 바꾸기
         request.getRequestDispatcher("/views/quest/user-quest-list.jsp").forward(request, response);
     }
 }
