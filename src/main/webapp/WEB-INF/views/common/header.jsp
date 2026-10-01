@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/common/head.jsp" %>
 <header class="header">
     <a href="${pageContext.request.contextPath}/" class="logo">
-        <img src="${pageContext.request.contextPath}/resources/css/logo.png" alt="상새 로고">상새
+        <img src="${pageContext.request.contextPath}/resources/css/logo.png" alt="로고">상새
     </a>
     <nav class="nav">
         <a href="${pageContext.request.contextPath}/WEB-INF/views/home/home_main.jsp" id="nav-home">홈</a>
