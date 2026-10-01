@@ -134,7 +134,7 @@
 <div class="profile-container">
     <div class="step-indicator">Step 1 of 2</div>
     <div class="title">프로필 및 관심사 설정</div>
-    <div class="desc">QUESTRIP에서 사용할 닉네임과 선호하는 여행/습관 테마를 선택해주세요.</div>
+    <div class="desc">상새에서 사용할 닉네임과 선호하는 여행/습관 테마를 선택해주세요.</div>
 
     <!-- 닉네임 설정 영역 -->
     <div class="form-group">
@@ -156,12 +156,12 @@
             <div class="interest-chip" onclick="toggleChip(this)">#문화/예술</div>
             <div class="interest-chip" onclick="toggleChip(this)">#힐링/자연</div>
         </div>
-        <div class="error-msg" id="chip-error">최대 5개까지 선택할 수 있어요.</div>
+        <div class="error-msg" id="chip-error">최소 1개의 관심사를 선택해주세요.</div>
+        <div class="error-msg" id="chip-error2">최대 5개까지 선택할 수 있어요.</div>
     </div>
 
     <!-- 하단 액션 버튼 -->
     <div class="btn-group">
-        <button type="button" class="btn btn-skip" onclick="navigateToStep(4)">건너뛰기</button>
         <button type="button" class="btn btn-primary" onclick="handleSubmitProfile()">다음</button>
     </div>
 </div>
@@ -169,14 +169,14 @@
 <script>
     function toggleChip(element) {
         const selectedChips = document.querySelectorAll('.interest-chip.selected');
-        const chipError = document.getElementById('chip-error');
+        const chipError2 = document.getElementById('chip-error2');
 
         if (element.classList.contains('selected')) {
             element.classList.remove('selected');
             chipError.style.display = 'none';
         } else {
             if (selectedChips.length >= 5) {
-                chipError.style.display = 'block';
+                chipError2.style.display = 'block';
                 return;
             }
             element.classList.add('selected');
@@ -195,6 +195,7 @@
     function handleSubmitProfile() {
         const nicknameInput = document.getElementById('nickname');
         const nicknameError = document.getElementById('nickname-error');
+        const chipError = document.getElementById('chip-error');
         const trimmedVal = nicknameInput.value.trim();
 
         if (trimmedVal.length === 0 || trimmedVal.length > 15) {
@@ -203,6 +204,10 @@
             return;
         } else {
             nicknameError.style.display = 'none';
+        }
+
+        if (selectedChips.length < 0) {
+            chipError.style.display = 'none';
         }
 
         navigateToStep(4);
