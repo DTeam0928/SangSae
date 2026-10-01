@@ -55,13 +55,29 @@ public class QuestService {
     }
     
     //공개 퀘스트를 사용자의 일정에 담기
-    public UserQuest addQuestToSchedule(Long templateId, Long userId, Long tripId, LocalDate scheduledDate, LocalTime targetTime) {
+    public UserQuest addQuestToSchedule(
+    		Long templateId, 
+    		Long userId, 
+    		Long tripId, 
+    		LocalDate scheduledDate, 
+    		LocalTime targetTime,
+    		Integer authRadiusM) {
         //1. 원본 퀘스트 조회
         QuestTemplate template = getQuestById(templateId);
         if (template == null)
             return null;
-        
-        //2. 원본 퀘스트를 기반으로 사용자 퀘스트 생성
+        //2. LOCATION 인증 퀘스트일 경우 인증 반경 검사
+        if ("LOCATION".equals(template.getAuthType())) {
+            if (authRadiusM == null || authRadiusM < 100 || authRadiusM > 1000) {
+                throw new IllegalArgumentException(
+                        "위치 인증 반경은 100m 이상 1000m 이하로 설정해야 합니다."
+                );
+            }
+        } else {
+            // 위치 인증이 아니면 인증 반경을 사용하지 않음
+            authRadiusM = null;
+        }
+        //3. 원본 퀘스트를 기반으로 사용자 퀘스트 생성
         UserQuest userQuest = new UserQuest(
                 null,
                 userId,
@@ -76,9 +92,10 @@ public class QuestService {
                 template.getRewardXp(),
                 null,
                 LocalDateTime.now(),
-                null
+                null,
+                authRadiusM
         );
-        //3. 사용자의 일정에 저장
+        //4. 사용자의 일정에 저장
         return userQuestRepository.save(userQuest);
     }
     
@@ -112,6 +129,7 @@ public class QuestService {
                 userQuest.getId(),
                 completedAt,
                 userQuest.getAuthType(),
+                null,
                 proofImageUrl,
                 proofText,
                 userQuest.getRewardXp()

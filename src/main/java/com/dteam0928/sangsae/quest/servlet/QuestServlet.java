@@ -63,12 +63,17 @@ public class QuestServlet extends HttpServlet {
 	    LocalTime targetTime = null;
 	    if (targetTimeParam != null && !targetTimeParam.isBlank())
 	        targetTime = LocalTime.parse(targetTimeParam);
+	    String authRadiusMParam = request.getParameter("authRadiusM");
+	    Integer authRadiusM = null;
+	    if (authRadiusMParam != null && !authRadiusMParam.isBlank())
+	        authRadiusM = Integer.parseInt(authRadiusMParam);
 	    UserQuest userQuest = questService.addQuestToSchedule(
 	            templateId,
 	            userId,
 	            tripId,
 	            scheduledDate,
-	            targetTime
+	            targetTime,
+	            authRadiusM
 	    );
 	    if (userQuest == null) {
 	        response.sendError(HttpServletResponse.SC_NOT_FOUND);
