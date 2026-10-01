@@ -2,133 +2,21 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>일상을 새롭게, 상새 - 종합 대시보드</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일상을 새롭게, 상새 - 종합 대시보드</title>
 
-<!-- 공통 디자인 시스템 CSS -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/style-jsp.css">
+    <!-- 공통 및 홈 전용 CSS 연결 -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-jsp.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/home.css">
 
-<style>
-/* =========================================================
-   H-00 대시보드 페이지 전용 스타일
-   ========================================================= */
-
-body {
-    background-color: var(--color-bg);
-}
-
-/* 대시보드 2x2 그리드 */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 24px;
-}
-
-.extra-section {
-    margin-top: 36px;
-}
-
-/* 여행 및 루틴 리스트 컨테이너 */
-.list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-/* 개별 아이템 행 */
-.item-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--color-sub-bg);
-    padding: 10px 12px;
-    border-radius: 10px;
-}
-
-.item-left-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.item-number {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--color-muted);
-}
-
-.item-subtext {
-    margin-top: 2px;
-}
-
-.item-btn-group {
-    display: flex;
-    gap: 4px;
-}
-
-/* 셀렉트 형태의 커스텀 뱃지 */
-.select-badge {
-    border: none;
-    background: transparent;
-}
-
-/* 카드 내부 플렉스 레이아웃 (추천 퀘스트/커뮤니티 카드) */
-.card-flex-col {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
-
-.card-header-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.card-title-gap {
-    margin-bottom: 6px;
-}
-
-/* 통계 위젯 상세 스타일 */
-.stat-divider {
-    border-left: 1px solid var(--color-border);
-    padding-left: 20px;
-}
-
-.stat-num-accent {
-    color: var(--color-accent);
-}
-
-.text-accent-bold {
-    color: var(--color-accent);
-    font-weight: 800;
-}
-
-/* 버튼 전용 컬러 커스텀 */
-.btn-community {
-    background: #4A5568;
-}
-.btn-community:hover {
-    background: #374151;
-}
-
-/* 반응형 설정 */
-@media (max-width: 760px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+    <!-- 홈 전용 JS 연결 (DOM 로드 후 실행) -->
+    <script src="${pageContext.request.contextPath}/resources/js/home.js" defer></script>
 </head>
 <body>
 
-    <!-- 공통 헤더 포함 -->
-    <%@ include file="/views/common/header.jsp" %>
+<!-- 공통 헤더 부품 포함 -->
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <main class="container">
     <div class="section-title">
@@ -148,7 +36,7 @@ body {
                     </select>
                 </div>
 
-                <!-- 여행 목록 또는 Empty 상태 -->
+                <!-- 여행 목록 컨테이너 -->
                 <div id="trip-content" class="list-container">
                     <div class="item-row">
                         <div class="item-left-group">
@@ -159,7 +47,6 @@ body {
                             </div>
                         </div>
                         <div class="item-btn-group">
-                            <!-- Q-00 여행 관리 탭으로 이동 -->
                             <button type="button" class="small-btn" onclick="location.href='${pageContext.request.contextPath}/quest/quest_main.jsp#management'">수정</button>
                             <button type="button" class="small-btn danger" onclick="openDeleteModal('여행', '부산 여행')">삭제</button>
                         </div>
@@ -180,7 +67,7 @@ body {
                     </select>
                 </div>
 
-                <!-- 루틴 목록 또는 Empty 상태 -->
+                <!-- 루틴 목록 컨테이너 -->
                 <div id="routine-content" class="list-container">
                     <div class="item-row">
                         <div class="item-left-group">
@@ -191,7 +78,6 @@ body {
                             </div>
                         </div>
                         <div class="item-btn-group">
-                            <!-- R-00 루틴 관리 탭으로 이동 -->
                             <button type="button" class="small-btn" onclick="location.href='${pageContext.request.contextPath}/routine/routine_main.jsp#manage'">수정</button>
                             <button type="button" class="small-btn danger" onclick="openDeleteModal('루틴', '갓생 살기 루틴')">삭제</button>
                         </div>
@@ -236,7 +122,7 @@ body {
         </div>
     </div>
 
-    <!-- 추가 섹션: 오늘의 추천 퀘스트 및 커뮤니티 하이라이트 -->
+    <!-- 5. 하단 퀘스트 & 소식 추천 섹션 -->
     <div class="extra-section">
         <div class="section-title"><span>🌟 오늘의 추천 퀘스트 & 소식</span></div>
         <div class="dashboard-grid">
@@ -278,40 +164,6 @@ body {
         </div>
     </div>
 </div>
-
-<script>
-    var currentTargetType = '';
-
-    function openDeleteModal(type, name) {
-        currentTargetType = type;
-        document.getElementById('modalTitle').innerText = type + ' 삭제';
-        document.getElementById('modalDesc').innerText = '"' + name + '" ' + type + '을(를) 정말 삭제하시겠습니까? 관련 데이터가 모두 제거됩니다.';
-        document.getElementById('deleteModal').classList.add('show');
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.remove('show');
-    }
-
-    function confirmDelete() {
-        alert(currentTargetType + '이(가) 성공적으로 삭제되었습니다.');
-        closeDeleteModal();
-    }
-
-    var isEmpty = false;
-    function toggleEmptyState() {
-        isEmpty = !isEmpty;
-        var tripContent = document.getElementById('trip-content');
-        var routineContent = document.getElementById('routine-content');
-
-        if (isEmpty) {
-            tripContent.innerHTML = '<div class="empty-state">등록된 여행이 없습니다.<br>첫 여행을 만들어보세요!</div>';
-            routineContent.innerHTML = '<div class="empty-state">활성 루틴이 없습니다.<br>새 루틴을 추가해보세요!</div>';
-        } else {
-            location.reload();
-        }
-    }
-</script>
 
 </body>
 </html>
