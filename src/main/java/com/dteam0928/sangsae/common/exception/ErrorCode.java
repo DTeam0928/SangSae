@@ -3,11 +3,10 @@ package com.dteam0928.sangsae.common.exception;
 /**
  * 비즈니스 오류 목록.
  *
- * <ul>
- *   <li>status  : AJAX 응답 시 HTTP 상태코드</li>
- *   <li>field   : 화면에서 인라인 에러를 붙일 입력 필드 이름 (null 이면 폼 전체 에러)</li>
- *   <li>message : 사용자 안내 문구. {0}, {1} 자리에 인자가 들어간다</li>
- * </ul>
+ *   status  : AJAX 응답 시 HTTP 상태코드
+ *   field   : 화면에서 인라인 에러를 붙일 입력 필드 이름 (null 이면 폼 전체 에러)</li>
+ *   message : 사용자 안내 문구. {0}, {1} 자리에 인자가 들어간다
+ * 
  * 문구를 바꾸고 싶으면 이 파일만 고치면 된다.
  */
 public enum ErrorCode {
@@ -43,9 +42,10 @@ public enum ErrorCode {
     OAUTH_EMAIL_DUPLICATED(409, null, "이미 가입된 이메일입니다. {0}(으)로 로그인해 주세요."),
 
     // 온보딩
-    NICKNAME_REQUIRED(400, "nickname", "닉네임을 입력해 주세요."),
+    NICKNAME_REQUIRED(400, "nickname", "필수 입력 항목입니다."),
     NICKNAME_LENGTH(400, "nickname", "닉네임은 {0}~{1}자로 입력해 주세요."),
     NICKNAME_DUPLICATED(409, "nickname", "이미 사용 중인 닉네임입니다."),
+    INTEREST_REQUIRED(400, "interests", "최소 1개 이상 선택해주세요."),
     INTEREST_LIMIT(400, "interests", "관심사는 최대 {0}개까지 선택할 수 있습니다."),
     INTEREST_INVALID(400, "interests", "선택할 수 없는 관심사가 포함되어 있습니다."),
     LOCATION_INVALID(400, "location", "위치 정보가 올바르지 않습니다.");

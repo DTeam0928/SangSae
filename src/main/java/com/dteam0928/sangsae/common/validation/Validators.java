@@ -31,7 +31,8 @@ public final class Validators {
     public static final int NICKNAME_MIN_LENGTH = 1;
     public static final int NICKNAME_MAX_LENGTH = 30;
 
-    // ---- 관심사 (화면설계 O-02: 0~5개) ----
+    // ---- 관심사 (화면설계 O-02: 1~5개) ----
+    public static final int INTEREST_MIN_COUNT = 1;
     public static final int INTEREST_MAX_COUNT = 5;
 
     /** 이메일 형식 검사 후 소문자로 정규화 */
