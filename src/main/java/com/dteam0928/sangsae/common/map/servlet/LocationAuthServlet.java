@@ -30,7 +30,7 @@ public class LocationAuthServlet extends HttpServlet {
 
     public LocationAuthServlet(LocationAuthService locationAuthService) {
         this.locationAuthService = locationAuthService;
-        this.gson = new GsonBuilder().disableHtmlEscaping().create();
+        this.gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class LocationAuthServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         processVerification(request, response);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         processVerification(request, response);
     }
 
@@ -56,7 +56,7 @@ public class LocationAuthServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         Map<String, Object> jsonResponse = new HashMap<>();
-        jsonResponse.put("command", "VERIFY_LOCATION");
+        jsonResponse.put("api", "/api/map/verify-location");
 
         Long placeId = null;
         Double userLat = null;
@@ -76,7 +76,10 @@ public class LocationAuthServlet extends HttpServlet {
             String body = sb.toString();
             if (!body.isBlank()) {
                 try {
-                    JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+                    JsonObject rootJson = JsonParser.parseString(body).getAsJsonObject();
+                    JsonObject json = (rootJson.has("data") && rootJson.get("data").isJsonObject())
+                            ? rootJson.getAsJsonObject("data")
+                            : rootJson;
                     if (json.has("placeId") && !json.get("placeId").isJsonNull()) {
                         placeId = json.get("placeId").getAsLong();
                     }
@@ -116,14 +119,24 @@ public class LocationAuthServlet extends HttpServlet {
             try { radius = Integer.parseInt(request.getParameter("radius")); } catch (NumberFormatException ignored) {}
         }
 
-        LocationAuthResult result = locationAuthService.verifyLocation(placeId, userLat, userLng, radius);
+        try {
+            LocationAuthResult result = locationAuthService.verifyLocation(placeId, userLat, userLng, radius);
 
-        response.setStatus(result.isSuccess() ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
-        jsonResponse.put("success", result.isSuccess());
-        jsonResponse.put("code", result.isSuccess() ? 200 : 400);
-        jsonResponse.put("status", result.status().name());
-        jsonResponse.put("message", result.message());
-        jsonResponse.put("data", result);
+            response.setStatus(result.isSuccess() ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
+            jsonResponse.put("success", result.isSuccess());
+            jsonResponse.put("code", result.isSuccess() ? 200 : 400);
+            jsonResponse.put("status", result.status().name());
+            jsonResponse.put("message", result.message());
+            jsonResponse.put("data", result);
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.put("success", false);
+            jsonResponse.put("code", 500);
+            jsonResponse.put("status", "INTERNAL_ERROR");
+            jsonResponse.put("message", "서버 내부 처리 오류: " + e.getMessage());
+            jsonResponse.put("data", null);
+        }
 
         try (PrintWriter out = response.getWriter()) {
             out.print(gson.toJson(jsonResponse));

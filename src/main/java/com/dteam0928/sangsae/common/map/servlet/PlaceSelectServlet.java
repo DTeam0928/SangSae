@@ -29,7 +29,7 @@ public class PlaceSelectServlet extends HttpServlet {
 
     public PlaceSelectServlet(PlaceService placeService) {
         this.placeService = placeService;
-        this.gson = new GsonBuilder().disableHtmlEscaping().create();
+        this.gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
     }
 
     @Override
@@ -41,12 +41,12 @@ public class PlaceSelectServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
         Map<String, Object> jsonResponse = new HashMap<>();
-        jsonResponse.put("command", "PLACE_SELECT");
+        jsonResponse.put("api", "/api/place/select");
 
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {

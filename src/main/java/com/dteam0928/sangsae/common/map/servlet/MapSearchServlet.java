@@ -28,7 +28,7 @@ public class MapSearchServlet extends HttpServlet {
 
     public MapSearchServlet(PlaceSearchService searchService) {
         this.searchService = searchService;
-        this.gson = new GsonBuilder().disableHtmlEscaping().create();
+        this.gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class MapSearchServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
@@ -55,13 +55,15 @@ public class MapSearchServlet extends HttpServlet {
         Integer searchRadius = parseIntegerOrNull(request.getParameter("radius"));
 
         Map<String, Object> jsonResponse = new HashMap<>();
+        jsonResponse.put("api", "/api/map/search");
 
         if (query == null || query.trim().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             jsonResponse.put("success", false);
+            jsonResponse.put("code", 400);
             jsonResponse.put("message", "검색어(query) 파라미터가 누락되었습니다.");
             jsonResponse.put("count", 0);
-            jsonResponse.put("data", List.of());
+            jsonResponse.put("data", null);
             writeJson(response, jsonResponse);
             return;
         }
@@ -74,16 +76,20 @@ public class MapSearchServlet extends HttpServlet {
                 places = searchService.searchPlaces(query, latitude, longitude, searchRadius);
             }
 
+            response.setStatus(HttpServletResponse.SC_OK);
             jsonResponse.put("success", true);
+            jsonResponse.put("code", 200);
+            jsonResponse.put("message", "장소 검색 완료");
             jsonResponse.put("count", places.size());
             jsonResponse.put("data", places);
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.put("success", false);
-            jsonResponse.put("message", e.getMessage());
+            jsonResponse.put("code", 500);
+            jsonResponse.put("message", "서버 내부 처리 오류: " + e.getMessage());
             jsonResponse.put("count", 0);
-            jsonResponse.put("data", List.of());
+            jsonResponse.put("data", null);
         }
 
         writeJson(response, jsonResponse);
