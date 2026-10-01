@@ -4,6 +4,10 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
   <persistence-unit name="default">
-
+	<!-- Quest Entity -->
+	<class>com.dteam0928.sangsae.quest.dto.QuestTemplate</class>
+	<class>com.dteam0928.sangsae.quest.dto.UserQuest</class>
+	<class>com.dteam0928.sangsae.quest.dto.QuestLog</class>
+	<class>com.dteam0928.sangsae.quest.dto.UserQuestBookmark</class>
   </persistence-unit>
 </persistence>
