@@ -10,7 +10,6 @@ import com.dteam0928.sangsae.user.model.User;
 import com.dteam0928.sangsae.user.model.UserProfile;
 import jakarta.persistence.EntityManager;
 
-import java.util.function.Supplier;
 
 /**
  * 이메일 가입과 소셜 가입이 함께 쓰는 계정 공통 로직.
@@ -20,8 +19,6 @@ public class UserAccountService {
 
     /** 기본 닉네임 후보를 뽑는 최대 횟수 (이미 쓰는 닉네임이면 다시 뽑음) */
     private static final int NICKNAME_MAX_ATTEMPTS = 10;
-    /** 동시에 같은 닉네임이 들어가 UNIQUE 에 걸렸을 때 가입 전체를 다시 시도하는 횟수 */
-    private static final int CREATE_RETRY = 3;
 
     private final UserDao userDao;
     private final UserProfileDao profileDao;
@@ -52,19 +49,6 @@ public class UserAccountService {
         throw new IllegalStateException("기본 닉네임 생성 실패: nickname.prefixes / nickname.digits 설정을 늘려 주세요.");
     }
 
-    /**
-     * 가입 트랜잭션을 감싸서, 드물게 다른 가입과 같은 기본 닉네임이 동시에 들어가 충돌하면 다시 시도한다.
-     * (JPA 는 flush 실패 후 같은 트랜잭션을 이어 쓸 수 없어서 트랜잭션 단위로 재시도)
-     */
-    public <T> T retryOnNicknameCollision(Supplier<T> signupTransaction) {
-        for (int attempt = 1; ; attempt++) {
-            try {
-                return signupTransaction.get();
-            } catch (DuplicateKeyException e) {
-                if (!e.isKey(UserProfileDao.UK_NICKNAME) || attempt >= CREATE_RETRY) throw e;
-            }
-        }
-    }
 
     /** 로그인 가능한 상태인지 확인 */
     public void assertLoginable(User user) {
