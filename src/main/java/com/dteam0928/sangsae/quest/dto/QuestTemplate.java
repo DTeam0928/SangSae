@@ -17,7 +17,7 @@ public class QuestTemplate {
 	@Column(name = "id")
 	private Long id;
 	
-	@Column(name = "creator_id", nullable = false)
+	@Column(name = "creator_id")
 	private Long creatorId;
 
 	@Column(name = "place_id")
@@ -50,6 +50,9 @@ public class QuestTemplate {
 	@Column(name = "bookmark_count", nullable = false)
 	private int bookmarkCount;
 
+	@Column(name = "completion_count", nullable = false)
+	private Integer completionCount;
+	
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 	
@@ -57,7 +60,7 @@ public class QuestTemplate {
 
 	public QuestTemplate(Long id, Long creatorId, Long placeId, String title, String description, String category,
 			int estimatedMinutes, int rewardXp, String authType, String visibility, String thumbnailUrl,
-			int bookmarkCount, LocalDateTime createdAt) {
+			int bookmarkCount, Integer completionCount, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.creatorId = creatorId;
@@ -71,6 +74,7 @@ public class QuestTemplate {
 		this.visibility = visibility;
 		this.thumbnailUrl = thumbnailUrl;
 		this.bookmarkCount = bookmarkCount;
+		this.completionCount = completionCount;
 		this.createdAt = createdAt;
 	}
 
@@ -168,6 +172,14 @@ public class QuestTemplate {
 
 	public void setBookmarkCount(int bookmarkCount) {
 		this.bookmarkCount = bookmarkCount;
+	}
+	
+	public Integer getCompletionCount() {
+		return completionCount;
+	}
+
+	public void setCompletionCount(Integer completionCount) {
+		this.completionCount = completionCount;
 	}
 
 	public LocalDateTime getCreatedAt() {

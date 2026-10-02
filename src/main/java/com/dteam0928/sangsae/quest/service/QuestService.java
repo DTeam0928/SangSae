@@ -200,7 +200,16 @@ public class QuestService {
         userQuest.setStatus("COMPLETED");
         userQuest.setCompletedAt(completedAt);
         
-        //7. 완료 로그 생성
+    	//7. 원본 퀘스트 완료 횟수 증가
+        Long originTemplateId = userQuest.getOriginTemplateId();
+        if (originTemplateId != null) {
+            QuestTemplate template = questRepository.findById(originTemplateId);
+            if (template != null) {
+                template.setCompletionCount(template.getCompletionCount() + 1);
+            }
+        }
+        
+        //8. 완료 로그 생성
         QuestLog questLog = new QuestLog(
                 null,
                 userId,
@@ -212,7 +221,8 @@ public class QuestService {
                 proofText,
                 userQuest.getRewardXp()
         );
-        //8. QuestLog 저장
+        
+        //9. QuestLog 저장
         return questLogRepository.save(questLog);
     }
     
