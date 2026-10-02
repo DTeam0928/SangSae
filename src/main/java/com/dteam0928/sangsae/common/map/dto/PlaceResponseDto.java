@@ -3,6 +3,7 @@ package com.dteam0928.sangsae.common.map.dto;
 import java.io.Serializable;
 
 public record PlaceResponseDto(
+    Long placeId,
     String kakaoPlaceId,
     String name,
     String roadAddress,
@@ -25,6 +26,7 @@ public record PlaceResponseDto(
     }
 
     public static class Builder {
+        private Long placeId;
         private String kakaoPlaceId;
         private String name;
         private String roadAddress;
@@ -90,6 +92,11 @@ public record PlaceResponseDto(
             return this;
         }
 
+        public Builder placeId(Long placeId) {
+            this.placeId = placeId;
+            return this;
+        }
+
         public Builder phone(String phone) {
             this.phone = phone;
             return this;
@@ -102,6 +109,7 @@ public record PlaceResponseDto(
 
         public PlaceResponseDto build() {
             return new PlaceResponseDto(
+                placeId,
                 kakaoPlaceId,
                 name,
                 roadAddress,

@@ -1,6 +1,7 @@
 package com.dteam0928.sangsae.common.map.service;
 
 import com.dteam0928.sangsae.common.map.client.KakaoLocalClient;
+import com.dteam0928.sangsae.common.map.dto.AddressResponseDto;
 import com.dteam0928.sangsae.common.map.dto.PlaceResponseDto;
 import com.dteam0928.sangsae.common.map.theme.SangsaeTheme;
 import com.google.gson.JsonArray;
@@ -169,6 +170,72 @@ public class PlaceSearchService {
         }
 
         return resultList;
+    }
+
+    public AddressResponseDto coordToAddress(double lat, double lng) {
+        if (lat < -90.0 || lat > 90.0 || lng < -180.0 || lng > 180.0) {
+            throw new IllegalArgumentException("유효하지 않은 위도/경도 좌표 범위입니다.");
+        }
+
+        try {
+            JsonObject json = kakaoClient.coordToAddress(lat, lng);
+            if (!json.has("documents")) {
+                return null;
+            }
+
+            JsonArray documents = json.getAsJsonArray("documents");
+            if (documents.isEmpty()) {
+                return null;
+            }
+
+            JsonObject doc = documents.get(0).getAsJsonObject();
+            String roadAddress = "";
+            String r1 = "";
+            String r2 = "";
+            String r3 = "";
+            String zoneNo = "";
+            String buildingName = "";
+
+            if (doc.has("road_address") && !doc.get("road_address").isJsonNull()) {
+                JsonObject roadObj = doc.getAsJsonObject("road_address");
+                roadAddress = getAsString(roadObj, "address_name");
+                r1 = getAsString(roadObj, "region_1depth_name");
+                r2 = getAsString(roadObj, "region_2depth_name");
+                r3 = getAsString(roadObj, "region_3depth_name");
+                zoneNo = getAsString(roadObj, "zone_no");
+                buildingName = getAsString(roadObj, "building_name");
+            }
+
+            String address = "";
+            if (doc.has("address") && !doc.get("address").isJsonNull()) {
+                JsonObject addrObj = doc.getAsJsonObject("address");
+                address = getAsString(addrObj, "address_name");
+                if (r1.isBlank()) r1 = getAsString(addrObj, "region_1depth_name");
+                if (r2.isBlank()) r2 = getAsString(addrObj, "region_2depth_name");
+                if (r3.isBlank()) r3 = getAsString(addrObj, "region_3depth_name");
+            }
+
+            if (r1.isBlank()) {
+                String[] parsed = parseAddressDepths(roadAddress, address);
+                r1 = parsed[0];
+                r2 = parsed[1];
+                r3 = parsed[2];
+            }
+
+            return AddressResponseDto.builder()
+                    .roadAddress(roadAddress)
+                    .address(address)
+                    .regions(r1, r2, r3)
+                    .zoneNo(zoneNo)
+                    .buildingName(buildingName)
+                    .coordinates(lat, lng)
+                    .build();
+
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("좌표 기반 주소 역변환 처리 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 
     private String[] parseAddressDepths(String roadAddress, String address) {

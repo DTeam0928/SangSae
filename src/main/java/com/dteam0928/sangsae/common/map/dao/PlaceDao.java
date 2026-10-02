@@ -44,6 +44,31 @@ public class PlaceDao {
         return null;
     }
 
+    public PlaceResponseDto findByKakaoPlaceId(String kakaoPlaceId) throws SQLException {
+        if (kakaoPlaceId == null || kakaoPlaceId.isBlank()) {
+            return null;
+        }
+        String sql = """
+            SELECT id, kakao_place_id, name, road_address,
+                   region_1depth_name, region_2depth_name, region_3depth_name,
+                   ST_Latitude(coordinates) AS lat, ST_Longitude(coordinates) AS lng,
+                   category
+            FROM places
+            WHERE kakao_place_id = ?
+        """;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, kakaoPlaceId.trim());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToDto(rs);
+                }
+            }
+        }
+        return null;
+    }
+
     public PlaceResponseDto findById(Long id) throws SQLException {
         // MySQL 8.0 SRID 4326 공간 좌표에서 ST_Latitude, ST_Longitude 함수로 위도/경도를 명시적 분리 추출.
         String sql = """
@@ -68,8 +93,12 @@ public class PlaceDao {
     }
 
     public List<PlaceResponseDto> findNearby(double lat, double lng, int radiusInMeters) throws SQLException {
-        // MySQL SPATIAL 인덱스를 활용하여 사용자 기준 반경 내 장소를 고속 탐색하는 구면 거리(ST_Distance_Sphere) 쿼리.
-        String sql = """
+        return findNearby(lat, lng, radiusInMeters, null);
+    }
+
+    public List<PlaceResponseDto> findNearby(double lat, double lng, int radiusInMeters, String category) throws SQLException {
+        boolean hasCategory = category != null && !category.isBlank();
+        StringBuilder sql = new StringBuilder("""
             SELECT id, kakao_place_id, name, road_address,
                    region_1depth_name, region_2depth_name, region_3depth_name,
                    ST_Latitude(coordinates) AS lat, ST_Longitude(coordinates) AS lng,
@@ -77,23 +106,31 @@ public class PlaceDao {
                    ROUND(ST_Distance_Sphere(coordinates, ST_GeomFromText(?, 4326))) AS distance_meters
             FROM places
             WHERE ST_Distance_Sphere(coordinates, ST_GeomFromText(?, 4326)) <= ?
-            ORDER BY distance_meters ASC
-        """;
+        """);
 
-        String pointWkt = String.format("POINT(%.6f %.6f)", lat, lng);
+        if (hasCategory) {
+            sql.append(" AND category = ?");
+        }
+        sql.append(" ORDER BY distance_meters ASC");
+
+        String pointWkt = String.format(java.util.Locale.US, "POINT(%.6f %.6f)", lat, lng);
         List<PlaceResponseDto> result = new ArrayList<>();
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
             pstmt.setString(1, pointWkt);
             pstmt.setString(2, pointWkt);
             pstmt.setInt(3, radiusInMeters);
+            if (hasCategory) {
+                pstmt.setString(4, category.trim());
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     PlaceResponseDto dto = mapRowToDto(rs);
                     int dist = rs.getInt("distance_meters");
                     result.add(PlaceResponseDto.builder()
+                        .placeId(dto.placeId())
                         .kakaoPlaceId(dto.kakaoPlaceId())
                         .name(dto.name())
                         .roadAddress(dto.roadAddress())
@@ -121,7 +158,7 @@ public class PlaceDao {
             ) VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 4326), ?)
         """;
 
-        String pointWkt = String.format("POINT(%.6f %.6f)", dto.latitude(), dto.longitude());
+        String pointWkt = String.format(java.util.Locale.US, "POINT(%.6f %.6f)", dto.latitude(), dto.longitude());
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -157,6 +194,7 @@ public class PlaceDao {
         }
 
         return PlaceResponseDto.builder()
+            .placeId(rs.getLong("id"))
             .kakaoPlaceId(rs.getString("kakao_place_id"))
             .name(rs.getString("name"))
             .roadAddress(rs.getString("road_address"))

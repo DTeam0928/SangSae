@@ -49,12 +49,32 @@ public class PlaceService {
         }
     }
 
-    public List<PlaceResponseDto> findNearbyPlaces(double lat, double lng, int radiusInMeters) {
-        int safeRadius = Math.min(Math.max(radiusInMeters, 100), 20000);
+    public PlaceResponseDto getPlaceByKakaoPlaceId(String kakaoPlaceId) {
+        if (kakaoPlaceId == null || kakaoPlaceId.isBlank()) {
+            return null;
+        }
+
         try {
-            return placeDao.findNearby(lat, lng, safeRadius);
+            return placeDao.findByKakaoPlaceId(kakaoPlaceId.trim());
+        } catch (SQLException e) {
+            throw new RuntimeException("카카오 장소 ID 기반 장소 단건 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    public List<PlaceResponseDto> findNearbyPlaces(double lat, double lng, Integer radiusInMeters, String category) {
+        if (lat < -90.0 || lat > 90.0 || lng < -180.0 || lng > 180.0) {
+            throw new IllegalArgumentException("유효하지 않은 위도/경도 좌표 범위입니다.");
+        }
+        int radius = (radiusInMeters != null) ? radiusInMeters : 3000;
+        int safeRadius = Math.min(Math.max(radius, 100), 20000);
+        try {
+            return placeDao.findNearby(lat, lng, safeRadius, category);
         } catch (SQLException e) {
             throw new RuntimeException("반경 내 장소 검색 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
+    }
+
+    public List<PlaceResponseDto> findNearbyPlaces(double lat, double lng, int radiusInMeters) {
+        return findNearbyPlaces(lat, lng, radiusInMeters, null);
     }
 }
