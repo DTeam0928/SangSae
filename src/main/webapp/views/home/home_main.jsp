@@ -5,268 +5,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<%!
-    /*
-     * 별도 JSON 라이브러리 없이 로컬 더미 JSON을 Map/List로 변환합니다.
-     * 데이터 로딩만 Java로 처리하고 HTML 출력은 JSTL로 처리합니다.
-     */
-    private static final class HomeJsonReader {
-        private final String source;
-        private int position;
-
-        HomeJsonReader(String source) {
-            this.source = source;
-        }
-
-        Object parse() {
-            Object result = readValue();
-            skipWhitespace();
-
-            if (position != source.length()) {
-                throw error("Unexpected trailing content");
-            }
-
-            return result;
-        }
-
-        private IllegalArgumentException error(String message) {
-            return new IllegalArgumentException(
-                    message + " at position " + position
-            );
-        }
-
-        private void skipWhitespace() {
-            while (position < source.length()) {
-                char ch = source.charAt(position);
-
-                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r') {
-                    break;
-                }
-
-                position++;
-            }
-        }
-
-        private boolean consume(char expected) {
-            skipWhitespace();
-
-            if (position < source.length()
-                    && source.charAt(position) == expected) {
-                position++;
-                return true;
-            }
-
-            return false;
-        }
-
-        private void expect(char expected) {
-            if (!consume(expected)) {
-                throw error("Expected " + expected);
-            }
-        }
-
-        private Object readValue() {
-            skipWhitespace();
-
-            if (position >= source.length()) {
-                throw error("Unexpected end");
-            }
-
-            char ch = source.charAt(position);
-
-            if (ch == '{') return readObject();
-            if (ch == '[') return readArray();
-            if (ch == '"') return readString();
-
-            if (source.startsWith("true", position)) {
-                position += 4;
-                return Boolean.TRUE;
-            }
-
-            if (source.startsWith("false", position)) {
-                position += 5;
-                return Boolean.FALSE;
-            }
-
-            if (source.startsWith("null", position)) {
-                position += 4;
-                return null;
-            }
-
-            return readNumber();
-        }
-
-        private Map<String, Object> readObject() {
-            expect('{');
-            Map<String, Object> result = new LinkedHashMap<>();
-
-            if (consume('}')) return result;
-
-            do {
-                String key = readString();
-                expect(':');
-
-                if (result.containsKey(key)) {
-                    throw error("Duplicate object key");
-                }
-
-                result.put(key, readValue());
-            } while (consume(','));
-
-            expect('}');
-            return result;
-        }
-
-        private List<Object> readArray() {
-            expect('[');
-            List<Object> result = new ArrayList<>();
-
-            if (consume(']')) return result;
-
-            do {
-                result.add(readValue());
-            } while (consume(','));
-
-            expect(']');
-            return result;
-        }
-
-        private String readString() {
-            expect('"');
-            StringBuilder result = new StringBuilder();
-
-            while (position < source.length()) {
-                char ch = source.charAt(position++);
-
-                if (ch == '"') return result.toString();
-
-                if (ch < 0x20) {
-                    throw error("Invalid control character");
-                }
-
-                if (ch != '\\') {
-                    result.append(ch);
-                    continue;
-                }
-
-                if (position >= source.length()) {
-                    throw error("Incomplete escape");
-                }
-
-                char escaped = source.charAt(position++);
-
-                switch (escaped) {
-                    case '"': result.append('"'); break;
-                    case '\\': result.append('\\'); break;
-                    case '/': result.append('/'); break;
-                    case 'b': result.append('\b'); break;
-                    case 'f': result.append('\f'); break;
-                    case 'n': result.append('\n'); break;
-                    case 'r': result.append('\r'); break;
-                    case 't': result.append('\t'); break;
-                    case 'u':
-                        if (position + 4 > source.length()) {
-                            throw error("Incomplete unicode escape");
-                        }
-
-                        String hex = source.substring(position, position + 4);
-
-                        if (!hex.matches("[0-9a-fA-F]{4}")) {
-                            throw error("Invalid unicode escape");
-                        }
-
-                        result.append((char) Integer.parseInt(hex, 16));
-                        position += 4;
-                        break;
-                    default:
-                        throw error("Invalid escape");
-                }
-            }
-
-            throw error("Unterminated string");
-        }
-
-        private Number readNumber() {
-            int start = position;
-
-            while (position < source.length()) {
-                char ch = source.charAt(position);
-
-                if (ch == ',' || ch == ']' || ch == '}'
-                        || Character.isWhitespace(ch)) {
-                    break;
-                }
-
-                position++;
-            }
-
-            String token = source.substring(start, position);
-
-            if (!token.matches(
-                    "-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?")) {
-                throw error("Invalid number");
-            }
-
-            return new java.math.BigDecimal(token);
-        }
-    }
-%>
-
-<%
-    /*
-     * 외부에서 완성된 homeModel을 전달하면 그 모델을 우선 사용합니다.
-     * 모델이 없을 때만 /resources/js/dummy.js를 읽습니다.
-     */
-    if (request.getAttribute("homeModel") == null) {
-        String resourcePath = "/resources/js/dummy.js";
-        String startMarker = "/* HOME_MODEL_START */";
-        String endMarker = "/* HOME_MODEL_END */";
-        StringBuilder source = new StringBuilder();
-
-        InputStream input = application.getResourceAsStream(resourcePath);
-
-        if (input == null) {
-            throw new IllegalStateException(
-                    "Dummy resource not found: " + resourcePath
-            );
-        }
-
-        try (Reader reader = new InputStreamReader(
-                input, StandardCharsets.UTF_8)) {
-            char[] buffer = new char[4096];
-            int count;
-
-            while ((count = reader.read(buffer)) != -1) {
-                source.append(buffer, 0, count);
-            }
-        }
-
-        String text = source.toString();
-        int start = text.indexOf(startMarker);
-
-        if (start < 0) {
-            throw new IllegalStateException("Dummy JSON start marker missing");
-        }
-
-        start += startMarker.length();
-        int end = text.indexOf(endMarker, start);
-
-        if (end < 0) {
-            throw new IllegalStateException("Dummy JSON end marker missing");
-        }
-
-        Object parsed = new HomeJsonReader(
-                text.substring(start, end).trim()
-        ).parse();
-
-        if (!(parsed instanceof Map)) {
-            throw new IllegalStateException("homeModel must be an object");
-        }
-
-        request.setAttribute("homeModel", parsed);
-    }
-%>
-
+<%@ include file="/views/common/home_model.jspf" %>
 <c:set var="home" value="${requestScope.homeModel}" />
 <c:set var="ui" value="${home.ui}" />
 <fmt:setLocale value="ko_KR" />
@@ -295,7 +34,6 @@
     </c:otherwise>
 </c:choose>
 
-<c:url var="commonCssUrl" value="/resources/css/style-jsp.css" />
 <c:url var="homeCssUrl" value="/resources/css/home.css" />
 <c:url var="dummyJsUrl" value="/resources/js/dummy.js" />
 <c:url var="homeJsUrl" value="/resources/js/home.js" />
@@ -303,18 +41,16 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<%@ include file="/views/common/head.jsp" %>
 
     <title><c:out value="${ui.pageTitle}" /></title>
 
-    <link rel="stylesheet" href="<c:out value='${commonCssUrl}' />">
     <link rel="stylesheet" href="<c:out value='${homeCssUrl}' />">
 
     <script src="<c:out value='${dummyJsUrl}' />" defer></script>
     <script src="<c:out value='${homeJsUrl}' />" defer></script>
 </head>
-<body>
+<body data-page="home" data-context-path="${pageContext.request.contextPath}">
 
 <%@ include file="/views/common/header.jsp" %>
 
@@ -464,7 +200,7 @@
                              data-empty-state
                              data-empty-text="<c:out value='${card.emptyText}' />"
                              data-filtered-empty-text="<c:out value='${card.filteredEmptyText}' />"
-                             <c:if test="${not empty items}">hidden</c:if>>
+                             <c:if test="${not empty items}">is-hidden</c:if>>
                             <c:out value="${card.emptyText}" />
                         </div>
                     </div>
@@ -553,34 +289,6 @@
     </section>
 </main>
 
-<div class="modal-backdrop"
-     id="deleteModal"
-     aria-hidden="true"
-     data-title-template="<c:out value='${ui.modalTitle}' />"
-     data-description-template="<c:out value='${ui.modalDescription}' />">
-    <div class="modal"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="modalTitle"
-         aria-describedby="modalDesc">
-        <div class="modal-title" id="modalTitle"></div>
-        <div class="modal-desc" id="modalDesc"></div>
-
-        <div class="modal-btns">
-            <button type="button"
-                    class="modal-btn btn-cancel"
-                    data-action="cancel-delete">
-                <c:out value="${ui.cancelLabel}" />
-            </button>
-
-            <button type="button"
-                    class="modal-btn btn-confirm"
-                    data-action="confirm-delete">
-                <c:out value="${ui.confirmLabel}" />
-            </button>
-        </div>
-    </div>
-</div>
-
+<%@ include file="/views/common/modal_delete.jsp" %>
 </body>
 </html>
