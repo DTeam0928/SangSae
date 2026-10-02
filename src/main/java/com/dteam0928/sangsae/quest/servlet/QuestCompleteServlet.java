@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.dteam0928.sangsae.auth.model.LoginUser;
+import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestLog;
 import com.dteam0928.sangsae.quest.service.QuestService;
 
@@ -23,8 +25,12 @@ public class QuestCompleteServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 			Long userQuestId = Long.parseLong(request.getParameter("userQuestId"));
-			//TODO auth 통합 후 request parameter가 아니라 로그인 세션에서 userId를 가져오도록 변경
-            Long userId = Long.parseLong(request.getParameter("userId"));
+			LoginUser loginUser = LoginSession.current(request);
+			if (loginUser == null) {
+			    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+			    return;
+			}
+			Long userId = loginUser.getId();
             String proofImageUrl = request.getParameter("proofImageUrl");
             String proofText = request.getParameter("proofText");
             QuestLog questLog = questService.completeQuest(

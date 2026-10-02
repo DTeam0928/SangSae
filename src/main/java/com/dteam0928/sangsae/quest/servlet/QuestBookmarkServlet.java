@@ -6,6 +6,8 @@ import java.util.List;
 import com.dteam0928.sangsae.quest.dto.UserQuestBookmark;
 import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.auth.model.LoginUser;
+import com.dteam0928.sangsae.auth.web.LoginSession;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,7 +26,12 @@ public class QuestBookmarkServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     		throws ServletException, IOException {
-    	Long userId = Long.parseLong(request.getParameter("userId"));
+    	LoginUser loginUser = LoginSession.current(request);
+    	if (loginUser == null) {
+    	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+    	    return;
+    	}
+    	Long userId = loginUser.getId();
     	List<QuestTemplate> bookmarkQuests = 
     			questService.getBookmarkedQuests(userId);
     	request.setAttribute("bookmarkedQuests", bookmarkQuests);
@@ -49,7 +56,12 @@ public class QuestBookmarkServlet extends HttpServlet {
     //북마크 추가
     private void addBookmark(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        Long userId = Long.parseLong(request.getParameter("userId"));
+    	LoginUser loginUser = LoginSession.current(request);
+    	if (loginUser == null) {
+    	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+    	    return;
+    	}
+    	Long userId = loginUser.getId();
         Long questTemplateId = Long.parseLong(request.getParameter("questTemplateId"));
         String folderName = request.getParameter("folderName");
         UserQuestBookmark bookmark = questService.addBookmark(
@@ -65,7 +77,12 @@ public class QuestBookmarkServlet extends HttpServlet {
     //북마크 제거
     private void removeBookmark(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        Long userId = Long.parseLong(request.getParameter("userId"));
+    	LoginUser loginUser = LoginSession.current(request);
+    	if (loginUser == null) {
+    	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+    	    return;
+    	}
+    	Long userId = loginUser.getId();
         Long questTemplateId = Long.parseLong(request.getParameter("questTemplateId"));
         boolean removed = questService.removeBookmark(userId, questTemplateId);
         if (!removed) {

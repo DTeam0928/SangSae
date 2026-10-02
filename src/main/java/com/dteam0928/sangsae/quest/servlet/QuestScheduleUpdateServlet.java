@@ -12,6 +12,8 @@ import java.io.IOException;
 
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.auth.model.LoginUser;
+import com.dteam0928.sangsae.auth.web.LoginSession;
 
 //등록한 퀘스트의 일정 수정
 //UserQuest에 일정 정보 변경
@@ -26,8 +28,12 @@ public class QuestScheduleUpdateServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 			Long userQuestId = Long.parseLong(request.getParameter("userQuestId"));
-			//TODO auth 통합 후 로그인 세션에서 userId를 가져오도록 변경
-			Long userId = Long.parseLong(request.getParameter("userId"));
+			LoginUser loginUser = LoginSession.current(request);
+			if (loginUser == null) {
+			    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+			    return;
+			}
+			Long userId = loginUser.getId();
 			LocalDate scheduledDate = LocalDate.parse(request.getParameter("scheduledDate"));
 			String targetTimeParam = request.getParameter("targetTime");
 			LocalTime targetTime = 
