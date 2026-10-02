@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.dteam0928.sangsae.auth.model.LoginUser;
+import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
 
@@ -22,7 +24,12 @@ public class UserQuestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Long userId = Long.parseLong(request.getParameter("userId"));
+    	LoginUser loginUser = LoginSession.current(request);
+    	if (loginUser == null) {
+    	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+    	    return;
+    	}
+    	Long userId = loginUser.getId();
         String tripIdParam = request.getParameter("tripId");
         Long tripId = (tripIdParam == null || tripIdParam.isBlank())
                 ? null

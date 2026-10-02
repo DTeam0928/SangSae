@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.dteam0928.sangsae.auth.model.LoginUser;
+import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
@@ -56,7 +58,12 @@ public class QuestServlet extends HttpServlet {
 	        throws ServletException, IOException {
 	    request.setCharacterEncoding("UTF-8");
 	    Long templateId = Long.parseLong(request.getParameter("templateId"));
-	    Long userId = Long.parseLong(request.getParameter("userId"));
+	    LoginUser loginUser = LoginSession.current(request);
+	    if (loginUser == null) {
+	        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+	        return;
+	    }
+	    Long userId = loginUser.getId();
 	    String tripIdParam = request.getParameter("tripId");
 	    Long tripId = (tripIdParam == null || tripIdParam.isBlank())
 	            ? null

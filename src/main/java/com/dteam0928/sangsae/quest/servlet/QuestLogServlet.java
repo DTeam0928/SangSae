@@ -3,6 +3,8 @@ package com.dteam0928.sangsae.quest.servlet;
 import java.io.IOException;
 import java.util.List;
 
+import com.dteam0928.sangsae.auth.model.LoginUser;
+import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestLog;
 import com.dteam0928.sangsae.quest.service.QuestService;
 
@@ -24,8 +26,12 @@ public class QuestLogServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // TODO auth 통합 후 로그인 세션에서 userId를 가져오도록 변경
-            Long userId = Long.parseLong(request.getParameter("userId"));
+        	LoginUser loginUser = LoginSession.current(request);
+        	if (loginUser == null) {
+        	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+        	    return;
+        	}
+        	Long userId = loginUser.getId();
             List<QuestLog> questLogs = questService.getQuestLogsByUserId(userId);
             request.setAttribute("questLogs", questLogs);
             // TODO 프론트 통합 후 완료 기록 화면 경로 확정
