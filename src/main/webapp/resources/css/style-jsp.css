@@ -4,7 +4,7 @@
 /* ---------- 1. 폰트 정의 (fonts) ---------- */
 @font-face {
     font-family: 'NalnaRiji';
-    src: url('./common/nelnalizzychae2020.ttf') format('truetype');
+    src: url('nelnalizzychae2020.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
