@@ -24,6 +24,7 @@ public class QuestTemplateRepository {
 				"PUBLIC",
 				null,
 				24,
+				0,
 				LocalDateTime.now()
 				));
 		
@@ -40,6 +41,7 @@ public class QuestTemplateRepository {
                 "PUBLIC",
                 null,
                 12,
+                0,
                 LocalDateTime.now()
         ));
 
@@ -56,6 +58,7 @@ public class QuestTemplateRepository {
                 "PUBLIC",
                 null,
                 8,
+                0,
                 LocalDateTime.now()
         ));
 	}
