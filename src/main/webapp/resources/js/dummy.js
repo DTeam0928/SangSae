@@ -83,8 +83,8 @@ const mockData = /* HOME_MODEL_START */
                         "emptyText": "등록된 여행이 없습니다.\n첫 여행을 만들어보세요!",
                         "filteredEmptyText": "선택한 조건에 해당하는 여행이 없습니다.",
                         "addLabel": "여행 및 퀘스트 추가하기",
-                        "addPath": "/quest/quest_main.jsp",
-                        "editPath": "/quest/quest_main.jsp",
+                        "addPath": "/views/quest/quest_main.jsp",
+                        "editPath": "/views/quest/quest_main.jsp",
                         "editFragment": "management",
                         "filters": [
                             { "value": "all", "label": "전체 여행" },
@@ -101,8 +101,8 @@ const mockData = /* HOME_MODEL_START */
                         "emptyText": "등록된 루틴이 없습니다.\n새 루틴을 추가해보세요!",
                         "filteredEmptyText": "선택한 조건에 해당하는 루틴이 없습니다.",
                         "addLabel": "루틴 추가하기",
-                        "addPath": "/routine/routine_main.jsp",
-                        "editPath": "/routine/routine_main.jsp",
+                        "addPath": "/views/routine/routine_main.jsp",
+                        "editPath": "/views/routine/routine_main.jsp",
                         "editFragment": "manage",
                         "filters": [
                             { "value": "all", "label": "전체 루틴" },
@@ -162,7 +162,7 @@ const mockData = /* HOME_MODEL_START */
                         "bodyKey": "description",
                         "emptyText": "추천 퀘스트가 없습니다.",
                         "linkLabel": "퀘스트 탐색하러 가기",
-                        "path": "/quest/quest_main.jsp"
+                        "path": "/views/quest/quest_main.jsp"
                     },
                     {
                         "key": "community",
@@ -172,7 +172,7 @@ const mockData = /* HOME_MODEL_START */
                         "bodyKey": "content",
                         "emptyText": "커뮤니티 소식이 없습니다.",
                         "linkLabel": "커뮤니티 구경하기",
-                        "path": "/community/community_main.jsp"
+                        "path": "/views/community/community_main.jsp"
                     }
                 ]
             }
