@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<%@ include file="/views/common/head.jsp" %>
+<%@ include file="/WEB-INF/views/common/head.jsp" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/quest.css">
 <script src="${pageContext.request.contextPath}/resources/js/quest.js" defer></script>
 
@@ -14,7 +14,7 @@
 <body data-page="quest" data-context-path="${pageContext.request.contextPath}">
 
     <!-- 헤더 포함 -->
-    <%@ include file="/views/common/header.jsp" %>
+    <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
     <main class="container">
         <!-- 메인 탭 전환 버튼 -->
@@ -27,12 +27,12 @@
 
         <!-- [탭 1] 퀘스트 탐색 탭 -->
         <div id="tab-explorer" class="tab-content active">
-            <%@ include file="/views/quest/tab_explorer.jsp" %>
+            <%@ include file="/WEB-INF/views/quest/tab_explorer.jsp" %>
         </div>
 
         <!-- [탭 2] 여행 관리 탭 (올바른 경로 적용) -->
         <div id="tab-management" class="tab-content">
-            <%@ include file="/views/quest/tab_management.jsp" %>
+            <%@ include file="/WEB-INF/views/quest/tab_management.jsp" %>
         </div>
     </main>
 
