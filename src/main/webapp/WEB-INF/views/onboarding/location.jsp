@@ -1,4 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>상새</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/onboarding.css">
+<script src="${pageContext.request.contextPath}/assets/js/onboarding.js" defer></script>
+</head>
+<body data-page="onboarding" data-context-path="${pageContext.request.contextPath}">
+<main id="onboarding-viewport"><section class="step-section active">
+
 
 <div class="location-container">
     <div class="step-indicator">Step 2 of 2</div>
@@ -13,3 +26,6 @@
         <button type="button" class="btn btn-later" onclick="App.onboarding.skipLocationPermission()">나중에 하기</button>
     </div>
 </div>
+
+</section></main>
+</body></html>
