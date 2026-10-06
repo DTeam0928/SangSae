@@ -33,6 +33,9 @@ public class UserProfile {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "total_xp", nullable = false)
+    private int totalXp = 0;
+
     /** POINT 컬럼 — DAO 가 조회 시 채워 준다 */
     @Transient
     private GeoPoint lastKnownLocation;
@@ -59,6 +62,9 @@ public class UserProfile {
 
     public GeoPoint getLastKnownLocation() { return lastKnownLocation; }
     public void setLastKnownLocation(GeoPoint lastKnownLocation) { this.lastKnownLocation = lastKnownLocation; }
+
+    public int getTotalXp() { return totalXp; }
+    public void setTotalXp(int totalXp) { this.totalXp = Math.max(0, totalXp); }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

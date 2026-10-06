@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     profile_image_url VARCHAR(500) COMMENT '프로필 이미지 URL',
     is_location_permitted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'GPS 위치 권한 동의 여부',
     last_known_location POINT SRID 4326 COMMENT '온보딩 시 1회 저장된 최근 GPS 좌표',
+    total_xp INT NOT NULL DEFAULT 0 COMMENT '누적 경험치 (XP)',
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_profiles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
