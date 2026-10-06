@@ -36,10 +36,8 @@ public class QuestServlet extends BaseServlet {
 		    	response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    	return;
 		    }
-		    List<UserQuest> userQuests = questService.getUserQuests();
 		    request.setAttribute("quest", questDetail);
 		    request.setAttribute("place", questDetail.place());
-		    request.setAttribute("userQuests", userQuests);
 		    //경로는 추후 통합되고 나면 수정
 		    request.getRequestDispatcher("/views/quest/detail.jsp").forward(request, response);
 		    return;
