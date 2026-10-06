@@ -18,6 +18,7 @@ import com.dteam0928.sangsae.user.dao.jpa.JpaUserProfileDao;
 import com.dteam0928.sangsae.user.service.NicknameGenerator;
 import com.dteam0928.sangsae.user.service.RandomNicknameGenerator;
 import com.dteam0928.sangsae.user.service.UserAccountService;
+import com.dteam0928.sangsae.quest.service.QuestService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletContext;
@@ -50,7 +51,9 @@ public class AppContext implements AutoCloseable {
     private final OAuthLoginService oAuthLoginService;
     private final OnboardingService onboardingService;
     private final OAuthProviderRegistry oAuthProviderRegistry;
-
+    
+    private final QuestService questService;
+    
     public AppContext(AppConfig config) {
         this(config, DataSourceFactory.create(config));
     }
@@ -85,6 +88,7 @@ public class AppContext implements AutoCloseable {
         this.oAuthProviderRegistry = OAuthProviderRegistry.fromConfig(config);
 
         // ---- 각 기능 Service (다른 담당자가 여기에 추가) ----
+        this.questService = new QuestService(tx);
     }
 
     /**
@@ -109,6 +113,8 @@ public class AppContext implements AutoCloseable {
     public OAuthLoginService oAuthLoginService() { return oAuthLoginService; }
     public OnboardingService onboardingService() { return onboardingService; }
     public OAuthProviderRegistry oAuthProviderRegistry() { return oAuthProviderRegistry; }
+    
+    public QuestService questService() { return questService; }
 
     @Override
     public void close() {
