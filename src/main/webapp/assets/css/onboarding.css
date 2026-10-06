@@ -1,0 +1,450 @@
+
+        body {
+            background-color: var(--color-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #onboarding-viewport {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .step-section {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .step-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+
+    /* ===== Step 2 (이메일 로그인/가입) 고유 스타일 ===== */
+    .auth-container {
+        width: min(400px, calc(100% - 40px));
+        margin: 0 auto;
+        background: var(--color-white);
+        padding: 40px 30px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--color-border);
+    }
+
+    .auth-container .logo {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-family: var(--font-logo);
+        font-size: 44px;
+        font-weight: 400;
+        color: var(--color-dark);
+        margin: 0 auto 30px auto;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .auth-container .logo img {
+        height: 50px;
+        width: auto;
+        margin-right: 10px;
+        object-fit: contain;
+    }
+
+    .tab-group {
+        display: flex;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .tab {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        cursor: pointer;
+        font-size: var(--fs-body);
+        font-weight: 700;
+        color: var(--color-muted);
+        transition: color 0.2s, border-bottom 0.2s;
+    }
+
+    .tab.active {
+        color: var(--color-dark);
+        border-bottom: 2px solid var(--color-dark);
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .input-wrap {
+        display: flex;
+        gap: 8px;
+    }
+
+    .input-wrap .form-input {
+        flex: 1;
+    }
+
+    .dup-btn {
+        padding: 0 16px;
+        background: var(--color-sub-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        font-size: var(--fs-small);
+        font-weight: 700;
+        color: var(--color-text);
+        white-space: nowrap;
+        transition: background 0.2s;
+        cursor: pointer;
+    }
+
+    .dup-btn:hover {
+        background: var(--color-border);
+    }
+
+    .guide-msg {
+        color: var(--color-muted);
+        font-size: var(--fs-small);
+        margin-top: 6px;
+        display: none;
+    }
+
+    .error-msg {
+        color: var(--color-danger);
+        font-size: var(--fs-small);
+        margin-top: 6px;
+        display: none;
+    }
+
+    .success-msg {
+        color: var(--color-primary);
+        font-size: var(--fs-small);
+        margin-top: 6px;
+        display: none;
+    }
+
+    .submit-btn {
+        width: 100%;
+        height: 50px;
+        background: var(--color-dark);
+        border: none;
+        border-radius: var(--radius-md);
+        color: var(--color-white);
+        font-size: 15px;
+        font-weight: 800;
+        margin-top: 10px;
+        transition: background 0.2s, transform 0.2s;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background: var(--color-dark);
+        transform: translateY(-1px);
+    }
+    
+
+    /* ===== Step 4 (위치 권한) 고유 스타일 ===== */
+    .location-container {
+        width: min(440px, calc(100% - 40px));
+        margin: 0 auto;
+        background: var(--color-white);
+        padding: 40px 30px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--color-border);
+    }
+
+    .location-container .step-indicator {
+        font-size: var(--fs-small);
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: center;
+    }
+
+    .icon-wrapper {
+        width: 72px;
+        height: 72px;
+        background: var(--color-main);
+        color: var(--color-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin: 0 auto 24px;
+    }
+
+    .location-container .title {
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-h1);
+        margin-bottom: 6px;
+        text-align: center;
+    }
+
+    .location-container .desc {
+        font-size: var(--fs-body);
+        color: var(--color-muted);
+        margin-bottom: 28px;
+        text-align: center;
+    }
+
+    .location-container .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .location-container .btn-group .btn {
+        width: 100%;
+        height: 50px;
+        margin-top: 0;
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-allow {
+        background-color: var(--color-primary);
+        border: none;
+        color: var(--color-white);
+    }
+
+    .btn-allow:hover {
+        background-color: var(--color-dark);
+    }
+
+    .btn-later {
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        color: var(--color-muted);
+    }
+
+    .btn-later:hover {
+        background: var(--color-sub-bg);
+    }
+    
+
+    /* ===== Step 3 (프로필 설정) 고유 스타일 ===== */
+    .profile-container {
+        width: min(440px, calc(100% - 40px));
+        margin: 0 auto;
+        background: var(--color-white);
+        padding: 40px 30px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--color-border);
+    }
+
+    .profile-container .step-indicator {
+        font-size: var(--fs-small);
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .profile-container .title {
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-h1);
+        margin-bottom: 6px;
+    }
+
+    .profile-container .desc {
+        font-size: var(--fs-body);
+        color: var(--color-muted);
+        margin-bottom: 28px;
+    }
+
+    .profile-container .form-group {
+        margin-bottom: 24px;
+    }
+
+    .profile-container .form-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .profile-container .form-label span {
+        font-weight: 400;
+        color: var(--color-muted);
+    }
+
+    /* 관심사 칩 그리드 */
+    .chip-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .interest-chip {
+        background: var(--color-sub-bg);
+        border: 1px solid var(--color-border);
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--color-text);
+        cursor: pointer;
+        transition: border-color 0.2s, background-color 0.2s;
+        user-select: none;
+    }
+
+    .interest-chip:hover {
+        border-color: var(--color-muted);
+    }
+
+    .interest-chip.selected {
+        background: var(--color-main);
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+        font-weight: 700;
+    }
+
+    .profile-container .error-msg {
+        display: none;
+        font-size: var(--fs-small);
+        font-weight: 600;
+        color: var(--color-danger);
+        background-color: var(--color-danger-bg);
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        margin-top: 8px;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .profile-container .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 32px;
+    }
+
+    .profile-container .btn-group .btn {
+        flex: 1;
+        height: 48px;
+        margin-top: 0;
+        width: auto;
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-skip {
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        color: var(--color-muted);
+    }
+
+    .btn-skip:hover {
+        background: var(--color-sub-bg);
+    }
+
+    .btn-primary {
+        background-color: var(--color-primary);
+        border: none;
+        color: var(--color-white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-dark);
+    }
+    
+
+    /* ===== Step 1 (소셜 로그인) 고유 스타일 ===== */
+    .onboarding-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .onboarding-container .subtitle {
+        color: var(--color-text);
+        font-family: var(--font-logo);
+        font-size: var(--fs-b);
+        font-weight: var(--fw-body);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .onboarding-container .logo {
+        display: block;
+        width: 100%;
+        color: var(--color-dark);
+        font-family: var(--font-logo);
+        font-size: var(--fs-a);
+        font-weight: 400;
+        text-align: center;
+        margin: 0 auto 30px auto;
+        line-height: 1;
+        letter-spacing: normal;
+    }
+
+    .social-login-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .social-btn {
+        width: 100%;
+        height: 50px;
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-size: var(--fs-body);
+        font-weight: 700;
+        color: var(--color-text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: background 0.2s, border-color 0.2s, transform 0.2s;
+        box-shadow: var(--shadow-card);
+        cursor: pointer;
+    }
+
+    .social-btn:hover {
+        background: var(--color-bg);
+        border-color: var(--color-dark);
+        transform: translateY(-1px);
+    }
+
+    .social-icon {
+        font-size: 18px;
+    }
+
+    .sub-links {
+        margin-top: 24px;
+        font-size: var(--fs-small);
+        color: var(--color-muted);
+        text-align: center;
+    }
+
+    .sub-links a {
+        color: var(--color-dark);
+        text-decoration: none;
+        font-weight: 700;
+        margin-left: 6px;
+        cursor: pointer;
+    }
+
+    .sub-links a:hover {
+        text-decoration: underline;
+    }
+    
+.onboarding-detail-1 {display: none;}
