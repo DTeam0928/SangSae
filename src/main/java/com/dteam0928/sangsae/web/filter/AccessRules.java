@@ -15,7 +15,9 @@ final class AccessRules {
     }
 
     /** 누구나 접근 (정적 파일 등) */
-    static final List<String> PUBLIC_PREFIXES = List.of("/assets/", "/favicon.ico", "/error");
+    static final List<String> PUBLIC_PREFIXES = List.of(
+            "/assets/", "/resources/", "/js/", "/css/", "/favicon.ico", "/error"
+    );
 
     /** 비로그인 전용. 로그인 상태로 오면 홈(또는 온보딩)으로 보낸다 */
     static final Set<String> GUEST_ONLY = Set.of(Routes.LANDING, Routes.LOGIN, Routes.SIGNUP);
