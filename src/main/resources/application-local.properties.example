@@ -1,0 +1,16 @@
+# 이 파일을 application-local.properties 로 복사해서 개인 값을 채운다 (git 에 올리지 않음)
+db.username=root
+db.password=비밀번호
+
+# oauth.google.client-id=xxxx.apps.googleusercontent.com
+# oauth.google.client-secret=GOCSPX-xxxx
+
+# oauth.x.client-id=
+# oauth.x.client-secret=
+
+# Apple 은 HTTPS 도메인이 필요하므로 ngrok 등으로 받은 주소를 base-url 로 사용
+# app.base-url=https://xxxx.ngrok-free.app/sangsae
+# oauth.apple.client-id=com.dteam0928.sangsae.web
+# oauth.apple.team-id=ABCDE12345
+# oauth.apple.key-id=XYZ9876543
+# oauth.apple.private-key-path=C:/keys/AuthKey_XYZ9876543.p8
