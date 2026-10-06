@@ -18,6 +18,10 @@ import com.dteam0928.sangsae.user.dao.jpa.JpaUserProfileDao;
 import com.dteam0928.sangsae.user.service.NicknameGenerator;
 import com.dteam0928.sangsae.user.service.RandomNicknameGenerator;
 import com.dteam0928.sangsae.user.service.UserAccountService;
+import com.dteam0928.sangsae.common.map.dao.PlaceDao;
+import com.dteam0928.sangsae.common.map.service.LocationAuthService;
+import com.dteam0928.sangsae.common.map.service.PlaceService;
+import com.dteam0928.sangsae.common.util.DBUtil;
 import com.dteam0928.sangsae.quest.service.QuestService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -52,6 +56,12 @@ public class AppContext implements AutoCloseable {
     private final OnboardingService onboardingService;
     private final OAuthProviderRegistry oAuthProviderRegistry;
     
+    // ---- 지도 / 장소 ----
+    private final PlaceDao placeDao;
+    private final PlaceService placeService;
+    private final LocationAuthService locationAuthService;
+
+    // ---- 퀘스트 ----
     private final QuestService questService;
     
     public AppContext(AppConfig config) {
@@ -87,8 +97,14 @@ public class AppContext implements AutoCloseable {
         this.onboardingService = new OnboardingService(tx, profileDao, interestDao, accountService);
         this.oAuthProviderRegistry = OAuthProviderRegistry.fromConfig(config);
 
-        // ---- 각 기능 Service (다른 담당자가 여기에 추가) ----
-        this.questService = new QuestService(tx);
+        // ---- 지도 / 장소 (단일 커넥션 풀 공유) ----
+        DBUtil.setDataSource(dataSource);
+        this.placeDao = new PlaceDao(dataSource);
+        this.placeService = new PlaceService(placeDao);
+        this.locationAuthService = new LocationAuthService(placeService);
+
+        // ---- 퀘스트 (지도·위치인증 서비스 주입) ----
+        this.questService = new QuestService(tx, placeService, locationAuthService);
     }
 
     /**
@@ -114,6 +130,9 @@ public class AppContext implements AutoCloseable {
     public OnboardingService onboardingService() { return onboardingService; }
     public OAuthProviderRegistry oAuthProviderRegistry() { return oAuthProviderRegistry; }
     
+    public PlaceDao placeDao() { return placeDao; }
+    public PlaceService placeService() { return placeService; }
+    public LocationAuthService locationAuthService() { return locationAuthService; }
     public QuestService questService() { return questService; }
 
     @Override
