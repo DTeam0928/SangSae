@@ -119,13 +119,6 @@ public class QuestService {
             return userQuestRepository.save(em, userQuest);
         });
     }
-    
-    // 사용자가 일정에 담은 퀘스트 전체 조회
-    public List<UserQuest> getUserQuests() {
-        return tx.read(em ->
-            userQuestRepository.findAll(em)
-        );
-    }
 
     // 사용자가 일정에 담은 퀘스트 조건별 조회
     public List<UserQuest> getUserQuestsByDate(

@@ -15,13 +15,6 @@ public class UserQuestRepository {
         return userQuest;
     }
 
-    public List<UserQuest> findAll(EntityManager em) {
-        return em.createQuery(
-                "SELECT uq FROM UserQuest uq ORDER BY uq.id",
-                UserQuest.class
-        ).getResultList();
-    }
-
     // 조건별 사용자 퀘스트 조회
     public List<UserQuest> findByUserIdAndTripIdAndScheduledDate(
             EntityManager em,
