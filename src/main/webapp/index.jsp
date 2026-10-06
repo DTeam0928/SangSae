@@ -8,6 +8,6 @@
 <h1>상새 (SangSae)</h1>
 <p>일상을 새롭게</p>
 <br/>
-<a href="hello-servlet">Hello Servlet</a>
+<a href="${pageContext.request.contextPath}/views/onboarding/onboarding_main.jsp">온보딩</a>
 </body>
 </html>
