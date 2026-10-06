@@ -12,6 +12,7 @@ import java.util.List;
 import com.dteam0928.sangsae.auth.model.LoginUser;
 import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestTemplate;
+import com.dteam0928.sangsae.quest.dto.QuestDetailResponseDto;
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
 import com.dteam0928.sangsae.web.page.BaseServlet;
@@ -28,13 +29,16 @@ public class QuestServlet extends BaseServlet {
 		String idParam = request.getParameter("id");
 		if (idParam != null && !idParam.isBlank()) {
 		    Long id = Long.parseLong(idParam);
-		    QuestTemplate quest = questService.getQuestById(id);
-		    if(quest==null) {
+		    LoginUser loginUser = LoginSession.current(request);
+		    Long userId = (loginUser != null) ? loginUser.getId() : null;
+		    QuestDetailResponseDto questDetail = questService.getQuestDetail(id, userId);
+		    if (questDetail == null) {
 		    	response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    	return;
 		    }
 		    List<UserQuest> userQuests = questService.getUserQuests();
-		    request.setAttribute("quest", quest);
+		    request.setAttribute("quest", questDetail);
+		    request.setAttribute("place", questDetail.place());
 		    request.setAttribute("userQuests", userQuests);
 		    //경로는 추후 통합되고 나면 수정
 		    request.getRequestDispatcher("/views/quest/detail.jsp").forward(request, response);

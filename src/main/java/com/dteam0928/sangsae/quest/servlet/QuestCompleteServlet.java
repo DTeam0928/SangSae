@@ -21,25 +21,38 @@ public class QuestCompleteServlet extends BaseServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
+		LoginUser loginUser = LoginSession.current(request);
+		if (loginUser == null) {
+		    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+		    return;
+		}
 		QuestService questService = app().questService();
 		try {
 			Long userQuestId = Long.parseLong(request.getParameter("userQuestId"));
-			LoginUser loginUser = LoginSession.current(request);
-			if (loginUser == null) {
-			    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
-			    return;
-			}
 			Long userId = loginUser.getId();
             String proofImageUrl = request.getParameter("proofImageUrl");
             String proofText = request.getParameter("proofText");
-            QuestLog questLog = questService.completeQuest(
-            	userQuestId, userId, proofImageUrl, proofText	
-            );
-            if(questLog==null) {
-            	response.sendError(HttpServletResponse.SC_NOT_FOUND, "퀘스트를 찾을 수 없습니다.");
-            	return;
+
+            String latParam = request.getParameter("latitude");
+            if (latParam == null || latParam.isBlank()) {
+                latParam = request.getParameter("userLat");
             }
-            response.sendRedirect(request.getContextPath() + "/user-quests");//나중에 조금 손봐야함
+            String lngParam = request.getParameter("longitude");
+            if (lngParam == null || lngParam.isBlank()) {
+                lngParam = request.getParameter("userLng");
+            }
+
+            Double userLat = (latParam != null && !latParam.isBlank()) ? Double.parseDouble(latParam.trim()) : null;
+            Double userLng = (lngParam != null && !lngParam.isBlank()) ? Double.parseDouble(lngParam.trim()) : null;
+
+            QuestLog questLog = questService.completeQuest(
+                userQuestId, userId, proofImageUrl, proofText, userLat, userLng
+            );
+            if (questLog == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "퀘스트를 찾을 수 없습니다.");
+                return;
+            }
+            response.sendRedirect(request.getContextPath() + "/user-quests");
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 		}

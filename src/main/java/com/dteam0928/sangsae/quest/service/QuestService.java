@@ -14,6 +14,12 @@ import com.dteam0928.sangsae.quest.repository.UserQuestRepository;
 import com.dteam0928.sangsae.quest.repository.QuestLogRepository;
 import com.dteam0928.sangsae.quest.repository.UserQuestBookmarkRepository;
 import com.dteam0928.sangsae.common.db.TransactionTemplate;
+import com.dteam0928.sangsae.common.map.dto.LocationAuthResult;
+import com.dteam0928.sangsae.common.map.dto.PlaceResponseDto;
+import com.dteam0928.sangsae.common.map.service.LocationAuthService;
+import com.dteam0928.sangsae.common.map.service.PlaceService;
+import com.dteam0928.sangsae.quest.dto.QuestDetailResponseDto;
+import com.dteam0928.sangsae.quest.dto.UserQuestDetailResponseDto;
 
 public class QuestService {
 
@@ -22,13 +28,21 @@ public class QuestService {
     private final QuestLogRepository questLogRepository;
     private final UserQuestBookmarkRepository bookmarkRepository;    
     private final TransactionTemplate tx;
+    private final PlaceService placeService;
+    private final LocationAuthService locationAuthService;
     
     public QuestService(TransactionTemplate tx) {
-    	this.tx = tx;
-    	this.questRepository = new QuestTemplateRepository();
+        this(tx, new PlaceService(), new LocationAuthService());
+    }
+
+    public QuestService(TransactionTemplate tx, PlaceService placeService, LocationAuthService locationAuthService) {
+        this.tx = tx;
+        this.questRepository = new QuestTemplateRepository();
         this.userQuestRepository = new UserQuestRepository();
         this.questLogRepository = new QuestLogRepository();
         this.bookmarkRepository = new UserQuestBookmarkRepository();
+        this.placeService = placeService;
+        this.locationAuthService = locationAuthService;
     }
 
     //공개된 퀘스트 전체 조회
@@ -58,6 +72,40 @@ public class QuestService {
             if (!"PUBLIC".equals(quest.getVisibility()))
                 return null;
             return quest;
+        });
+    }
+
+    // 퀘스트 상세 정보와 장소 정보를 결합하여 조회
+    public QuestDetailResponseDto getQuestDetail(Long id, Long currentUserId) {
+        return tx.read(em -> {
+            QuestTemplate quest = questRepository.findById(em, id);
+            if (quest == null || !"PUBLIC".equals(quest.getVisibility())) {
+                return null;
+            }
+            PlaceResponseDto place = null;
+            if (quest.getPlaceId() != null) {
+                place = placeService.getPlaceById(quest.getPlaceId());
+            }
+            boolean bookmarked = false;
+            if (currentUserId != null) {
+                bookmarked = bookmarkRepository.findByUserIdAndQuestTemplateId(em, currentUserId, id) != null;
+            }
+            return QuestDetailResponseDto.of(quest, place, bookmarked);
+        });
+    }
+
+    // 사용자 등록 퀘스트와 장소 정보를 결합하여 단건 조회
+    public UserQuestDetailResponseDto getUserQuestDetail(Long userQuestId) {
+        return tx.read(em -> {
+            UserQuest userQuest = userQuestRepository.findById(em, userQuestId);
+            if (userQuest == null) {
+                return null;
+            }
+            PlaceResponseDto place = null;
+            if (userQuest.getPlaceId() != null) {
+                place = placeService.getPlaceById(userQuest.getPlaceId());
+            }
+            return UserQuestDetailResponseDto.of(userQuest, place);
         });
     }
     
@@ -180,8 +228,13 @@ public class QuestService {
         });
     }
     
-    //퀘스트 완료 처리 및 저장
+    // 퀘스트 완료 처리 (좌표 미포함 시 하위 호환용)
     public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText) {
+        return completeQuest(userQuestId, userId, proofImageUrl, proofText, null, null);
+    }
+
+    // 퀘스트 완료 처리 및 현장 위치 인증(GPS) 검증
+    public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText, Double userLat, Double userLng) {
         return tx.inTransaction(em -> {
 
             // 1. 사용자 퀘스트 조회
@@ -211,10 +264,21 @@ public class QuestService {
                     throw new IllegalArgumentException("텍스트 인증이 필요합니다.");
                 }
             } else if ("LOCATION".equals(authType)) {
-                // TODO places 테이블 연동 후
-                // 퀘스트 장소 좌표와 현재 GPS 좌표의 거리를 계산하여
-                // userQuest.getAuthRadiusM() 이내인지 확인해야 함.
-                throw new IllegalStateException("위치 인증은 장소 좌표 연동 후 사용할 수 있습니다.");
+                if (userLat == null || userLng == null) {
+                    throw new IllegalArgumentException("현장 GPS 좌표(위도, 경도)가 누락되었습니다.");
+                }
+                Long placeId = userQuest.getPlaceId();
+                if (placeId == null) {
+                    throw new IllegalStateException("퀘스트에 등록된 목표 장소가 없습니다.");
+                }
+                int allowedRadius = userQuest.getAuthRadiusM() != null && userQuest.getAuthRadiusM() > 0
+                        ? userQuest.getAuthRadiusM()
+                        : LocationAuthService.DEFAULT_ALLOWED_RADIUS_METERS;
+
+                LocationAuthResult authResult = locationAuthService.verifyLocation(placeId, userLat, userLng, allowedRadius);
+                if (!authResult.isSuccess()) {
+                    throw new IllegalStateException(authResult.message());
+                }
             } else if (!"NONE".equals(authType)) {
                 throw new IllegalArgumentException("지원하지 않는 인증 방식입니다.");
             }

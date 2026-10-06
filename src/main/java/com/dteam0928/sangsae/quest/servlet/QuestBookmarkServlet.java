@@ -25,12 +25,12 @@ public class QuestBookmarkServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     		throws ServletException, IOException {
-    	QuestService questService = app().questService();
     	LoginUser loginUser = LoginSession.current(request);
     	if (loginUser == null) {
     	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
     	    return;
     	}
+    	QuestService questService = app().questService();
     	Long userId = loginUser.getId();
     	List<QuestTemplate> bookmarkQuests = 
     			questService.getBookmarkedQuests(userId);

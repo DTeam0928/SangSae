@@ -24,14 +24,14 @@ public class QuestLogServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	QuestService questService = app().questService();
-    	try {
-        	LoginUser loginUser = LoginSession.current(request);
-        	if (loginUser == null) {
-        	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
-        	    return;
-        	}
-        	Long userId = loginUser.getId();
+        LoginUser loginUser = LoginSession.current(request);
+        if (loginUser == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+            return;
+        }
+        QuestService questService = app().questService();
+        try {
+            Long userId = loginUser.getId();
             List<QuestLog> questLogs = questService.getQuestLogsByUserId(userId);
             request.setAttribute("questLogs", questLogs);
             // TODO 프론트 통합 후 완료 기록 화면 경로 확정
