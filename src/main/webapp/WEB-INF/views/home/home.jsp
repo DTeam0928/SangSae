@@ -1,11 +1,10 @@
 <%@ page language="java"
          contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"
-         import="java.io.*,java.nio.charset.StandardCharsets,java.util.*" %>
+ %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<%@ include file="/views/common/home_model.jspf" %>
 <c:set var="home" value="${requestScope.homeModel}" />
 <c:set var="ui" value="${home.ui}" />
 <fmt:setLocale value="ko_KR" />
@@ -34,27 +33,27 @@
     </c:otherwise>
 </c:choose>
 
-<c:url var="homeCssUrl" value="/resources/css/home.css" />
-<c:url var="dummyJsUrl" value="/resources/js/dummy.js" />
-<c:url var="homeJsUrl" value="/resources/js/home.js" />
+<c:url var="homeCssUrl" value="/assets/css/home.css" />
+<c:url var="homeJsUrl" value="/assets/js/home.js" />
 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<%@ include file="/views/common/head.jsp" %>
+<%@ include file="/WEB-INF/views/common/head.jsp" %>
 
     <title><c:out value="${ui.pageTitle}" /></title>
 
     <link rel="stylesheet" href="<c:out value='${homeCssUrl}' />">
 
-    <script src="<c:out value='${dummyJsUrl}' />" defer></script>
+    <script src="${pageContext.request.contextPath}/assets/js/api-client.js" defer></script>
     <script src="<c:out value='${homeJsUrl}' />" defer></script>
 </head>
 <body data-page="home" data-context-path="${pageContext.request.contextPath}">
 
-<%@ include file="/views/common/header.jsp" %>
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <main class="container" id="home-dashboard">
+    <c:if test="${empty home}"><p role="status">홈 데이터를 불러오지 못했습니다.</p></c:if>
     <div class="section-title">
         <span class="title" id="dashboard-title">
             <c:out value="${nickname}" /><c:out value="${ui.dashboardSuffix}" />
@@ -179,13 +178,7 @@
                                                 <c:out value="${ui.editLabel}" />
                                             </a>
 
-                                            <button type="button"
-                                                    class="small-btn danger"
-                                                    data-action="open-delete"
-                                                    data-type="<c:out value='${card.typeLabel}' />"
-                                                    data-name="<c:out value='${item.title}' />">
-                                                <c:out value="${ui.deleteLabel}" />
-                                            </button>
+
                                         </div>
                                     </div>
                                 </c:forEach>
@@ -200,7 +193,7 @@
                              data-empty-state
                              data-empty-text="<c:out value='${card.emptyText}' />"
                              data-filtered-empty-text="<c:out value='${card.filteredEmptyText}' />"
-                             <c:if test="${not empty items}">is-hidden</c:if>>
+                             <c:if test="${not empty items}">hidden</c:if>>
                             <c:out value="${card.emptyText}" />
                         </div>
                     </div>
@@ -289,6 +282,6 @@
     </section>
 </main>
 
-<%@ include file="/views/common/modal_delete.jsp" %>
+<%@ include file="/WEB-INF/views/common/modal_delete.jsp" %>
 </body>
 </html>
