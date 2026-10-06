@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<%@ include file="/views/common/head.jsp" %>
+<%@ include file="/WEB-INF/views/common/head.jsp" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/routine.css">
 <script src="${pageContext.request.contextPath}/resources/js/routine.js" defer></script>
 
@@ -12,7 +12,7 @@
 <body data-page="routine" data-context-path="${pageContext.request.contextPath}" class="viewport-height">
 
     <!-- 헤더 포함 -->
-    <%@ include file="/views/common/header.jsp" %>
+    <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <main class="routine-container margin-auto ds-py-7 space-y-6">
   <!-- 탭 메뉴 컨트롤 -->
@@ -23,12 +23,12 @@
 
   <!-- 탭 1: 루틴 탐색 -->
   <section id="tab-explore" class="space-y-6">
-    <%@ include file="/views/routine/tab_explorer.jsp" %>
+    <%@ include file="/WEB-INF/views/routine/tab_explorer.jsp" %>
   </section>
 
   <!-- 탭 2: 루틴 관리 -->
   <section id="tab-manage" class="is-hidden space-y-6">
-    <%@ include file="/views/routine/tab_management.jsp" %>
+    <%@ include file="/WEB-INF/views/routine/tab_management.jsp" %>
   </section>
 </main>
 
