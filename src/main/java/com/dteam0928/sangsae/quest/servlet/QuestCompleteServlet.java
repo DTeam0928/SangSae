@@ -2,7 +2,6 @@ package com.dteam0928.sangsae.quest.servlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -11,18 +10,18 @@ import com.dteam0928.sangsae.auth.model.LoginUser;
 import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestLog;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.web.page.BaseServlet;
 
 //퀘스트를 완료 및 인증
 //UserQuest 완료 및 QuestLog 생성
 @WebServlet("/user-quests/complete")
-public class QuestCompleteServlet extends HttpServlet {
+public class QuestCompleteServlet extends BaseServlet {
 	private static final long serialVersionUID = 1L;
-
-	private final QuestService questService = new QuestService();
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
+		QuestService questService = app().questService();
 		try {
 			Long userQuestId = Long.parseLong(request.getParameter("userQuestId"));
 			LoginUser loginUser = LoginSession.current(request);

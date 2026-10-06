@@ -7,25 +7,25 @@ import com.dteam0928.sangsae.auth.model.LoginUser;
 import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestLog;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.web.page.BaseServlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 //사용자의 퀘스트 완료 기록 조회
 //QuestLog 조회
 @WebServlet("/quest-logs")
-public class QuestLogServlet extends HttpServlet {
+public class QuestLogServlet extends BaseServlet {
 
     private static final long serialVersionUID = 1L;
-    private final QuestService questService = new QuestService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
+    	QuestService questService = app().questService();
+    	try {
         	LoginUser loginUser = LoginSession.current(request);
         	if (loginUser == null) {
         	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");

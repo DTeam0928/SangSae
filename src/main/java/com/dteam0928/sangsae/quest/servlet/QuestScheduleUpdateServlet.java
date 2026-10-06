@@ -5,27 +5,27 @@ import java.time.LocalTime;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.web.page.BaseServlet;
 import com.dteam0928.sangsae.auth.model.LoginUser;
 import com.dteam0928.sangsae.auth.web.LoginSession;
 
 //등록한 퀘스트의 일정 수정
 //UserQuest에 일정 정보 변경
 @WebServlet("/user-quests/schedule/update")
-public class QuestScheduleUpdateServlet extends HttpServlet {
+public class QuestScheduleUpdateServlet extends BaseServlet {
 	
 	private static final long serialVersionUID = 1L;
-	private final QuestService questService = new QuestService();
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		QuestService questService = app().questService();
 		try {
 			Long userQuestId = Long.parseLong(request.getParameter("userQuestId"));
 			LoginUser loginUser = LoginSession.current(request);

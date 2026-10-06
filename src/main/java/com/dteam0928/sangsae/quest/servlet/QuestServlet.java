@@ -2,7 +2,6 @@ package com.dteam0928.sangsae.quest.servlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -15,17 +14,17 @@ import com.dteam0928.sangsae.auth.web.LoginSession;
 import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 import com.dteam0928.sangsae.quest.dto.UserQuest;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.web.page.BaseServlet;
 
 //공개 퀘스트를 조회, 상세조회, 일정에 등록
 //QuestTemplate 조회, UserQuest에 등록
 @WebServlet("/quests")
-public class QuestServlet extends HttpServlet {
+public class QuestServlet extends BaseServlet {
 	private static final long serialVersionUID = 1L;
-	
-	private final QuestService questService = new QuestService();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		QuestService questService = app().questService();
 		String idParam = request.getParameter("id");
 		if (idParam != null && !idParam.isBlank()) {
 		    Long id = Long.parseLong(idParam);
@@ -56,6 +55,7 @@ public class QuestServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
+		QuestService questService = app().questService();
 	    request.setCharacterEncoding("UTF-8");
 	    Long templateId = Long.parseLong(request.getParameter("templateId"));
 	    LoginUser loginUser = LoginSession.current(request);

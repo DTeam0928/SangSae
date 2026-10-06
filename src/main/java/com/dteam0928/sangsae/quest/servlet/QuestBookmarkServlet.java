@@ -6,26 +6,26 @@ import java.util.List;
 import com.dteam0928.sangsae.quest.dto.UserQuestBookmark;
 import com.dteam0928.sangsae.quest.dto.QuestTemplate;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.web.page.BaseServlet;
 import com.dteam0928.sangsae.auth.model.LoginUser;
 import com.dteam0928.sangsae.auth.web.LoginSession;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 //퀘스트 북마크 관리
 //UserQuestBookmark를 추가, 삭제, 조회
 @WebServlet("/quest-bookmarks")
-public class QuestBookmarkServlet extends HttpServlet {
+public class QuestBookmarkServlet extends BaseServlet {
 
     private static final long serialVersionUID = 1L;
-    private final QuestService questService = new QuestService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     		throws ServletException, IOException {
+    	QuestService questService = app().questService();
     	LoginUser loginUser = LoginSession.current(request);
     	if (loginUser == null) {
     	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
@@ -56,6 +56,7 @@ public class QuestBookmarkServlet extends HttpServlet {
     //북마크 추가
     private void addBookmark(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+    	QuestService questService = app().questService();
     	LoginUser loginUser = LoginSession.current(request);
     	if (loginUser == null) {
     	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
@@ -77,6 +78,7 @@ public class QuestBookmarkServlet extends HttpServlet {
     //북마크 제거
     private void removeBookmark(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+    	QuestService questService = app().questService();
     	LoginUser loginUser = LoginSession.current(request);
     	if (loginUser == null) {
     	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
