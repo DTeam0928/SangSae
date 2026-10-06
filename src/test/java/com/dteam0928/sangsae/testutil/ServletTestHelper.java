@@ -18,6 +18,7 @@ public class ServletTestHelper {
 
     public static class MockContext {
         public final Map<String, String> params = new HashMap<>();
+        public final Map<String, String> headers = new HashMap<>();
         public final Map<String, Object> attributes = new HashMap<>();
         public final Map<String, Object> sessionAttributes = new HashMap<>();
         public final Map<String, Object> contextAttributes = new HashMap<>();
@@ -108,6 +109,8 @@ public class ServletTestHelper {
                     switch (m) {
                         case "getParameter":
                             return ctx.params.get(args[0]);
+                        case "getHeader":
+                            return ctx.headers.get(args[0]);
                         case "getParameterValues":
                             String val = ctx.params.get(args[0]);
                             return val != null ? new String[]{val} : null;
