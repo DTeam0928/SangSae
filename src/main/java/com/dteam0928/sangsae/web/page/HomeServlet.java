@@ -16,5 +16,6 @@ public class HomeServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         forward(req, resp, Views.HOME);
+        System.out.println("HOME 진입, JSP 경로: " + Views.HOME);
     }
 }
