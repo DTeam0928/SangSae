@@ -25,14 +25,14 @@ public class QuestScheduleUpdateServlet extends BaseServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		LoginUser loginUser = LoginSession.current(request);
+		if (loginUser == null) {
+		    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+		    return;
+		}
 		QuestService questService = app().questService();
 		try {
 			Long userQuestId = Long.parseLong(request.getParameter("userQuestId"));
-			LoginUser loginUser = LoginSession.current(request);
-			if (loginUser == null) {
-			    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
-			    return;
-			}
 			Long userId = loginUser.getId();
 			LocalDate scheduledDate = LocalDate.parse(request.getParameter("scheduledDate"));
 			String targetTimeParam = request.getParameter("targetTime");
