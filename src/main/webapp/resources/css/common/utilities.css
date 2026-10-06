@@ -1,1 +1,121 @@
 /* 레이아웃 공통 유틸 */
+
+/* ==========================================================================
+   레이아웃 공통 유틸
+   설명: 컴포넌트(카드, 버튼 등)를 제외한 오직 뼈대와 배치, 간격, 타이포그래피만 제어합니다.
+   ========================================================================== */
+
+/* --- 1. Reset & Base (기본 초기화) --- */
+* { box-sizing: border-box; } /* 모든 요소의 크기 계산에 패딩과 테두리를 포함합니다. */
+html, body { margin: 0; padding: 0; } /* 브라우저 기본 여백을 제거합니다. */
+body {
+    background-color: var(--color-bg); /* 배경색을 디자인 토큰의 기본 배경색으로 지정합니다. */
+    color: var(--color-text); /* 기본 텍스트 색상을 지정합니다. */
+    font-family: 'Pretendard', 'Malgun Gothic', sans-serif; /* 기본 폰트를 설정합니다. */
+    line-height: 1.5; /* 글줄 간격을 읽기 편하게 설정합니다. */
+    word-break: keep-all; /* 단어 단위로 줄바꿈되도록 하여 가독성을 높입니다. */
+}
+a { text-decoration: none; color: inherit; } /* 링크의 밑줄을 없애고 기본 색상을 상속받게 합니다. */
+ul, ol { list-style: none; margin: 0; padding: 0; } /* 목록 태그의 불릿 기호와 여백을 제거합니다. */
+
+/* --- 2. Container & Grid 12 (레이아웃) --- */
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 16px; } /* 화면 중앙에 위치하는 최대 너비 1200px의 컨테이너입니다. */
+.grid-12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; } /* 화면을 12칸으로 쪼개고 간격을 24px로 둡니다. */
+
+/* 그리드 칸 수 지정 (총 12칸 기준) */
+.col-1 { grid-column: span 1 / span 1; } /* 1칸을 차지합니다. */
+.col-2 { grid-column: span 2 / span 2; } /* 2칸을 차지합니다. */
+.col-3 { grid-column: span 3 / span 3; } /* 3칸을 차지합니다. */
+.col-4 { grid-column: span 4 / span 4; } /* 4칸을 차지합니다. */
+.col-6 { grid-column: span 6 / span 6; } /* 6칸을 차지합니다. */
+.col-8 { grid-column: span 8 / span 8; } /* 8칸을 차지합니다. */
+.col-12 { grid-column: span 12 / span 12; } /* 12칸 전체를 차지합니다. */
+
+/* --- 3. Flexbox (유연한 정렬) --- */
+.flex { display: flex; } /* 요소를 가로로 나열하는 Flex 컨테이너로 만듭니다. */
+.inline-flex { display: inline-flex; } /* 글자처럼 취급되는 Flex 컨테이너로 만듭니다. */
+.flex-col { flex-direction: column; } /* Flex 요소들을 세로 방향으로 나열합니다. */
+.flex-wrap { flex-wrap: wrap; } /* 공간이 부족하면 다음 줄로 넘깁니다. */
+
+/* 가로 정렬 (Justify) */
+.justify-start { justify-content: flex-start; } /* 요소들을 왼쪽(시작점)으로 몰아서 정렬합니다. */
+.justify-center { justify-content: center; } /* 요소들을 가로 중앙에 정렬합니다. */
+.justify-end { justify-content: flex-end; } /* 요소들을 오른쪽(끝점)으로 몰아서 정렬합니다. */
+.justify-between { justify-content: space-between; } /* 양끝에 붙이고 나머지 공간을 균등하게 나눕니다. */
+
+/* 세로 정렬 (Align) */
+.items-start { align-items: flex-start; } /* 요소들을 위쪽(시작점)으로 맞춰 정렬합니다. */
+.items-center { align-items: center; } /* 요소들을 세로 중앙에 맞춰 정렬합니다. */
+.items-end { align-items: flex-end; } /* 요소들을 아래쪽(끝점)으로 맞춰 정렬합니다. */
+.items-stretch { align-items: stretch; } /* 요소들의 높이를 꽉 차게 늘립니다. */
+
+/* --- 4. Spacing (여백 제어 - 8배수 시스템 적용) --- */
+/* Margin (바깥 여백) */
+.m-0 { margin: 0; } /* 모든 바깥 여백을 없앱니다. */
+.mt-8 { margin-top: 8px; } /* 위쪽 바깥 여백 8px */
+.mt-16 { margin-top: 16px; } /* 위쪽 바깥 여백 16px */
+.mt-24 { margin-top: 24px; } /* 위쪽 바깥 여백 24px */
+.mt-32 { margin-top: 32px; } /* 위쪽 바깥 여백 32px */
+.mb-8 { margin-bottom: 8px; } /* 아래쪽 바깥 여백 8px */
+.mb-16 { margin-bottom: 16px; } /* 아래쪽 바깥 여백 16px (문단 간격에 유용) */
+.mb-24 { margin-bottom: 24px; } /* 아래쪽 바깥 여백 24px (섹션 간격에 유용) */
+.mb-32 { margin-bottom: 32px; } /* 아래쪽 바깥 여백 32px */
+.ml-auto { margin-left: auto; } /* 요소를 오른쪽으로 끝까지 밀어냅니다. */
+.mr-auto { margin-right: auto; } /* 요소를 왼쪽으로 끝까지 밀어냅니다. */
+.mx-auto { margin-left: auto; margin-right: auto; } /* 가로 기준 중앙에 배치합니다. */
+
+/* Padding (안쪽 여백) */
+.p-0 { padding: 0; } /* 모든 안쪽 여백을 없앱니다. */
+.p-8 { padding: 8px; } /* 사방 안쪽 여백 8px */
+.p-16 { padding: 16px; } /* 사방 안쪽 여백 16px (카드 기본 여백) */
+.p-24 { padding: 24px; } /* 사방 안쪽 여백 24px (여유로운 카드 여백) */
+.px-16 { padding-left: 16px; padding-right: 16px; } /* 가로(좌우) 안쪽 여백 16px */
+.px-24 { padding-left: 24px; padding-right: 24px; } /* 가로(좌우) 안쪽 여백 24px */
+.py-16 { padding-top: 16px; padding-bottom: 16px; } /* 세로(상하) 안쪽 여백 16px */
+.py-24 { padding-top: 24px; padding-bottom: 24px; } /* 세로(상하) 안쪽 여백 24px */
+
+/* --- 5. Typography (글꼴 제어) --- */
+/* 글자 크기 */
+.text-xs { font-size: 12px; } /* 아주 작은 부가 설명 텍스트 크기입니다. */
+.text-sm { font-size: 14px; } /* 부제목이나 작은 본문 텍스트 크기입니다. */
+.text-md { font-size: 16px; } /* 기본 본문 텍스트 크기입니다. */
+.text-lg { font-size: 18px; } /* 약간 강조된 텍스트나 소제목 크기입니다. */
+.text-xl { font-size: 24px; } /* 타이틀(제목) 텍스트 크기입니다. */
+.text-2xl { font-size: 32px; } /* 매우 큰 강조용 텍스트 크기입니다. */
+
+/* 글자 두께 */
+.font-regular { font-weight: 400; } /* 기본 글자 두께입니다. */
+.font-medium { font-weight: 500; } /* 약간 굵은 글자 두께입니다. */
+.font-bold { font-weight: 700; } /* 굵은 강조용 글자 두께입니다. */
+
+/* 글자 정렬 및 색상 (variables.css 연동) */
+.text-left { text-align: left; } /* 글자를 왼쪽 정렬합니다. */
+.text-center { text-align: center; } /* 글자를 중앙 정렬합니다. */
+.text-right { text-align: right; } /* 글자를 오른쪽 정렬합니다. */
+.text-primary { color: var(--color-primary); } /* 글자색을 브랜드 기본 색상(민트)으로 지정합니다. */
+.text-secondary { color: var(--color-text-secondary); } /* 글자색을 연한 회색(서브 텍스트)으로 지정합니다. */
+.text-error { color: #FF6B6B; } /* 에러나 경고를 나타낼 때 쓰는 붉은색 텍스트입니다. */
+
+/* --- 6. Dimensions & Display (크기 및 화면 표시) --- */
+.w-full { width: 100%; } /* 너비를 부모 요소에 꽉 차게 100%로 설정합니다. */
+.h-full { height: 100%; } /* 높이를 부모 요소에 꽉 차게 100%로 설정합니다. */
+.w-auto { width: auto; } /* 너비를 콘텐츠 크기에 맞게 자동으로 조절합니다. */
+
+.block { display: block; } /* 요소를 한 줄을 다 차지하는 블록 형태로 만듭니다. */
+.inline-block { display: inline-block; } /* 글자처럼 흐르면서도 크기를 가질 수 있게 만듭니다. */
+.hidden { display: none !important; } /* 요소를 화면과 공간에서 완전히 삭제합니다(우선 적용). */
+.invisible { visibility: hidden; } /* 공간은 유지하되 눈에만 보이지 않게 숨깁니다. */
+
+/* --- 7. Positioning (위치 제어) --- */
+.relative { position: relative; } /* 자신의 원래 위치를 기준으로 배치 기준점을 잡습니다. */
+.absolute { position: absolute; } /* 부모 중 relative인 요소를 기준으로 자유롭게 띄워 배치합니다. */
+.fixed { position: fixed; } /* 스크롤을 내려도 화면의 특정 위치에 고정시킵니다. (헤더 등) */
+.sticky { position: sticky; top: 0; } /* 스크롤을 내릴 때 특정 지점에 걸려 고정되게 합니다. */
+
+/* --- 8. Misc (기타 유틸리티) --- */
+.cursor-pointer { cursor: pointer; } /* 마우스를 올렸을 때 클릭 가능한 손가락 모양으로 바꿉니다. */
+.cursor-not-allowed { cursor: not-allowed; } /* 비활성화 상태임을 알리는 금지 마우스 모양으로 바꿉니다. */
+.overflow-hidden { overflow: hidden; } /* 박스 바깥으로 삐져나가는 콘텐츠를 숨깁니다. */
+.rounded-md { border-radius: 8px; } /* 모서리를 약간 둥글게(8px) 깎아줍니다. */
+.rounded-lg { border-radius: 16px; } /* 모서리를 많이 둥글게(16px, 카드용) 깎아줍니다. */
+.rounded-full { border-radius: 9999px; } /* 요소(주로 프로필 이미지)를 완전한 원형으로 만듭니다. */
