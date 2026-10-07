@@ -1,1 +1,1225 @@
-/* 공통 구성요소 (카드, 모달) */
+/* components.css — 헤더, 폼, 버튼, 뱃지, 카드, 모달 등 재사용 UI를 관리합니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
+
+/* 공통 상단 헤더: 높이 74px, 배경 var(--color-white), border-bottom 1px solid var(--color-border2), 표시 방식 flex, 교차축 정렬 center를 적용합니다. */
+.header {
+    height: 74px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border2);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+/* 브랜드 로고: 표시 방식 flex, 교차축 정렬 center, 글꼴 var(--font-logo), sans-serif, 글자 크기 30px, 글자 두께 400를 적용합니다. */
+.logo {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-logo), sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: var(--color-dark);
+    margin-right: 90px;
+    text-decoration: none;
+}
+
+/* 브랜드 로고: 높이 32px, 너비 auto, 바깥 여백 right 10px, object-fit contain를 적용합니다. */
+.logo img {
+    height: 32px;
+    width: auto;
+    margin-right: 10px;
+    object-fit: contain;
+}
+
+/* 주 메뉴: 표시 방식 flex, 요소 간 간격 38px, 높이 100%, 교차축 정렬 center, 글꼴 var(--font-body), sans-serif를 적용합니다. */
+.nav {
+    display: flex;
+    gap: 38px;
+    height: 100%;
+    align-items: center;
+    font-family: var(--font-body), sans-serif;
+}
+
+/* 주 메뉴: 글자색 var(--color-text), text-decoration none, 글자 크기 var(--fs-body), 글자 두께 var(--fw-body)를 적용합니다. */
+.nav a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-body);
+}
+
+/* 주 메뉴 / .active 활성 상태: 글자색 var(--color-dark), 글자 두께 var(--fw-h2)를 적용합니다. */
+.nav a.active {
+    color: var(--color-dark);
+    font-weight: var(--fw-h2);
+}
+
+/* 폼 입력란 / 폼 선택란: 너비 100%, 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-sm), 안쪽 여백 12px, outline none를 적용합니다. */
+.form-input, .form-select {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    outline: none;
+    font-size: var(--fs-body);
+    background: var(--color-white);
+}
+
+/* 폼 입력란 / 폼 선택란: border-color var(--color-dark)를 적용합니다. */
+.form-input:focus, .form-select:focus {
+    border-color: var(--color-dark);
+}
+
+/* 폼 항목 이름: 표시 방식 block, 글자 크기 13px, 글자 두께 700, 바깥 여백 bottom 8px, 글자색 var(--color-text)를 적용합니다. */
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+/* .section-title: 글자 크기 var(--fs-h2), 글자 두께 var(--fw-h2), 바깥 여백 bottom 17px, 표시 방식 flex, 주축 정렬 space-between를 적용합니다. */
+.section-title {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-h2);
+    margin-bottom: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 대시보드 카드 / .full-card / .card: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 24px, 그림자 var(--shadow-card)를 적용합니다. */
+.dash-card, .full-card, .card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+}
+
+/* 대시보드 카드: 표시 방식 flex, 배치 방향 column, 주축 정렬 space-between, 최소 높이 220px를 적용합니다. */
+.dash-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+}
+
+/* 대시보드 카드 제목 영역: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 center, 바깥 여백 bottom 12px를 적용합니다. */
+.dash-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* .dash-title / .card-title: 글자 크기 var(--fs-h3), 글자 두께 var(--fw-h3)를 적용합니다. */
+.dash-title, .card-title {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-h3);
+}
+
+/* 통계 지표 묶음: 표시 방식 flex, 주축 정렬 space-around, text-align center, 배경 var(--color-sub-bg), 안쪽 여백 16px를 적용합니다. */
+.stats-row {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    background: var(--color-sub-bg);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    margin-top: 12px;
+}
+
+/* 통계 수치: 글자 크기 20px, 글자 두께 800, 글자색 var(--color-primary), 바깥 여백 top 4px를 적용합니다. */
+.stat-num {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-top: 4px;
+}
+
+/* 통계 지표 이름: 글자 크기 var(--fs-small), 글자색 var(--color-muted)를 적용합니다. */
+.stat-label {
+    font-size: var(--fs-small);
+    color: var(--color-muted);
+}
+
+/* 상태 뱃지: 글자 크기 11px, 안쪽 여백 3px 8px, 모서리 곡률 6px, 배경 var(--color-main), 글자색 var(--color-primary)를 적용합니다. */
+.badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--color-main);
+    color: var(--color-primary);
+    font-weight: 750;
+    display: inline-block;
+}
+
+/* 상태 뱃지 / .orange: 글자색 var(--color-muted), 배경 var(--color-main)를 적용합니다. */
+.badge.orange {
+    color: var(--color-muted);
+    background: var(--color-main);
+}
+
+/* 상태 뱃지 / .green: 글자색 var(--color-success), 배경 var(--color-sub-bg)를 적용합니다. */
+.badge.green {
+    color: var(--color-success);
+    background: var(--color-sub-bg);
+}
+
+/* .modal-backdrop: 배치 기준 fixed, inset 0, 배경 rgba(20,30,40,.45), 표시 방식 none, 교차축 정렬 center를 적용합니다. */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,30,40,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+}
+
+/* .modal-backdrop / .show 활성 상태: 표시 방식 flex를 적용합니다. */
+.modal-backdrop.show {
+    display: flex;
+}
+
+/* 모달 본체: 너비 min(400px, 100%), 배경 var(--color-white), 모서리 곡률 var(--radius-lg), 안쪽 여백 24px, 그림자 0 20px 60px rgba(0,0,0,.18)를 적용합니다. */
+.modal {
+    width: min(400px, 100%);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-modal);
+    text-align: center;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* .modal-title: 글자 크기 var(--fs-h3), 글자 두께 800, 바깥 여백 bottom 10px를 적용합니다. */
+.modal-title {
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+/* .modal-desc: 글자 크기 var(--fs-body), 글자색 var(--color-muted), 바깥 여백 bottom 20px를 적용합니다. */
+.modal-desc {
+    font-size: var(--fs-body);
+    color: var(--color-muted);
+    margin-bottom: 20px;
+}
+
+/* .modal-btns: 표시 방식 flex, 요소 간 간격 10px를 적용합니다. */
+.modal-btns {
+    display: flex;
+    gap: 10px;
+}
+
+/* .modal-btn: flex 1, 안쪽 여백 12px, 모서리 곡률 var(--radius-sm), 글자 두께 700, 테두리 none를 적용합니다. */
+.modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    border: none;
+}
+
+/* .btn-cancel: 배경 var(--color-sub-bg), 글자색 var(--color-muted)를 적용합니다. */
+.btn-cancel {
+    background: var(--color-sub-bg);
+    color: var(--color-muted);
+}
+
+/* .btn-confirm: 배경 var(--color-danger), 글자색 var(--color-white)를 적용합니다. */
+.btn-confirm {
+    background: var(--color-danger);
+    color: var(--color-white);
+}
+
+/* 기본 버튼 / 상세 화면 이동 버튼: 테두리 none, 모서리 곡률 var(--radius-sm), 안쪽 여백 11px 15px, 글자 두께 700, text-align center를 적용합니다. */
+.btn, .detail-btn {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 11px 15px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: var(--fs-body);
+    transition: background .15s, transform .15s;
+}
+
+/* .btn-primary / 상세 화면 이동 버튼: 배경 var(--color-primary), 글자색 var(--color-white), 너비 100%, 표시 방식 block, 바깥 여백 top 16px를 적용합니다. */
+.btn-primary, .detail-btn {
+    background: var(--color-primary);
+    color: var(--color-white);
+    width: 100%;
+    display: block;
+    margin-top: 16px;
+}
+
+/* .btn-primary / 상세 화면 이동 버튼 마우스 호버 상태: 배경 var(--color-dark)를 적용합니다. */
+.btn-primary:hover, .detail-btn:hover {
+    background: var(--color-dark);
+}
+
+/* .btn-secondary: 배경 var(--color-white), 테두리 1px solid var(--color-border), 글자색 var(--color-muted)를 적용합니다. */
+.btn-secondary {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+}
+
+/* .btn-secondary 마우스 호버 상태: 배경 var(--color-sub-bg)를 적용합니다. */
+.btn-secondary:hover {
+    background: var(--color-sub-bg);
+}
+
+/* .btn-danger: 배경 var(--color-danger), 글자색 var(--color-white)를 적용합니다. */
+.btn-danger {
+    background: var(--color-danger);
+    color: var(--color-white);
+}
+
+/* 소형 보조 버튼: 테두리 1px solid var(--color-border), 배경 var(--color-white), 모서리 곡률 6px, 안쪽 여백 4px 8px, 글자 크기 11px를 적용합니다. */
+.small-btn {
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-muted);
+}
+
+/* 소형 보조 버튼 / .danger: border-color var(--color-danger-bg), 글자색 var(--color-danger)를 적용합니다. */
+.small-btn.danger {
+    border-color: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+/* .btn-primary: 글자색 var(--color-text)를 적용합니다. */
+.btn-primary {
+    color: var(--color-text);
+}
+
+/* .btn-primary / 상세 화면 이동 버튼 마우스 호버 상태: 배경 var(--color-dark)를 적용합니다. */
+.btn-primary:hover,.detail-btn:hover {
+    background: var(--color-dark);
+}
+
+/* 상태 뱃지 / 통계 수치: 글자색 var(--color-text)를 적용합니다. */
+.badge,.stat-num {
+    color: var(--color-text);
+}
+
+/* 모달 배경: 배치 기준 fixed, inset 0, 배경 var(--color-overlay), 표시 방식 none, 교차축 정렬 center를 적용합니다. */
+.modal-bg {
+    position: fixed;
+    inset: 0;
+    background: var(--color-overlay);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+}
+
+/* 모달 배경 / .show 활성 상태: 표시 방식 flex를 적용합니다. */
+.modal-bg.show {
+    display: flex;
+}
+
+/* 임시 알림: 배치 기준 fixed, bottom 24px, right 24px, z-index 300, 안쪽 여백 14px 18px를 적용합니다. */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 300;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    background: var(--color-text);
+    color: var(--color-white);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 임시 알림 / .show 활성 상태: 불투명도 1, 위치·크기 변환 none를 적용합니다. */
+.toast.show {
+    opacity: 1;
+    transform: none;
+}
+
+/* .map-item: 표시 방식 block, 너비 100%, text-align left, 테두리 0, 배경 var(--color-white)를 적용합니다. */
+.map-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: var(--color-white);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-border2);
+    cursor: pointer;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(max-width:760px) */
+@media(max-width:760px) {
+    /* 공통 상단 헤더: 높이 auto, 최소 높이 74px, 안쪽 여백 12px 20px, flex-wrap wrap, 요소 간 간격 12px를 적용합니다. */
+    .header {
+        height: auto;
+        min-height: 74px;
+        padding: 12px 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    /* 브랜드 로고: 바깥 여백 right 12px를 적용합니다. */
+    .logo {
+        margin-right: 12px;
+    }
+
+    /* 주 메뉴: 요소 간 간격 16px, flex-wrap wrap를 적용합니다. */
+    .nav {
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+}
+/* 대시보드 카드 제목 영역 / 카드 제목과 동작 버튼 정렬: 표시 방식 flex, 교차축 정렬 center, 주축 정렬 space-between, flex-wrap wrap, 요소 간 간격 8px를 적용합니다. */
+.dash-card-header,
+.card-header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* 카드 내부 목록: 표시 방식 flex, 배치 방향 column, 요소 간 간격 8px, 바깥 여백 top 10px를 적용합니다. */
+.list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* 목록 항목: 표시 방식 flex, 교차축 정렬 center, 주축 정렬 space-between, 요소 간 간격 12px, 안쪽 여백 10px 12px를 적용합니다. */
+.item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--color-sub-bg);
+    border-radius: var(--radius-md);
+}
+
+/* 목록 번호와 본문 묶음: 표시 방식 flex, 교차축 정렬 center, 요소 간 간격 10px, min-width 0를 적용합니다. */
+.item-left-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* 목록 번호와 본문 묶음: min-width 0를 적용합니다. */
+.item-left-group > div {
+    min-width: 0;
+}
+
+/* .item-number: flex-shrink 0, 글자 크기 var(--fs-small), 글자 두께 var(--fw-h2), 글자색 var(--color-muted)를 적용합니다. */
+.item-number {
+    flex-shrink: 0;
+    font-size: var(--fs-small);
+    font-weight: var(--fw-h2);
+    color: var(--color-muted);
+}
+
+/* .item-subtext: 바깥 여백 top 2px, 글자색 var(--color-muted)를 적용합니다. */
+.item-subtext {
+    margin-top: 2px;
+    color: var(--color-muted);
+}
+
+/* 목록 동작 버튼 묶음: 표시 방식 flex, flex-shrink 0, 요소 간 간격 4px를 적용합니다. */
+.item-btn-group {
+    display: flex;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+/* 상태 뱃지: 글자 크기 var(--fs-small), 글자 두께 var(--fw-small), 모서리 곡률 var(--radius-sm), 글자색 var(--color-text), 배경 var(--color-main)를 적용합니다. */
+#home-dashboard .badge {
+    font-size: var(--fs-small);
+    font-weight: var(--fw-small);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    background: var(--color-main);
+}
+
+/* 상태 뱃지 / .orange: 글자색 var(--color-accent), 배경 var(--color-sub-bg)를 적용합니다. */
+#home-dashboard .badge.orange {
+    color: var(--color-accent);
+    background: var(--color-sub-bg);
+}
+
+/* .select-badge: 최대 너비 100%, 테두리 1px solid var(--color-border), cursor pointer를 적용합니다. */
+#home-dashboard .select-badge {
+    max-width: 100%;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+}
+
+/* 소형 보조 버튼: 글자 크기 var(--fs-small), 글자 두께 var(--fw-small), 글자색 var(--color-muted), 모서리 곡률 var(--radius-sm), cursor pointer를 적용합니다. */
+#home-dashboard .small-btn {
+    font-size: var(--fs-small);
+    font-weight: var(--fw-small);
+    color: var(--color-muted);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+/* 소형 보조 버튼 / .danger: 글자색 var(--color-danger), border-color var(--color-danger-bg)를 적용합니다. */
+#home-dashboard .small-btn.danger {
+    color: var(--color-danger);
+    border-color: var(--color-danger-bg);
+}
+
+/* 소형 보조 버튼 마우스 호버 상태: 배경 var(--color-main)를 적용합니다. */
+#home-dashboard .small-btn:hover {
+    background: var(--color-main);
+}
+
+/* 소형 보조 버튼 / .danger 마우스 호버 상태: 배경 var(--color-danger-bg)를 적용합니다. */
+#home-dashboard .small-btn.danger:hover {
+    background: var(--color-danger-bg);
+}
+
+/* 상세 화면 이동 버튼: 글자색 var(--color-text)를 적용합니다. */
+#home-dashboard .detail-btn {
+    color: var(--color-text);
+}
+
+/* 상세 화면 이동 버튼 마우스 호버 상태: 배경 var(--color-dark)를 적용합니다. */
+#home-dashboard .detail-btn:hover {
+    background: var(--color-dark);
+}
+
+/* 커뮤니티 이동 버튼: 배경 var(--color-muted), 글자색 var(--color-white)를 적용합니다. */
+#home-dashboard .btn-community {
+    background: var(--color-muted);
+    color: var(--color-white);
+}
+
+/* 커뮤니티 이동 버튼 마우스 호버 상태: 배경 var(--color-text)를 적용합니다. */
+#home-dashboard .btn-community:hover {
+    background: var(--color-text);
+}
+
+/* #home-dashboard :is(a, button, select):focus-visible,
+#deleteModal button:focus-visible: outline 2px solid var(--color-success), outline-offset 3px를 적용합니다. */
+#home-dashboard :is(a, button, select):focus-visible,
+#deleteModal button:focus-visible {
+    outline: 2px solid var(--color-success);
+    outline-offset: 3px;
+}
+
+/* 카드 제목과 동작 버튼 정렬: 바깥 여백 bottom 10px를 적용합니다. */
+.card-header-flex {
+    margin-bottom: 10px;
+}
+
+/* .card-title-gap: 바깥 여백 bottom 6px를 적용합니다. */
+.card-title-gap {
+    margin-bottom: 6px;
+}
+
+/* 통계 지표 묶음: 요소 간 간격 12px를 적용합니다. */
+#home-dashboard .stats-row {
+    gap: 12px;
+}
+
+/* 통계 지표 묶음: flex 1, min-width 0를 적용합니다. */
+.stats-row > div {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 통계 지표 묶음: border-left 1px solid var(--color-border), 안쪽 여백 left 12px를 적용합니다. */
+.stats-row > div + div {
+    border-left: 1px solid var(--color-border);
+    padding-left: 12px;
+}
+
+/* 통계 수치: 글자 크기 var(--fs-h2), 글자 두께 var(--fw-h2), 글자색 var(--color-text)를 적용합니다. */
+#home-dashboard .stat-num {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-h2);
+    color: var(--color-text);
+}
+
+/* .text-accent-bold: 글자 두께 var(--fw-h2)를 적용합니다. */
+.text-accent-bold {
+    font-weight: var(--fw-h2);
+}
+
+/* 데이터가 없는 카드 안내: 안쪽 여백 24px 12px, text-align center, white-space pre-line, 글자 크기 var(--fs-small), line-height var(--lh-body)를 적용합니다. */
+.empty-state {
+    padding: 24px 12px;
+    text-align: center;
+    white-space: pre-line;
+    font-size: var(--fs-small);
+    line-height: var(--lh-body);
+    color: var(--color-muted);
+    background: var(--color-sub-bg);
+    border-radius: var(--radius-md);
+}
+
+/* .modal-desc: white-space pre-line, overflow-wrap anywhere를 적용합니다. */
+#deleteModal .modal-desc {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* .btn-cancel: 글자색 var(--color-muted)를 적용합니다. */
+#deleteModal .btn-cancel {
+    color: var(--color-muted);
+}
+
+/* .modal-btn: 글자 크기 var(--fs-body), 글자 두께 var(--fw-small), cursor pointer를 적용합니다. */
+#deleteModal .modal-btn {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-small);
+    cursor: pointer;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media (max-width: 420px) */
+@media (max-width: 420px) {
+    /* 목록 항목: 교차축 정렬 flex-start, 배치 방향 column를 적용합니다. */
+    .item-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    /* 목록 동작 버튼 묶음: align-self flex-end를 적용합니다. */
+    .item-btn-group {
+        align-self: flex-end;
+    }
+
+}
+/* 탭 버튼 묶음: 표시 방식 flex, 바깥 여백 bottom 24px, border-bottom 1px solid var(--color-border)를 적용합니다. */
+.tab-group {
+    display: flex;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* 탭 선택 버튼: flex 1, text-align center, 안쪽 여백 12px, cursor pointer, 글자 크기 var(--fs-body)를 적용합니다. */
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    cursor: pointer;
+    font-size: var(--fs-body);
+    font-weight: 700;
+    color: var(--color-muted);
+    transition: color 0.2s, border-bottom 0.2s;
+}
+
+/* 탭 선택 버튼 / .active 활성 상태: 글자색 var(--color-dark), border-bottom 2px solid var(--color-dark)를 적용합니다. */
+.tab.active {
+    color: var(--color-dark);
+    border-bottom: 2px solid var(--color-dark);
+}
+
+/* 폼 항목 묶음: 바깥 여백 bottom 16px를 적용합니다. */
+.form-group {
+    margin-bottom: 16px;
+}
+
+/* 입력란과 보조 버튼 묶음: 표시 방식 flex, 요소 간 간격 8px를 적용합니다. */
+.input-wrap {
+    display: flex;
+    gap: 8px;
+}
+
+/* 입력란과 보조 버튼 묶음 / 폼 입력란: flex 1를 적용합니다. */
+.input-wrap .form-input {
+    flex: 1;
+}
+
+/* 입력 안내 메시지: 글자색 var(--color-muted), 글자 크기 var(--fs-small), 바깥 여백 top 6px, 표시 방식 none를 적용합니다. */
+.guide-msg {
+    color: var(--color-muted);
+    font-size: var(--fs-small);
+    margin-top: 6px;
+    display: none;
+}
+
+/* 입력 오류 메시지: 글자색 var(--color-danger), 글자 크기 var(--fs-small), 바깥 여백 top 6px, 표시 방식 none를 적용합니다. */
+.error-msg {
+    color: var(--color-danger);
+    font-size: var(--fs-small);
+    margin-top: 6px;
+    display: none;
+}
+
+/* 입력 성공 메시지: 글자색 var(--color-primary), 글자 크기 var(--fs-small), 바깥 여백 top 6px, 표시 방식 none를 적용합니다. */
+.success-msg {
+    color: var(--color-primary);
+    font-size: var(--fs-small);
+    margin-top: 6px;
+    display: none;
+}
+
+/* 폼 제출 버튼: 너비 100%, 높이 50px, 배경 var(--color-dark), 테두리 none, 모서리 곡률 var(--radius-md)를 적용합니다. */
+.submit-btn {
+    width: 100%;
+    height: 50px;
+    background: var(--color-dark);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-white);
+    font-size: 15px;
+    font-weight: 800;
+    margin-top: 10px;
+    transition: background 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+/* 폼 제출 버튼 마우스 호버 상태: 배경 var(--color-dark), 위치·크기 변환 translateY(-1px)를 적용합니다. */
+.submit-btn:hover {
+    background: var(--color-dark);
+    transform: translateY(-1px);
+}
+
+/* .btn-allow: 배경색 var(--color-primary), 테두리 none, 글자색 var(--color-white)를 적용합니다. */
+.btn-allow {
+    background-color: var(--color-primary);
+    border: none;
+    color: var(--color-white);
+}
+
+/* .btn-allow 마우스 호버 상태: 배경색 var(--color-dark)를 적용합니다. */
+.btn-allow:hover {
+    background-color: var(--color-dark);
+}
+
+/* .btn-later: 배경 var(--color-white), 테두리 1px solid var(--color-border), 글자색 var(--color-muted)를 적용합니다. */
+.btn-later {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+}
+
+/* .btn-later 마우스 호버 상태: 배경 var(--color-sub-bg)를 적용합니다. */
+.btn-later:hover {
+    background: var(--color-sub-bg);
+}
+
+/* .chip-grid: 표시 방식 flex, flex-wrap wrap, 요소 간 간격 8px를 적용합니다. */
+.chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* 선택 가능한 관심사 칩: 배경 var(--color-sub-bg), 테두리 1px solid var(--color-border), 안쪽 여백 8px 14px, 모서리 곡률 20px, 글자 크기 13px를 적용합니다. */
+.interest-chip {
+    background: var(--color-sub-bg);
+    border: 1px solid var(--color-border);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    user-select: none;
+}
+
+/* 선택 가능한 관심사 칩 마우스 호버 상태: border-color var(--color-muted)를 적용합니다. */
+.interest-chip:hover {
+    border-color: var(--color-muted);
+}
+
+/* 선택 가능한 관심사 칩 / .selected 활성 상태: 배경 var(--color-main), 글자색 var(--color-primary), border-color var(--color-primary), 글자 두께 700를 적용합니다. */
+.interest-chip.selected {
+    background: var(--color-main);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* .btn-skip: 배경 var(--color-white), 테두리 1px solid var(--color-border), 글자색 var(--color-muted)를 적용합니다. */
+.btn-skip {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+}
+
+/* .btn-skip 마우스 호버 상태: 배경 var(--color-sub-bg)를 적용합니다. */
+.btn-skip:hover {
+    background: var(--color-sub-bg);
+}
+
+/* 소셜 인증 버튼: 너비 100%, 높이 50px, 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-md)를 적용합니다. */
+.social-btn {
+    width: 100%;
+    height: 50px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-body);
+    font-weight: 700;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+}
+
+/* 소셜 인증 버튼 마우스 호버 상태: 배경 var(--color-bg), border-color var(--color-dark), 위치·크기 변환 translateY(-1px)를 적용합니다. */
+.social-btn:hover {
+    background: var(--color-bg);
+    border-color: var(--color-dark);
+    transform: translateY(-1px);
+}
+
+/* .social-icon: 글자 크기 18px를 적용합니다. */
+.social-icon {
+    font-size: 18px;
+}
+
+/* 주 탭 메뉴: 표시 방식 flex, 요소 간 간격 8px, 바깥 여백 bottom 24px, border-bottom 2px solid var(--color-border2), 안쪽 여백 bottom 10px를 적용합니다. */
+.main-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--color-border2);
+    padding-bottom: 10px;
+}
+
+/* 주 탭 선택 버튼: 테두리 0, 배경 transparent, 글자색 var(--color-muted), 안쪽 여백 10px 17px, 모서리 곡률 var(--radius-sm)를 적용합니다. */
+.main-tab-btn {
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    padding: 10px 17px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+/* 주 탭 선택 버튼 / .active 활성 상태: 배경 var(--color-main), 글자색 var(--color-dark)를 적용합니다. */
+.main-tab-btn.active {
+    background: var(--color-main);
+    color: var(--color-dark);
+}
+
+/* 탭 콘텐츠: 표시 방식 none를 적용합니다. */
+.tab-content {
+    display: none;
+}
+
+/* 탭 콘텐츠 / .active 활성 상태: 표시 방식 block를 적용합니다. */
+.tab-content.active {
+    display: block;
+}
+
+/* .badges: 표시 방식 flex, 요소 간 간격 6px, flex-wrap wrap, 바깥 여백 bottom 9px를 적용합니다. */
+.badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 9px;
+}
+
+/* 모달 제목 영역: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 center, 바깥 여백 bottom 20px를 적용합니다. */
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 모달 제목 영역: 바깥 여백 0, 글자 크기 var(--fs-h2), 글자 두께 var(--fw-h2)를 적용합니다. */
+.modal-head h2 {
+    margin: 0;
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-h2);
+}
+
+/* 모달 닫기 버튼: 테두리 0, 배경 var(--color-sub-bg), 모서리 곡률 8px, 너비 34px, 높이 34px를 적용합니다. */
+.close {
+    border: 0;
+    background: var(--color-sub-bg);
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 19px;
+    cursor: pointer;
+}
+
+/* 우클릭 메뉴: 배치 기준 fixed, 배경 var(--color-white), 테두리 1px solid var(--color-border), 그림자 var(--shadow-card), 모서리 곡률 var(--radius-sm)를 적용합니다. */
+.context-menu {
+    position: fixed;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-sm);
+    padding: 5px;
+    z-index: 150;
+    display: none;
+}
+
+/* 우클릭 메뉴: 표시 방식 block, 너비 140px, text-align left, 테두리 0, 배경 var(--color-white)를 적용합니다. */
+.context-menu button {
+    display: block;
+    width: 140px;
+    text-align: left;
+    border: 0;
+    background: var(--color-white);
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 우클릭 메뉴 마우스 호버 상태: 배경 var(--color-bg)를 적용합니다. */
+.context-menu button:hover {
+    background: var(--color-bg);
+}
+
+/* 우클릭 메뉴 / .danger: 글자색 var(--color-danger)를 적용합니다. */
+.context-menu button.danger {
+    color: var(--color-danger);
+}
+
+/* .collection-row: 표시 방식 flex, 요소 간 간격 12px, 교차축 정렬 center, 안쪽 여백 12px 0, border-bottom 1px solid var(--color-border2)를 적용합니다. */
+.collection-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-border2);
+}
+
+/* .collection-row: border-bottom 0를 적용합니다. */
+.collection-row:last-child {
+    border-bottom: 0;
+}
+
+/* 검색 입력과 필터 배치: 표시 방식 flex, 요소 간 간격 8px, 바깥 여백 bottom 18px, 배치 기준 relative를 적용합니다. */
+.searchbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    position: relative;
+}
+
+/* 검색 입력 배치 기준: flex 1, 배치 기준 relative, 표시 방식 flex, 교차축 정렬 center를 적용합니다. */
+.search-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* 검색어 지우기 버튼: 배치 기준 absolute, right 12px, 배경 var(--color-sub-bg), 테두리 0, 너비 24px를 적용합니다. */
+.clear-search {
+    position: absolute;
+    right: 12px;
+    background: var(--color-sub-bg);
+    border: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* .select-btn: 높이 46px, 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-sm), 배경 var(--color-white), 안쪽 여백 0 16px를 적용합니다. */
+.select-btn {
+    height: 46px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    padding: 0 16px;
+    cursor: pointer;
+}
+
+/* 필터 칩: white-space nowrap, 테두리 1px solid var(--color-border), 배경 var(--color-white), 모서리 곡률 999px, 안쪽 여백 8px 16px를 적용합니다. */
+.chip {
+    white-space: nowrap;
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
+    border-radius: var(--radius-pill);
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+/* 필터 칩 / .active 활성 상태: border-color var(--color-dark), 배경 var(--color-main), 글자색 var(--color-dark)를 적용합니다. */
+.chip.active, .chip:hover {
+    border-color: var(--color-dark);
+    background: var(--color-main);
+    color: var(--color-dark);
+}
+
+/* .thumb: 높이 120px, 모서리 곡률 var(--radius-md), 배경 var(--color-sub-bg), 표시 방식 flex, 교차축 정렬 center를 적용합니다. */
+.thumb {
+    height: 120px;
+    border-radius: var(--radius-md);
+    background: var(--color-sub-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+/* .card-bottom: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 center, 바깥 여백 top auto, 안쪽 여백 top 12px를 적용합니다. */
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+/* .card-actions: 표시 방식 flex, 요소 간 간격 6px를 적용합니다. */
+.card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* .map-item: border-bottom 0를 적용합니다. */
+.map-item:last-child {
+    border-bottom: 0;
+}
+
+/* 일정 달력 패널: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 20px, 바깥 여백 bottom 20px를 적용합니다. */
+.calendar {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+/* 달력 탐색 도구: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 center, 바깥 여백 bottom 16px를 적용합니다. */
+.calendar-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* .cal-nav-btn: 표시 방식 flex, 요소 간 간격 8px, 교차축 정렬 center를 적용합니다. */
+.cal-nav-btn {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* 보기 방식 전환 버튼 묶음: 표시 방식 flex, 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-sm), 안쪽 여백 2px, 배경 var(--color-bg)를 적용합니다. */
+.toggle {
+    display: flex;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    background: var(--color-bg);
+}
+
+/* 보기 방식 전환 버튼 묶음: 테두리 0, 배경 transparent, 안쪽 여백 6px 12px, 모서리 곡률 6px, cursor pointer를 적용합니다. */
+.toggle button {
+    border: 0;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 보기 방식 전환 버튼 묶음 / .active 활성 상태: 배경 var(--color-dark), 글자색 var(--color-white)를 적용합니다. */
+.toggle button.active {
+    background: var(--color-dark);
+    color: var(--color-white);
+}
+
+/* 일주일 날짜 배치: 표시 방식 grid, 그리드 열 구성 repeat(7, 1fr), 요소 간 간격 8px를 적용합니다. */
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+/* 선택 가능한 날짜: 테두리 1px solid var(--color-border2), 모서리 곡률 var(--radius-sm), 안쪽 여백 10px, text-align center, 배경 var(--color-white)를 적용합니다. */
+.day {
+    border: 1px solid var(--color-border2);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    text-align: center;
+    background: var(--color-white);
+    cursor: pointer;
+}
+
+/* 선택 가능한 날짜 / .selected 활성 상태: 배경 var(--color-dark), 글자색 var(--color-white), border-color var(--color-dark)를 적용합니다. */
+.day.selected {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-color: var(--color-dark);
+}
+
+/* 선택 가능한 날짜 / .selected / 짧은 설명 활성 상태: 글자색 var(--color-white)를 적용합니다. */
+.day.selected .desc {
+    color: var(--color-white);
+}
+
+/* 진행률 표시 막대: 높이 8px, 배경 var(--color-sub-bg), 모서리 곡률 999px, 넘친 내용 처리 hidden, 바깥 여백 12px 0를 적용합니다. */
+.progressbar {
+    height: 8px;
+    background: var(--color-sub-bg);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+/* 진행률 표시 막대: 표시 방식 block, 높이 100%, 배경 var(--color-dark), 너비 0%, 상태 전환 효과 width 0.3s를 적용합니다. */
+.progressbar i {
+    display: block;
+    height: 100%;
+    background: var(--color-dark);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* 완료 상태 뱃지: 안쪽 여백 4px 8px, 모서리 곡률 6px, 배경 var(--color-main), 글자색 var(--color-dark)를 적용합니다. */
+.status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--color-main);
+    color: var(--color-dark);
+}
+
+/* 완료 상태 뱃지 / .done: 배경 var(--color-sub-bg), 글자색 var(--color-success)를 적용합니다. */
+.status.done {
+    background: var(--color-sub-bg);
+    color: var(--color-success);
+}
+
+/* .tab-active: 글자색 var(--color-dark), 배경 var(--color-main)를 적용합니다. */
+.tab-active {
+    color: var(--color-dark);
+    background: var(--color-main);
+}
+
+/* 요일 선택 칩: 테두리 1px solid var(--color-border), 모서리 곡률 11px, 배경 var(--color-white), 안쪽 여백 7px 11px, 글자 크기 var(--fs-small)를 적용합니다. */
+.day-chip {
+    border: 1px solid var(--color-border);
+    border-radius: 11px;
+    background: var(--color-white);
+    padding: 7px 11px;
+    font-size: var(--fs-small);
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 요일 선택 칩 / .active 활성 상태: border-color var(--color-dark), 배경 var(--color-main), 글자색 var(--color-text)를 적용합니다. */
+.day-chip.active {
+    border-color: var(--color-dark);
+    background: var(--color-main);
+    color: var(--color-text);
+}
+
+/* 선택 가능한 장소 카드: 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 배경 var(--color-white), 안쪽 여백 15px, cursor pointer를 적용합니다. */
+.place-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    padding: 15px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* 선택 가능한 장소 카드 / .active 활성 상태: border-color var(--color-dark), 그림자 0 0 0 2px var(--color-sub-bg)를 적용합니다. */
+.place-card.active {
+    border-color: var(--color-dark);
+    box-shadow: 0 0 0 2px var(--color-sub-bg);
+}
+
+/* 소형 정보 뱃지: 글자 크기 10px, 글자 두께 800, 안쪽 여백 3px 8px, 모서리 곡률 999px, 배경 var(--color-main)를 적용합니다. */
+.pill {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--color-main);
+    color: var(--color-text);
+    display: inline-block;
+    line-height: normal;
+}
+
+/* 비어 있는 목록 안내: 안쪽 여백 35px, text-align center, 글자색 var(--color-muted), 배경 var(--color-bg), 테두리 1px dashed var(--color-border)를 적용합니다. */
+.empty {
+    padding: 35px;
+    text-align: center;
+    color: var(--color-muted);
+    background: var(--color-bg);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+/* .dot: 너비 6px, 높이 6px, 모서리 곡률 50%, 배경 var(--color-border)를 적용합니다. */
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-border);
+}
+
+/* .dot / .active 활성 상태: 배경 var(--color-dark)를 적용합니다. */
+.dot.active {
+    background: var(--color-dark);
+}
+
+/* .dot / .done: 배경 var(--color-success)를 적용합니다. */
+.dot.done {
+    background: var(--color-success);
+}
+
+/* .card: 상태 전환 효과 transform .18s,box-shadow .18s를 적용합니다. */
+.card {
+    transition: transform .18s,box-shadow .18s;
+}
+
+/* .card 마우스 호버 상태: 위치·크기 변환 translateY(-2px), 그림자 var(--shadow-card)를 적용합니다. */
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+/* .auth-container / .profile-container / .location-container: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 그림자 var(--shadow-card)를 적용합니다. */
+.auth-container, .profile-container, .location-container {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
