@@ -19,7 +19,7 @@ import com.dteam0928.sangsae.web.page.BaseServlet;
 
 //공개 퀘스트를 조회, 상세조회, 일정에 등록
 //QuestTemplate 조회, UserQuest에 등록
-@WebServlet("/quests")
+@WebServlet("/quest")
 public class QuestServlet extends BaseServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -39,7 +39,7 @@ public class QuestServlet extends BaseServlet {
 		    request.setAttribute("quest", questDetail);
 		    request.setAttribute("place", questDetail.place());
 		    //경로는 추후 통합되고 나면 수정
-		    request.getRequestDispatcher("/views/quest/detail.jsp").forward(request, response);
+		    request.getRequestDispatcher("/WEB-INF/views/quest/quest.jsp").forward(request, response);
 		    return;
 		}
 		String category = request.getParameter("category");
@@ -51,7 +51,7 @@ public class QuestServlet extends BaseServlet {
 		}
 		request.setAttribute("quests", quests);
 		//경로는 추후 통합되고 나면 수정
-		request.getRequestDispatcher("/views/quest/list.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/quest/quest.jsp").forward(request, response);
 	}
 	
 	@Override
