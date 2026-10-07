@@ -5,7 +5,8 @@ import com.dteam0928.sangsae.common.config.AppConfig;
 /**
  * 루틴 탐색 설정값 (application.properties 의 routine.*). 숫자를 바꿀 때 코드 수정 없이 설정만 고치면 된다.
  *
- * @param defaultLatitude    GPS·저장 위치가 모두 없을 때 기준 위치 (기본: 서울 시청)
+ * @param defaultLatitude    GPS·저장 위치가 모두 없을 때 기준 위치 (기본: 동의대학교)
+ * @param defaultLocationName 기본 위치 이름 ("기본 위치: 동의대학교 인근" 문구용)
  * @param nearbyRadiusMeters "내 주변" 반경
  * @param trendingDays       "지금 뜨는" 집계 기간(일)
  * @param sectionSize        섹션별 카드 수
@@ -16,14 +17,16 @@ import com.dteam0928.sangsae.common.config.AppConfig;
  * @param surgeRatio         "이용 급증" 기준: 최근 N일 ≥ 그 전 N일 × 이 배수
  * @param surgeMinCount      "이용 급증" 최소 건수 (기록이 너무 적을 때 급증으로 보지 않음)
  */
-public record RoutineSettings(double defaultLatitude, double defaultLongitude, int nearbyRadiusMeters,
+public record RoutineSettings(double defaultLatitude, double defaultLongitude, String defaultLocationName,
+                              int nearbyRadiusMeters,
                               int trendingDays, int sectionSize, int mapPlaceLimit, int pageSize,
                               int myPlaceLimit, int usageDays, double surgeRatio, int surgeMinCount) {
 
     public static RoutineSettings from(AppConfig config) {
         return new RoutineSettings(
-                Double.parseDouble(config.get("routine.default-latitude", "37.5665")),
-                Double.parseDouble(config.get("routine.default-longitude", "126.9780")),
+                Double.parseDouble(config.get("routine.default-latitude", "35.1434")),
+                Double.parseDouble(config.get("routine.default-longitude", "129.0346")),
+                config.get("routine.default-location-name", "동의대학교"),
                 config.getInt("routine.nearby-radius-meters", 3000),
                 config.getInt("routine.trending-days", 7),
                 config.getInt("routine.section-size", 6),

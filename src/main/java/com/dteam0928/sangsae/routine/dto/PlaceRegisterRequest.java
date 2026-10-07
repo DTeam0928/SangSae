@@ -5,7 +5,7 @@ package com.dteam0928.sangsae.routine.dto;
  * <ul>
  *   <li>이미 places 에 있는 장소: placeId 만 보낸다</li>
  *   <li>카카오 검색 결과로 새 장소: kakaoPlaceId, name, latitude(카카오 y), longitude(카카오 x) 필수.
- *       region1~3 이 없으면 addressName("서울 중구 태평로1가 31")을 앞에서부터 잘라 채운다</li>
+ *       region1~3 이 없으면 addressName("부산 부산진구 가야동 24")을 앞에서부터 잘라 채운다</li>
  * </ul>
  */
 public class PlaceRegisterRequest {

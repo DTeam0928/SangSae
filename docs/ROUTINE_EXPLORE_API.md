@@ -12,8 +12,8 @@
 ## 위치
 
 GET API 는 모두 `lat`, `lng` 를 선택으로 받는다 (브라우저 Geolocation 값).
-없으면 O-03 에서 저장한 위치 → 그것도 없으면 서울 시청. 응답의 `location.source` 로 구분:
-`GPS` / `PROFILE` / `DEFAULT` → DEFAULT 면 "기본 위치: 서울 시청 인근" 문구 표시.
+없으면 O-03 에서 저장한 위치 → 그것도 없으면 기본 위치(동의대학교). 응답의 `location.source` 로 구분:
+`GPS` / `PROFILE` / `DEFAULT` → DEFAULT 면 `location.label` 로 "기본 위치: 동의대학교 인근" 문구 표시.
 
 ---
 
@@ -144,7 +144,7 @@ POST 파라미터
 
 `routine.nearby-radius-meters`(3000), `routine.trending-days`(7), `routine.section-size`(6),
 `routine.map-place-limit`(20), `routine.page-size`(12), `routine.my-place-limit`(10),
-`routine.default-latitude` / `routine.default-longitude`(서울 시청),
+`routine.default-latitude` / `routine.default-longitude` / `routine.default-location-name`(동의대학교),
 `routine.usage-days`(7), `routine.surge-ratio`(1.5), `routine.surge-min-count`(3)
 
 ## 장소 유형 코드 (place_categories)
