@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     profile_image_url     VARCHAR(500) NULL,
     is_location_permitted BOOLEAN      NOT NULL DEFAULT FALSE,
     last_known_location   POINT SRID 4326 NULL,
+    total_xp              INT          NOT NULL DEFAULT 0,
     updated_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id),
     UNIQUE KEY uk_profiles_nickname (nickname),

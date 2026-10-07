@@ -23,6 +23,9 @@ import com.dteam0928.sangsae.common.map.service.LocationAuthService;
 import com.dteam0928.sangsae.common.map.service.PlaceService;
 import com.dteam0928.sangsae.common.util.DBUtil;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.routine.service.RoutineService;
+import com.dteam0928.sangsae.user.exp.ExpPolicy;
+import com.dteam0928.sangsae.user.exp.ExperienceService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletContext;
@@ -61,8 +64,15 @@ public class AppContext implements AutoCloseable {
     private final PlaceService placeService;
     private final LocationAuthService locationAuthService;
 
+    // ---- 경험치 / 레벨 ----
+    private final ExpPolicy expPolicy;
+    private final ExperienceService experienceService;
+
     // ---- 퀘스트 ----
     private final QuestService questService;
+
+    // ---- 루틴 ----
+    private final RoutineService routineService;
     
     public AppContext(AppConfig config) {
         this(config, DataSourceFactory.create(config));
@@ -103,8 +113,20 @@ public class AppContext implements AutoCloseable {
         this.placeService = new PlaceService(placeDao);
         this.locationAuthService = new LocationAuthService(placeService);
 
-        // ---- 퀘스트 (지도·위치인증 서비스 주입) ----
-        this.questService = new QuestService(tx, placeService, locationAuthService);
+        // ---- 경험치 / 레벨 ----
+        this.expPolicy = new ExpPolicy(
+                config.getInt("exp.quest.default", ExpPolicy.DEFAULT_QUEST_XP),
+                config.getInt("exp.routine.default", ExpPolicy.DEFAULT_ROUTINE_XP),
+                config.getInt("exp.level.per-xp", ExpPolicy.XP_PER_LEVEL),
+                config.getInt("exp.level.max", ExpPolicy.MAX_LEVEL)
+        );
+        this.experienceService = new ExperienceService(tx, profileDao, expPolicy);
+
+        // ---- 퀘스트 (지도·위치인증·경험치 서비스 주입) ----
+        this.questService = new QuestService(tx, placeService, locationAuthService, experienceService);
+
+        // ---- 루틴 (지도·위치인증·경험치 서비스 주입) ----
+        this.routineService = new RoutineService(tx, placeService, locationAuthService, experienceService);
     }
 
     /**
@@ -133,7 +155,10 @@ public class AppContext implements AutoCloseable {
     public PlaceDao placeDao() { return placeDao; }
     public PlaceService placeService() { return placeService; }
     public LocationAuthService locationAuthService() { return locationAuthService; }
+    public ExpPolicy expPolicy() { return expPolicy; }
+    public ExperienceService experienceService() { return experienceService; }
     public QuestService questService() { return questService; }
+    public RoutineService routineService() { return routineService; }
 
     @Override
     public void close() {
