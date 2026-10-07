@@ -12,5 +12,6 @@ public final class Views {
     public static final String EMAIL_AUTH = PREFIX + "auth/email-auth.jsp";         // O-01
     public static final String ONBOARDING_PROFILE = PREFIX + "onboarding/profile.jsp";   // O-02
     public static final String ONBOARDING_LOCATION = PREFIX + "onboarding/location.jsp"; // O-03
-    public static final String HOME = PREFIX + "home/home.jsp";                      // H-00 (임시)
+    public static final String HOME = PREFIX + "home/home.jsp";
+    public static final String QUEST = PREFIX + "quest/quest.jsp";
 }
