@@ -1,3 +1,4 @@
+<%-- places 기반 조회 모달. 입력 필드가 없으므로 기존 표시 요소와 동적 컨테이너를 유지합니다. --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- =================================================================
 [모달] 루틴 스팟/장소 상세 모달 (placeModal)

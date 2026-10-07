@@ -1,3 +1,4 @@
+<%-- 입력 필드와 삭제 대상 정보가 없는 기본 JSP입니다. 삭제 UI 및 연동은 추가하지 않습니다. --%>
 <%--
   Created by IntelliJ IDEA.
   User: dita_810

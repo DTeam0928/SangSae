@@ -1,3 +1,4 @@
+<%-- quest_templates / user_quests 상세 정보는 detailContent에 동적 렌더링합니다. 정적 입력 필드가 없어 구조를 유지합니다. --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- =================================================================
 [모달] 퀘스트 상세 보기 모달 (detailModal)

@@ -1,3 +1,4 @@
+<%-- rmAll은 Task 전체 선택용 UI 상태이며 DB 컬럼이 아닙니다. name을 부여하지 않고 기존 선택 동작을 유지합니다. --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- =================================================================
 [모달] 루틴 상세 및 Task 선택 모달 (routineModal)

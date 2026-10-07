@@ -1,3 +1,4 @@
+<%-- user_quest_bookmarks 기반 조회 컨테이너. 정적 입력 필드가 없어 구조를 유지합니다. folder_name은 동적 렌더링 단계에서 maxlength=50으로 처리합니다. --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- =================================================================
 [모달] 내 컬렉션 보관함 모달 (collectionModal)

@@ -1,3 +1,4 @@
+<%-- trips 목록 선택 전용 모달입니다. 여행 생성 폼을 추가하지 않고 tripListContent를 유지합니다. --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- =================================================================
 [모달] 내 여행 목록 선택/전환 모달 (tripModal)

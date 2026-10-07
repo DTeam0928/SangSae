@@ -1,3 +1,4 @@
+<%-- 장소 유형은 places.category / place_categories.code 기준으로 동적 구성합니다. 검색 반경(km)은 조회 조건이며 GPS 인증 허용 반경 컬럼과 다릅니다. --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- =================================================================
 [모달] 주변 장소/스팟 탐색 필터 모달 (filterModal)
