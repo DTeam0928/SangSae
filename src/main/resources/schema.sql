@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     profile_image_url VARCHAR(500) COMMENT '프로필 이미지 URL',
     is_location_permitted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'GPS 위치 권한 동의 여부',
     last_known_location POINT SRID 4326 COMMENT '온보딩 시 1회 저장된 최근 GPS 좌표',
+    total_xp INT NOT NULL DEFAULT 0 COMMENT '누적 경험치 (XP)',
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_profiles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -188,8 +189,9 @@ CREATE TABLE IF NOT EXISTS routine_template_tasks (
     content VARCHAR(150) NOT NULL COMMENT '세부 Task 내용',
     default_time TIME NOT NULL DEFAULT '07:00:00' COMMENT '권장 실천 시간',
     category VARCHAR(50) NOT NULL COMMENT '세부 카테고리',
-    reward_xp INT NOT NULL DEFAULT 10 COMMENT 'Task 완료 시 획득 XP',
+    reward_xp INT NOT NULL DEFAULT 100 COMMENT 'Task 완료 시 획득 XP',
     sort_order SMALLINT NOT NULL DEFAULT 1 COMMENT '패키지 내 순서',
+    allowed_radius_meters INT NOT NULL DEFAULT 50 COMMENT '방문 인증 허용 반경(m)',
     CONSTRAINT fk_routine_tpl_task_tpl FOREIGN KEY (routine_template_id) REFERENCES routine_templates(id) ON DELETE CASCADE,
     CONSTRAINT fk_routine_tpl_task_place FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -219,9 +221,10 @@ CREATE TABLE IF NOT EXISTS user_routine_tasks (
     category VARCHAR(50) NOT NULL COMMENT '카테고리',
     repeat_type VARCHAR(20) NOT NULL DEFAULT 'DAILY' COMMENT '반복 유형 (DAILY, WEEKDAY, WEEKEND, CUSTOM, ONCE)',
     alert_time TIME COMMENT '푸시 알림 희망 시간',
-    reward_xp INT NOT NULL DEFAULT 10 COMMENT 'Task 완료 시 획득할 XP',
+    reward_xp INT NOT NULL DEFAULT 100 COMMENT 'Task 완료 시 획득할 XP',
     memo VARCHAR(255) COMMENT '개인 메모',
     is_active BOOLEAN NOT NULL DEFAULT TRUE COMMENT '활성 여부',
+    allowed_radius_meters INT NOT NULL DEFAULT 50 COMMENT '방문 인증 허용 반경(m)',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user_routine_task_routine FOREIGN KEY (user_routine_id) REFERENCES user_routines(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_routine_task_origin FOREIGN KEY (origin_template_task_id) REFERENCES routine_template_tasks(id) ON DELETE SET NULL,
