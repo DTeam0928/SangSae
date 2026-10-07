@@ -153,11 +153,12 @@ public class RoutineExploreService {
     /** 기준 위치: 요청 좌표(GPS) → O-03 저장 위치 → 기본 위치 */
     LocationInfo resolveLocation(EntityManager em, long userId, Double lat, Double lng) {
         if (lat != null && lng != null && GeoPoint.isValid(lat, lng) && !(lat == 0.0 && lng == 0.0)) {
-            return new LocationInfo(lat, lng, "GPS");
+            return new LocationInfo(lat, lng, "GPS", null);
         }
         GeoPoint saved = profileDao.findByUserId(em, userId).map(UserProfile::getLastKnownLocation).orElse(null);
-        if (saved != null) return new LocationInfo(saved.getLatitude(), saved.getLongitude(), "PROFILE");
-        return new LocationInfo(settings.defaultLatitude(), settings.defaultLongitude(), "DEFAULT");
+        if (saved != null) return new LocationInfo(saved.getLatitude(), saved.getLongitude(), "PROFILE", null);
+        return new LocationInfo(settings.defaultLatitude(), settings.defaultLongitude(), "DEFAULT",
+                settings.defaultLocationName());
     }
 
     private List<NearbySpot> buildSpots(EntityManager em, long userId, List<PlaceSummary> places) {

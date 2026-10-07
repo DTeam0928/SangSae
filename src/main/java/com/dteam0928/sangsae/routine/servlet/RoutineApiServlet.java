@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * R-00 루틴 탐색 API. 모든 GET 은 lat, lng(선택)을 받는다. 없으면 O-03 저장 위치 → 기본 위치(서울 시청).
+ * R-00 루틴 탐색 API. 모든 GET 은 lat, lng(선택)을 받는다. 없으면 O-03 저장 위치 → 기본 위치(동의대학교).
  * <pre>
  * GET    /api/routines?q=&amp;category=&amp;placeCategory=&amp;sort=&amp;page=   검색 · 칩 · 장소 유형 · 정렬
  *                                                    (sort: distance|popular|latest|recommend)
