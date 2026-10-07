@@ -52,33 +52,9 @@
                 <div class="desc">현재 시간과 여행지에 맞춰 골라봤어요</div>
             </div>
         </div>
-        <div class="feature">
-            <div class="feature-main">
-                <div class="badges">
-                    <span class="badge">오늘 추천</span>
-                    <span class="badge orange">+120 XP</span>
-                </div>
-                <h2 class="quest-detail-5 title">광안리에서 일몰 사진 남기기</h2>
-                <p class="quest-detail-7 desc">해 질 무렵 바다를 바라보며 마음에 드는 사진 한 장을 남겨보세요.</p>
-                <div class="desc">📍 수영구 · 광안리 · ⏱ 30~40분 · ⭐ 4.8</div>
-                <div class="quest-detail-8">
-                    <button class="quest-detail-6 btn btn-primary" onclick="App.quest.openDetailModal(1)">퀘스트 보기</button>
-                    <button class="btn btn-secondary" onclick="App.quest.toggleSave(1, this)">♡</button>
-                </div>
-            </div>
-            <div class="feature-side">
-                <div class="quest-detail-9 dash-card">
-                    <strong class="subtitle">🌅 추천 시간</strong>
-                    <span class="desc">오늘 18:20 ~ 19:10</span>
-                </div>
-                <div class="quest-detail-9 dash-card">
-                    <strong class="subtitle">🎯 난이도</strong>
-                    <span class="desc">★★☆☆☆ 쉬움</span>
-                </div>
-                <div class="quest-detail-9 dash-card">
-                    <strong class="subtitle">🏆 완료 보상</strong>
-                    <span class="quest-detail-10 desc">+120 XP · 일몰 기록 배지</span>
-                </div>
+        <div class="feature" id="heroRecommendContainer">
+            <div class="feature-main" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+                <h2 class="title" style="color: var(--color-muted);">🌟 퀘스트 데이터를 불러오는 중입니다...</h2>
             </div>
         </div>
     </div>
@@ -90,12 +66,13 @@
                 <div class="title">📍 내 주변 퀘스트</div>
                 <div class="desc">지도에서 장소와 퀘스트를 함께 확인하세요</div>
             </div>
-            <div class="quest-detail-11 subtitle" onclick="App.quest.showToast('지도 기능을 준비 중입니다.')">지도 크게 보기 →</div>
+            <div class="quest-detail-11 subtitle" onclick="App.quest.focusUserLocation()">내 위치로 이동 📍</div>
         </div>
         <div class="map-layout">
-            <div class="map">
-                <div class="quest-detail-12 subtitle">
-                    부산 · 주변 12개
+            <div class="map" style="position: relative; overflow: hidden;">
+                <div id="questMapContainer" style="width: 100%; height: 100%;"></div>
+                <div class="quest-detail-12 subtitle" id="questMapBadge" style="z-index: 2; pointer-events: none;">
+                    부산 · 주변 퀘스트
                 </div>
             </div>
             <div class="map-list" id="mapList"></div>

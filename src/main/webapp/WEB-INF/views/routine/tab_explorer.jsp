@@ -66,11 +66,10 @@
         <button type="button" onclick="App.routine.openPlaceFilters()" class="ds-px-3 ds-py-2 radius-md surface-sub-bg color-muted type-xs weight-bold">필터</button>
       </div>
     </div>
-    <div id="map" class="map-wrap">
-      <div class="map-grid-bg"></div>
-      <div id="customMapContainer" class="position-absolute inset-zero"></div>
-      <div class="position-absolute ds-bottom-3 ds-left-3 surface-glass backdrop-blur-sm ds-px-3 ds-py-1_5 radius-sm type-xs weight-bold shadow-card border-default border-color-border color-muted ds-z-10 layout-row align-center ds-gap-2">
-        <span class="ds-w-2 ds-h-2 radius-pill surface-dark animate-pulse"></span> QUESTRIP 인터랙티브 지도 서비스
+    <div id="map" class="map-wrap" style="position: relative; overflow: hidden;">
+      <div id="customMapContainer" style="width: 100%; height: 100%;"></div>
+      <div class="position-absolute ds-bottom-3 ds-left-3 surface-glass backdrop-blur-sm ds-px-3 ds-py-1_5 radius-sm type-xs weight-bold shadow-card border-default border-color-border color-muted ds-z-10 layout-row align-center ds-gap-2" style="pointer-events: none;">
+        <span class="ds-w-2 ds-h-2 radius-pill surface-dark animate-pulse"></span> SANGSAE 루틴 스팟 지도
       </div>
     </div>
     <div id="nearbyPlaces" class="layout-grid columns-1 medium-columns-3 ds-gap-3 ds-mt-4"></div>
@@ -87,27 +86,9 @@
     <div id="nearbyRoutineGrid" class="layout-grid columns-1 medium-columns-2 large-columns-3 ds-gap-5"></div>
   </section>
 
-  <section class="layout-grid columns-1 large-columns-2 ds-gap-6">
-    <div class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card">
-      <div class="layout-row justify-between align-start ds-mb-4">
-        <div>
-          <h2 class="weight-heading type-xl">🏋️ 내가 다니는 장소의 인기 루틴</h2>
-          <p class="type-xs color-muted ds-mt-1">등록한 장소에서 다른 사람들이 자주 하는 루틴</p>
-        </div>
-        <button type="button" onclick="App.routine.openMyPlaces()" class="type-xs color-dark weight-bold">장소 관리</button>
-      </div>
-      <select id="myPlaceSelect" onchange="App.routine.renderMyPlaceRoutines()" class="width-full border-default border-color-border surface-sub-bg radius-md ds-px-3 ds-py-3 type-sm"></select>
-      <div id="myPlaceRoutineList" class="space-y-3 ds-mt-4"></div>
-    </div>
-    <div class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card">
-      <div class="layout-row justify-between align-start ds-mb-4">
-        <div>
-          <h2 class="weight-heading type-xl">🎯 장소별 루틴 아이디어</h2>
-          <p class="type-xs color-muted ds-mt-1">같은 행동도 장소에 따라 다른 루틴이 됩니다.</p>
-        </div>
-      </div>
-      <div id="placeIdeas" class="space-y-3"></div>
-    </div>
+  <section class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card">
+    <h2 class="weight-heading type-xl">🎯 일상 루틴 가이드</h2>
+    <p class="type-xs color-muted ds-mt-1">마음에 드는 루틴을 담아 내 일정으로 만들고, 지정된 장소나 시간에서 완료해 보세요.</p>
   </section>
 
   <section>
