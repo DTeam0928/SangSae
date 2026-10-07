@@ -9,6 +9,12 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'IBM Plex Sans KR';
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* ---------- 2. 디자인 정의 (style guide) ---------- */
 :root {
     /* 컬러 팔레트 */
@@ -36,15 +42,15 @@
     --color-danger-bg: #FDE8E8;   /* 에러 배경 연한 톤 */
     --color-success: #2A9D8F;     /* 성공/완료 (민트 계열과 찰떡궁합인 딥 그린) */
 
-    --font-logo: 'NalnaRiji', 'Pretendard', sans-serif;
-    --font-body: 'IBM Plex Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-logo: 'NalnaRiji', sans-serif;
+    --font-body: 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
     /* 타이포그래피 스케일 */
     --fs-a: 128px;
     --fs-b: 36px;
     --fs-h1: 25px;  --fw-h1: 850;
     --fs-h2: 19px;  --fw-h2: 800;
-    --fs-h3: 15.5px; --fw-h3: 730;
+    --fs-h3: 16px; --fw-h3: 730;
     --fs-body: 14px; --fw-body: 450; --lh-body: 1.5;
     --fs-small: 12px; --fw-small: 600;
 
@@ -57,7 +63,8 @@
 
 /* ---------- 3. 바디 기본 세팅 (body) ---------- */
 * { box-sizing: border-box; }
-body { font-family: var(--font-body); color: var(--color-text); background: var(--color-bg); font-size: var(--fs-body); line-height: var(--lh-body); }
+body {
+    font-family: var(--font-body), sans-serif; color: var(--color-text); background: var(--color-bg); font-size: var(--fs-body); line-height: var(--lh-body); }
 html, body { margin: 0; padding: 0; }
 a { color: inherit; }
 img { max-width: 100%; display: block; }
@@ -70,14 +77,14 @@ img { max-width: 100%; display: block; }
             display: flex;
             align-items: center;
             padding: 0 32px;
-            position: position-sticky;
+            position: sticky;
             top: 0;
             z-index: 30;
         }
         .logo {
             display: flex;
             align-items: center;
-            font-family: var(--font-logo);
+            font-family: var(--font-logo), sans-serif;
             font-size: 30px;
             font-weight: 400;
             letter-spacing: 0.5px;
@@ -92,7 +99,8 @@ img { max-width: 100%; display: block; }
             margin-right: 10px;
             object-fit: contain;
         }
-        .nav { display: flex; gap: 38px; height: 100%; align-items: center; font-family: var(--font-body);}
+        .nav { display: flex; gap: 38px; height: 100%; align-items: center;
+            font-family: var(--font-body), sans-serif;}
         .nav a {
             color: var(--color-text);
             text-decoration: none;
