@@ -32,8 +32,16 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, null, null, message, data);
     }
 
+    public static <T> ApiResponse<T> ok(T data) {
+        return ok(null, data);
+    }
+
     public static ApiResponse<Void> ok(String message) {
         return ok(message, null);
+    }
+
+    public static ApiResponse<Void> fail(String message) {
+        return new ApiResponse<>(false, null, null, message, null);
     }
 
     public static ApiResponse<Void> fail(BusinessException e) {

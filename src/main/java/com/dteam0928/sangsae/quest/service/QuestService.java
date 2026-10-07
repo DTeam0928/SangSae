@@ -20,6 +20,9 @@ import com.dteam0928.sangsae.common.map.service.LocationAuthService;
 import com.dteam0928.sangsae.common.map.service.PlaceService;
 import com.dteam0928.sangsae.quest.dto.QuestDetailResponseDto;
 import com.dteam0928.sangsae.quest.dto.UserQuestDetailResponseDto;
+import com.dteam0928.sangsae.quest.dto.QuestCompleteResult;
+import com.dteam0928.sangsae.user.exp.ExpRewardResult;
+import com.dteam0928.sangsae.user.exp.ExperienceService;
 
 public class QuestService {
 
@@ -30,12 +33,17 @@ public class QuestService {
     private final TransactionTemplate tx;
     private final PlaceService placeService;
     private final LocationAuthService locationAuthService;
+    private final ExperienceService experienceService;
     
     public QuestService(TransactionTemplate tx) {
-        this(tx, new PlaceService(), new LocationAuthService());
+        this(tx, new PlaceService(), new LocationAuthService(), null);
     }
 
     public QuestService(TransactionTemplate tx, PlaceService placeService, LocationAuthService locationAuthService) {
+        this(tx, placeService, locationAuthService, null);
+    }
+
+    public QuestService(TransactionTemplate tx, PlaceService placeService, LocationAuthService locationAuthService, ExperienceService experienceService) {
         this.tx = tx;
         this.questRepository = new QuestTemplateRepository();
         this.userQuestRepository = new UserQuestRepository();
@@ -43,6 +51,7 @@ public class QuestService {
         this.bookmarkRepository = new UserQuestBookmarkRepository();
         this.placeService = placeService;
         this.locationAuthService = locationAuthService;
+        this.experienceService = experienceService;
     }
 
     //공개된 퀘스트 전체 조회
@@ -221,13 +230,45 @@ public class QuestService {
         });
     }
     
+    // 사용자가 일정에 등록한 미완료 퀘스트 삭제
+    public boolean deleteUserQuest(Long userQuestId, Long userId) {
+        return tx.inTransaction(em -> {
+
+            // 1. 사용자 퀘스트 조회
+            UserQuest userQuest = userQuestRepository.findById(em, userQuestId);
+            if (userQuest == null) {
+                return false;
+            }
+
+            // 2. 본인의 퀘스트인지 확인
+            if (!userId.equals(userQuest.getUserId())) {
+                throw new IllegalArgumentException("본인의 퀘스트만 삭제할 수 있습니다.");
+            }
+
+            // 3. 완료된 퀘스트는 수동 삭제 불가
+            if ("COMPLETED".equals(userQuest.getStatus())) {
+                throw new IllegalStateException("완료된 퀘스트는 일정에서 직접 삭제할 수 없습니다.");
+            }
+
+            // 4. 일정에서 삭제
+            userQuestRepository.delete(em, userQuest);
+            return true;
+        });
+    }
+    
     // 퀘스트 완료 처리 (좌표 미포함 시 하위 호환용)
     public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText) {
         return completeQuest(userQuestId, userId, proofImageUrl, proofText, null, null);
     }
 
-    // 퀘스트 완료 처리 및 현장 위치 인증(GPS) 검증
+    // 퀘스트 완료 처리 및 현장 위치 인증(GPS) 검증 (기존 시그니처 호환)
     public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText, Double userLat, Double userLng) {
+        QuestCompleteResult result = completeQuestWithReward(userQuestId, userId, proofImageUrl, proofText, userLat, userLng);
+        return (result != null) ? result.questLog() : null;
+    }
+
+    // 퀘스트 완료 처리, GPS 위치 인증 및 경험치/레벨 보상 통합 결과 반환
+    public QuestCompleteResult completeQuestWithReward(Long userQuestId, Long userId, String proofImageUrl, String proofText, Double userLat, Double userLng) {
         return tx.inTransaction(em -> {
 
             // 1. 사용자 퀘스트 조회
@@ -292,7 +333,18 @@ public class QuestService {
                 }
             }
 
-            // 8. 완료 로그 생성
+            // 8. 경험치 보상 지급 및 레벨업 판정
+            int earnedXp = (userQuest.getRewardXp() > 0)
+                    ? userQuest.getRewardXp()
+                    : (experienceService != null ? experienceService.getExpPolicy().getQuestDefaultXp() : 500);
+
+            ExpRewardResult expRewardResult = null;
+            if (experienceService != null) {
+                expRewardResult = experienceService.awardQuestExp(em, userId, userQuest.getRewardXp());
+                earnedXp = expRewardResult.earnedXp();
+            }
+
+            // 9. 완료 로그 생성
             QuestLog questLog = new QuestLog(
                     null,
                     userId,
@@ -302,11 +354,16 @@ public class QuestService {
                     null,
                     proofImageUrl,
                     proofText,
-                    userQuest.getRewardXp()
+                    earnedXp
             );
+            // 10. QuestLog 저장
+            QuestLog savedLog = questLogRepository.save(em, questLog);
 
-            // 9. QuestLog 저장
-            return questLogRepository.save(em, questLog);
+            // 11. 완료된 UserQuest를 일정에서 삭제
+            userQuestRepository.delete(em, userQuest);
+
+            // 12. 경험치 보상 통합 결과 반환
+            return new QuestCompleteResult(savedLog, expRewardResult);
         });
     }
     

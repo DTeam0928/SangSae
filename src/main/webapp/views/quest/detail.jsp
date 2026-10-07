@@ -31,7 +31,7 @@
 		</div>
 
 		<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=<%= com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() != null ? com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() : "" %>&libraries=services,clusterer"></script>
-		<script src="${pageContext.request.contextPath}/js/mapUtil.js"></script>
+		<script src="${pageContext.request.contextPath}/assets/js/mapUtil.js"></script>
 		<script>
 			window.addEventListener('DOMContentLoaded', function() {
 				try {
