@@ -3,8 +3,8 @@
 <html lang="ko">
 <head>
 <%@ include file="/WEB-INF/views/common/head.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/quest.css">
-<script src="${pageContext.request.contextPath}/resources/js/quest.js" defer></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/quest.css">
+<script src="${pageContext.request.contextPath}/assets/js/quest.js" defer></script>
 
     <title>상새 - 퀘스트</title>
 
@@ -104,10 +104,6 @@
     <!-- 컨텍스트 메뉴 및 토스트 -->
     <div class="context-menu" id="rowMenu"></div>
     <div class="toast desc" id="toast"></div>
-
-    <!-- ==========================================
-         전역 스크립트 및 렌더링 로직
-    =========================================== -->
     
 </body>
 </html>
