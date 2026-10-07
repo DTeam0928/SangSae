@@ -1,13 +1,8 @@
-@charset "UTF-8";
+/* home.css — 홈 대시보드의 배치와 경험치 표시 등 고유 스타일입니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
 
-body {
-    background-color: var(--color-bg);
-}
-
-#home-dashboard [hidden] {
-    display: none;
-}
-
+/* 홈 대시보드 카드 배치: 표시 방식 grid, 그리드 열 구성 repeat(2, minmax(0, 1fr)), 요소 간 간격 20px, 바깥 여백 bottom 24px를 적용합니다. */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -15,192 +10,27 @@ body {
     margin-bottom: 24px;
 }
 
+/* 홈 대시보드 카드 배치: min-width 0를 적용합니다. */
 .dashboard-grid > * {
     min-width: 0;
 }
 
+/* .extra-section: 바깥 여백 top 36px를 적용합니다. */
 .extra-section {
     margin-top: 36px;
 }
 
-.dash-card-header,
-.card-header-flex {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.item-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 12px;
-    background: var(--color-sub-bg);
-    border-radius: var(--radius-md);
-}
-
-.item-left-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-}
-
-.item-left-group > div {
-    min-width: 0;
-}
-
-.item-number {
-    flex-shrink: 0;
-    font-size: var(--fs-small);
-    font-weight: var(--fw-h2);
-    color: var(--color-muted);
-}
-
-.subtitle,
-.desc {
-    overflow-wrap: anywhere;
-}
-
-.item-subtext {
-    margin-top: 2px;
-    color: var(--color-muted);
-}
-
-.item-btn-group {
-    display: flex;
-    flex-shrink: 0;
-    gap: 4px;
-}
-
-#home-dashboard .badge {
-    font-size: var(--fs-small);
-    font-weight: var(--fw-small);
-    border-radius: var(--radius-sm);
-    color: var(--color-text);
-    background: var(--color-main);
-}
-
-#home-dashboard .badge.orange {
-    color: var(--color-accent);
-    background: var(--color-sub-bg);
-}
-
-#home-dashboard .select-badge {
-    max-width: 100%;
-    border: 1px solid var(--color-border);
-    cursor: pointer;
-}
-
-#home-dashboard .small-btn {
-    font-size: var(--fs-small);
-    font-weight: var(--fw-small);
-    color: var(--color-muted);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-}
-
-#home-dashboard .small-btn.danger {
-    color: var(--color-danger);
-    border-color: var(--color-danger-bg);
-}
-
-#home-dashboard .small-btn:hover {
-    background: var(--color-main);
-}
-
-#home-dashboard .small-btn.danger:hover {
-    background: var(--color-danger-bg);
-}
-
-#home-dashboard .detail-btn {
-    color: var(--color-text);
-}
-
-#home-dashboard .detail-btn:hover {
-    background: var(--color-dark);
-}
-
-#home-dashboard .btn-community {
-    background: var(--color-muted);
-    color: var(--color-white);
-}
-
-#home-dashboard .btn-community:hover {
-    background: var(--color-text);
-}
-
-#home-dashboard :is(a, button, select):focus-visible,
-#deleteModal button:focus-visible {
-    outline: 2px solid var(--color-success);
-    outline-offset: 3px;
-}
-
-.card-flex-col {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
-
-.card-header-flex {
-    margin-bottom: 10px;
-}
-
-.card-title-gap {
-    margin-bottom: 6px;
-}
-
-#home-dashboard .stats-row {
-    gap: 12px;
-}
-
-.stats-row > div {
-    flex: 1;
-    min-width: 0;
-}
-
-.stats-row > div + div {
-    border-left: 1px solid var(--color-border);
-    padding-left: 12px;
-}
-
-#home-dashboard .stat-num {
-    font-size: var(--fs-h2);
-    font-weight: var(--fw-h2);
-    color: var(--color-text);
-}
-
+/* .stat-num-accent / .text-accent-bold: 글자색 var(--color-accent)를 적용합니다. */
 #home-dashboard .stat-num-accent,
 #home-dashboard .text-accent-bold {
     color: var(--color-accent);
 }
 
-.text-accent-bold {
-    font-weight: var(--fw-h2);
-}
-
-.empty-state {
-    padding: 24px 12px;
-    text-align: center;
-    white-space: pre-line;
-    font-size: var(--fs-small);
-    line-height: var(--lh-body);
-    color: var(--color-muted);
-    background: var(--color-sub-bg);
-    border-radius: var(--radius-md);
-}
-
+/* .xp-card: 배경 linear-gradient(
+            135deg,
+            var(--color-white),
+            var(--color-sub-bg)
+    ), border-color var(--color-border)를 적용합니다. */
 .xp-card {
     background: linear-gradient(
             135deg,
@@ -210,12 +40,14 @@ body {
     border-color: var(--color-border);
 }
 
+/* .xp-badge: 배경 var(--color-accent), 글자색 var(--color-white), 글자 두께 var(--fw-h2)를 적용합니다. */
 #home-dashboard .xp-badge {
     background: var(--color-accent);
     color: var(--color-white);
     font-weight: var(--fw-h2);
 }
 
+/* .xp-content-group: 표시 방식 flex, 배치 방향 column, 요소 간 간격 10px, 바깥 여백 top 14px를 적용합니다. */
 .xp-content-group {
     display: flex;
     flex-direction: column;
@@ -223,6 +55,7 @@ body {
     margin-top: 14px;
 }
 
+/* .xp-info-row: 표시 방식 flex, 교차축 정렬 flex-end, 주축 정렬 space-between, flex-wrap wrap, 요소 간 간격 8px를 적용합니다. */
 .xp-info-row {
     display: flex;
     align-items: flex-end;
@@ -231,12 +64,14 @@ body {
     gap: 8px;
 }
 
+/* .xp-unit: 글자 크기 var(--fs-body), 글자 두께 var(--fw-small), 글자색 var(--color-muted)를 적용합니다. */
 .xp-unit {
     font-size: var(--fs-body);
     font-weight: var(--fw-small);
     color: var(--color-muted);
 }
 
+/* .xp-progress-bar-container: 표시 방식 block, 배치 기준 relative, 너비 100%, 높이 12px, 최소 높이 12px를 적용합니다. */
 .xp-progress-bar-container {
     display: block;
     position: relative;
@@ -249,6 +84,7 @@ body {
     border-radius: var(--radius-sm);
 }
 
+/* .xp-progress-bar: 표시 방식 block, 너비 0, 높이 100%, 최소 높이 12px, 배경색 var(--color-accent)를 적용합니다. */
 .xp-progress-bar {
     display: block;
     width: 0;
@@ -259,6 +95,7 @@ body {
     transition: width 600ms ease;
 }
 
+/* .xp-next-target: 표시 방식 flex, 주축 정렬 space-between, flex-wrap wrap, 요소 간 간격 8px, 글자 크기 var(--fs-small)를 적용합니다. */
 .xp-next-target {
     display: flex;
     justify-content: space-between;
@@ -267,44 +104,24 @@ body {
     font-size: var(--fs-small);
 }
 
+/* .xp-next-target: 글자색 var(--color-muted)를 적용합니다. */
 .xp-next-target > span:first-child {
     color: var(--color-muted);
 }
 
-#deleteModal .modal-desc {
-    white-space: pre-line;
-    overflow-wrap: anywhere;
-}
-
-#deleteModal .btn-cancel {
-    color: var(--color-muted);
-}
-
-#deleteModal .modal-btn {
-    font-size: var(--fs-body);
-    font-weight: var(--fw-small);
-    cursor: pointer;
-}
-
+/* 반응형 또는 사용자 동작 설정: @media (max-width: 760px) */
 @media (max-width: 760px) {
+    /* 홈 대시보드 카드 배치: 그리드 열 구성 minmax(0, 1fr)를 적용합니다. */
     .dashboard-grid {
         grid-template-columns: minmax(0, 1fr);
     }
+
 }
-
-@media (max-width: 420px) {
-    .item-row {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .item-btn-group {
-        align-self: flex-end;
-    }
-}
-
+/* 반응형 또는 사용자 동작 설정: @media (prefers-reduced-motion: reduce) */
 @media (prefers-reduced-motion: reduce) {
+    /* .xp-progress-bar: 상태 전환 효과 none를 적용합니다. */
     .xp-progress-bar {
         transition: none;
     }
+
 }
