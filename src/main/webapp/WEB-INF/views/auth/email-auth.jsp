@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>상새</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style-jsp.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/variables.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/onboarding.css">
 <script src="${pageContext.request.contextPath}/assets/js/api-client.js" defer></script>
 <script src="${pageContext.request.contextPath}/assets/js/onboarding.js" defer></script>
