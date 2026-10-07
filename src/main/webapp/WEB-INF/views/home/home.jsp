@@ -1,276 +1,138 @@
-<%@ page language="java"
-         contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"
-%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-
-<c:set var="home" value="${requestScope.homeModel}" />
-<c:set var="ui" value="${home.ui}" />
-<fmt:setLocale value="ko_KR" />
-
-<c:choose>
-    <c:when test="${not empty sessionScope.nickname}">
-        <c:set var="nickname" value="${sessionScope.nickname}" />
-    </c:when>
-    <c:otherwise>
-        <c:set var="nickname" value="${home.nickname}" />
-    </c:otherwise>
-</c:choose>
-
-<!-- 1. [수정됨] 루틴 성공 비율로 퍼센트 계산 (0으로 나누기 방지 및 Null 처리) -->
-<c:choose>
-    <c:when test="${empty home.dailyAggregate or empty home.dailyAggregate.routineTotalCount or home.dailyAggregate.routineTotalCount eq 0}">
-        <c:set var="xpPercent" value="0" />
-    </c:when>
-    <c:otherwise>
-        <c:set var="xpPercent" value="${(home.dailyAggregate.routineSuccessCount / home.dailyAggregate.routineTotalCount) * 100}" />
-    </c:otherwise>
-</c:choose>
-
-<c:url var="homeCssUrl" value="/assets/css/home.css" />
-<c:url var="homeJsUrl" value="/assets/js/home.js" />
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <%@ include file="/WEB-INF/views/common/head.jsp" %>
-
-    <title><c:out value="${ui.pageTitle}" /></title>
-
-    <link rel="stylesheet" href="<c:out value='${homeCssUrl}' />">
-
+    <title>상새 - Home</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/home.css">
     <script src="${pageContext.request.contextPath}/assets/js/api-client.js" defer></script>
-    <script src="<c:out value='${homeJsUrl}' />" defer></script>
+    <script src="${pageContext.request.contextPath}/assets/js/home.js" defer></script>
 </head>
 <body data-page="home" data-context-path="${pageContext.request.contextPath}">
 
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <main class="container" id="home-dashboard">
-    <c:if test="${empty home}"><p role="status">홈 데이터를 불러오지 못했습니다.</p></c:if>
     <div class="section-title">
-        <span class="title" id="dashboard-title">
-            <c:out value="${nickname}" /><c:out value="${ui.dashboardSuffix}" />
+        <span class="title">
+            <span id="user-nickname">게스트</span>님의 종합 대시보드
         </span>
     </div>
 
     <div class="dashboard-grid">
-        <!-- 2. [수정됨] XP 카드 렌더링 (user_daily_aggregates 테이블 반영 및 Null 방어) -->
+        <!-- 0. XP 및 오늘의 달성도 카드 (고정 레이아웃) -->
         <section class="dash-card xp-card">
             <div class="dash-card-header">
-                <div class="dash-title">
-                    <c:out value="${ui.xpTitle}" default="오늘의 달성도" />
-                </div>
-
-                <span class="badge xp-badge" id="user-title-badge">
-                    🔥 연속 <c:out value="${empty home.dailyAggregate.currentStreak ? 0 : home.dailyAggregate.currentStreak}" />일
-                </span>
+                <div class="dash-title">🎯 오늘의 달성도</div>
+                <span class="badge xp-badge" id="user-streak-badge">🔥 연속 0일</span>
             </div>
 
             <div class="xp-content-group">
                 <div class="xp-info-row">
-                    <span class="stat-label">
-                        오늘 획득한 XP (퀘스트: <c:out value="${empty home.dailyAggregate.questSuccessCount ? 0 : home.dailyAggregate.questSuccessCount}"/>개)
-                    </span>
-
+                    <span class="stat-label">오늘 획득한 XP</span>
                     <div class="stat-num stat-num-accent">
-                        <fmt:formatNumber
-                                value="${empty home.dailyAggregate.earnedXp ? 0 : home.dailyAggregate.earnedXp}"
-                                type="number"
-                                maxFractionDigits="0" />
-                        <span class="xp-unit">
-                            <c:out value="${ui.xpUnit}" default="XP" />
-                        </span>
+                        <span id="earned-xp-num">0</span>
+                        <span class="xp-unit">XP</span>
                     </div>
                 </div>
 
-                <div class="xp-progress-bar-container"
-                     role="progressbar"
-                     aria-label="오늘의 진행도"
-                     aria-valuemin="0"
-                     aria-valuemax="100"
-                     aria-valuenow="<c:out value='${xpPercent}' />">
-                    <div class="xp-progress-bar"
-                         id="xp-progress"
-                         data-progress="<c:out value='${xpPercent}' />"
-                         style="width: <c:out value='${xpPercent}' />%;"></div>
+                <div class="xp-progress-bar-container" role="progressbar" aria-label="오늘의 진행도">
+                    <div class="xp-progress-bar" id="xp-progress" style="width: 0%;"></div>
                 </div>
 
                 <div class="xp-next-target">
                     <span>루틴 완료 현황</span>
-
-                    <span class="text-accent-bold">
-                        <c:out value="${empty home.dailyAggregate.routineSuccessCount ? 0 : home.dailyAggregate.routineSuccessCount}" /> /
-                        <c:out value="${empty home.dailyAggregate.routineTotalCount ? 0 : home.dailyAggregate.routineTotalCount}" />개
-                    </span>
+                    <span class="text-accent-bold" id="routine-status-text">0 / 0개</span>
                 </div>
             </div>
         </section>
 
-        <!-- 3. 관리 카드 렌더링 (이후 영역은 기존과 동일) -->
-        <c:forEach var="card" items="${ui.managementCards}">
-            <c:set var="items" value="${home[card.listKey]}" />
-            <c:url var="addUrl" value="${card.addPath}" />
+        <!-- 1. 내 여행 관리 -->
+        <div class="dash-card">
+            <div>
+                <div class="dash-card-header">
+                    <div class="dash-title">✈️ 내 여행 관리</div>
+                    <select class="badge select-badge" id="trip-filter">
+                        <option value="active">진행 중 여행 ▾</option>
+                        <option value="planned">예정된 여행</option>
+                        <option value="completed">완료된 여행</option>
+                    </select>
+                </div>
 
-            <section class="dash-card"
-                     data-management-card="<c:out value='${card.key}' />">
+                <div id="trip-content" class="list-container">
+                    <div class="empty-state">등록된 여행이 없습니다.<br>첫 여행을 만들어보세요!</div>
+                </div>
+            </div>
+            <a href="${pageContext.request.contextPath}/quest#management" class="detail-btn">여행 및 퀘스트 추가하기</a>
+        </div>
+
+        <!-- 2. 내 루틴 관리 -->
+        <div class="dash-card">
+            <div>
+                <div class="dash-card-header">
+                    <div class="dash-title">🔄 내 루틴 관리</div>
+                    <select class="badge select-badge orange" id="routine-filter">
+                        <option value="active">활성 루틴 ▾</option>
+                        <option value="inactive">비활성 루틴</option>
+                    </select>
+                </div>
+
+                <div id="routine-content" class="list-container">
+                    <div class="empty-state">활성 루틴이 없습니다.<br>새 루틴을 추가해보세요!</div>
+                </div>
+            </div>
+            <a href="${pageContext.request.contextPath}/routine#manage" class="detail-btn">루틴 추가하기</a>
+        </div>
+
+        <!-- 3. 통계 카드 (퀘스트 & 루틴 달성도) -->
+        <div class="dash-card">
+            <div class="dash-title">🔥 내 달성 현황</div>
+            <div class="stats-row">
                 <div>
-                    <div class="dash-card-header">
-                        <div class="dash-title">
-                            <c:out value="${card.title}" />
-                        </div>
-
-                        <select class="badge select-badge"
-                                id="<c:out value='${card.key}' />-filter"
-                                data-list-filter
-                                aria-label="<c:out value='${card.title}' />">
-                            <c:forEach var="filter" items="${card.filters}">
-                                <option value="<c:out value='${filter.value}' />">
-                                    <c:out value="${filter.label}" />
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-                    <div class="list-container"
-                         id="<c:out value='${card.key}' />-content">
-                        <c:choose>
-                            <c:when test="${not empty items}">
-                                <c:forEach var="item"
-                                           items="${items}"
-                                           varStatus="status">
-                                    <c:url var="editUrl" value="${card.editPath}">
-                                        <c:param name="id" value="${item.id}" />
-                                    </c:url>
-
-                                    <div class="item-row"
-                                         data-item-row
-                                         data-id="<c:out value='${item.id}' />"
-                                         data-start-date="<c:out value='${item.startDate}' />"
-                                         data-end-date="<c:out value='${item.endDate}' />"
-                                         data-status="<c:out value='${item.status}' />">
-                                        <div class="item-left-group">
-                                            <span class="item-number">
-                                                <c:out value="${status.count}" />
-                                            </span>
-
-                                            <div>
-                                                <div class="subtitle">
-                                                    <c:out value="${item.title}" />
-                                                </div>
-
-                                                <div class="desc item-subtext">
-                                                    <c:out value="${item.startDate}" /><c:out value="${ui.dateSeparator}" /><c:out value="${item.endDate}" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="item-btn-group">
-                                            <a class="small-btn"
-                                               href="<c:out value='${editUrl}' />#<c:out value='${card.editFragment}' />">
-                                                <c:out value="${ui.editLabel}" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <%-- 빈 상태 문구는 아래 공통 요소에서 출력합니다. --%>
-                            </c:otherwise>
-                        </c:choose>
-
-                        <div class="empty-state"
-                             data-empty-state
-                             data-empty-text="<c:out value='${card.emptyText}' />"
-                             data-filtered-empty-text="<c:out value='${card.filteredEmptyText}' />"
-                             <c:if test="${not empty items}">hidden</c:if>>
-                            <c:out value="${card.emptyText}" />
-                        </div>
-                    </div>
+                    <div class="stat-label">달성한 퀘스트</div>
+                    <div class="stat-num" id="stat-completed-quests">0개</div>
                 </div>
-
-                <a href="<c:out value='${addUrl}' />" class="detail-btn">
-                    <c:out value="${card.addLabel}" />
-                </a>
-            </section>
-        </c:forEach>
-
-        <c:forEach var="card" items="${ui.statsCards}">
-            <section class="dash-card">
-                <div class="dash-title">
-                    <c:out value="${card.title}" />
+                <div>
+                    <div class="stat-label">남은 퀘스트</div>
+                    <div class="stat-num stat-num-accent" id="stat-remaining-quests">0개</div>
                 </div>
-
-                <div class="stats-row">
-                    <c:forEach var="stat" items="${card.items}">
-                        <div>
-                            <div class="stat-label">
-                                <c:out value="${stat.label}" />
-                            </div>
-
-                            <div class="stat-num${stat.accent ? ' stat-num-accent' : ''}">
-                                <fmt:formatNumber
-                                        value="${home.stats[stat.key]}"
-                                        type="number"
-                                        maxFractionDigits="0" /><c:out value="${stat.unit}" />
-                            </div>
-                        </div>
-                    </c:forEach>
+                <div style="border-left: 1px solid var(--color-border); padding-left: 12px;">
+                    <div class="stat-label">달성한 할 일</div>
+                    <div class="stat-num" id="stat-completed-routines">0개</div>
                 </div>
-            </section>
-        </c:forEach>
+            </div>
+        </div>
     </div>
 
-    <section class="extra-section">
-        <div class="section-title">
-            <span><c:out value="${ui.extraTitle}" /></span>
-        </div>
-
+    <!-- 추가 섹션: 오늘의 추천 퀘스트 및 커뮤니티 하이라이트 -->
+    <div class="extra-section">
+        <div class="section-title"><span>🌟 오늘의 추천 퀘스트 & 소식</span></div>
         <div class="dashboard-grid">
-            <c:forEach var="card" items="${ui.featureCards}">
-                <c:set var="feature" value="${home[card.dataKey]}" />
-                <c:url var="featureUrl" value="${card.path}" />
-
-                <section class="full-card card-flex-col">
-                    <div>
-                        <div class="card-header-flex">
-                            <span class="badge${card.key eq 'community' ? ' orange' : ''}">
-                                <c:out value="${card.badgeLabel}" />
-                            </span>
-
-                            <span class="desc${card.key eq 'quest' ? ' text-accent-bold' : ''}">
-                                <c:out value="${feature[card.metaKey]}" />
-                            </span>
-                        </div>
-
-                        <c:choose>
-                            <c:when test="${not empty feature}">
-                                <div class="card-title-gap subtitle">
-                                    <c:out value="${feature.title}" />
-                                </div>
-
-                                <p class="desc">
-                                    <c:out value="${feature[card.bodyKey]}" />
-                                </p>
-                            </c:when>
-
-                            <c:otherwise>
-                                <div class="empty-state">
-                                    <c:out value="${card.emptyText}" />
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+            <div class="full-card card-flex-col">
+                <div>
+                    <div class="card-header-flex">
+                        <span class="badge">추천 챌린지</span>
+                        <span class="text-accent-bold" id="rec-quest-xp">+120 XP</span>
                     </div>
+                    <div class="subtitle card-title-gap" id="rec-quest-title">광안리에서 일몰 사진 남기기</div>
+                    <p class="desc" id="rec-quest-desc">해 질 무렵 바다를 바라보며 마음에 드는 사진 한 장을 남겨보세요.</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/quest" class="detail-btn">퀘스트 탐색하러 가기</a>
+            </div>
 
-                    <a href="<c:out value='${featureUrl}' />"
-                       class="detail-btn${card.key eq 'community' ? ' btn-community' : ''}">
-                        <c:out value="${card.linkLabel}" />
-                    </a>
-                </section>
-            </c:forEach>
+            <div class="full-card card-flex-col">
+                <div>
+                    <div class="card-header-flex">
+                        <span class="badge orange">커뮤니티 피드</span>
+                        <span class="desc" id="community-time">10분 전</span>
+                    </div>
+                    <div class="subtitle card-title-gap" id="community-title">광안대교 야경 보면서 산책하기 완료! ✨</div>
+                    <p class="desc" id="community-desc">"밤바다가 너무 예쁘네요. 다들 오늘 산책 어떠신가요?" - 여행러버</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/community" class="detail-btn btn-community">커뮤니티 구경하기</a>
+            </div>
         </div>
-    </section>
+    </div>
 </main>
 
 <%@ include file="/WEB-INF/views/common/modal_delete.jsp" %>
