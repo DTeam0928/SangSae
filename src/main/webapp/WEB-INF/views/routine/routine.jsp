@@ -4,6 +4,8 @@
 <head>
 <%@ include file="/WEB-INF/views/common/head.jsp" %>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/routine.css">
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=<%= com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() != null ? com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() : "" %>&libraries=services,clusterer"></script>
+<script src="${pageContext.request.contextPath}/assets/js/mapUtil.js" defer></script>
 <script src="${pageContext.request.contextPath}/assets/js/routine.js" defer></script>
 
 <title>일상을 새롭게, 상새</title>

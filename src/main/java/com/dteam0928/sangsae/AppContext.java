@@ -84,6 +84,9 @@ public class AppContext implements AutoCloseable {
     private final RoutineExploreService routineExploreService;
     private final RoutineBookmarkService routineBookmarkService;
     private final MyPlaceService myPlaceService;
+
+    // ---- 홈 대시보드 ----
+    private final com.dteam0928.sangsae.home.HomeDashboardService homeDashboardService;
     
     public AppContext(AppConfig config) {
         this(config, DataSourceFactory.create(config));
@@ -146,6 +149,13 @@ public class AppContext implements AutoCloseable {
         this.routineExploreService = new RoutineExploreService(tx, routineExploreRepository, myPlaceRepository, profileDao, routineSettings);
         this.routineBookmarkService = new RoutineBookmarkService(tx, routineExploreRepository);
         this.myPlaceService = new MyPlaceService(tx, myPlaceRepository, routineSettings);
+
+        // ---- 홈 대시보드 ----
+        this.homeDashboardService = new com.dteam0928.sangsae.home.HomeDashboardService(
+                tx, profileDao, experienceService, routineService,
+                new com.dteam0928.sangsae.quest.repository.UserQuestRepository(),
+                new com.dteam0928.sangsae.quest.repository.QuestTemplateRepository()
+        );
     }
 
     /**
@@ -181,6 +191,7 @@ public class AppContext implements AutoCloseable {
     public RoutineExploreService routineExploreService() { return routineExploreService; }
     public RoutineBookmarkService routineBookmarkService() { return routineBookmarkService; }
     public MyPlaceService myPlaceService() { return myPlaceService; }
+    public com.dteam0928.sangsae.home.HomeDashboardService homeDashboardService() { return homeDashboardService; }
 
     @Override
     public void close() {

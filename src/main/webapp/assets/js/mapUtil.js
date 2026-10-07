@@ -168,7 +168,8 @@ const MapUtil = (function () {
         if (params.lng != null) queryParams.set('lng', params.lng);
         if (params.radius != null) queryParams.set('radius', params.radius);
 
-        const response = await fetch(`/api/map/search?${queryParams.toString()}`);
+        const ctx = (document.body && document.body.dataset && document.body.dataset.contextPath) || '';
+        const response = await fetch(`${ctx}/api/map/search?${queryParams.toString()}`);
         if (!response.ok) {
             const errorPayload = await response.json().catch(() => null);
             throw new Error((errorPayload && errorPayload.message) || `서버 통신 오류 (HTTP ${response.status})`);
@@ -186,7 +187,8 @@ const MapUtil = (function () {
             throw new Error('선택할 장소 정보가 없습니다.');
         }
 
-        const response = await fetch('/api/place/select', {
+        const ctx = (document.body && document.body.dataset && document.body.dataset.contextPath) || '';
+        const response = await fetch(`${ctx}/api/place/select`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8'
