@@ -26,6 +26,14 @@ import com.dteam0928.sangsae.quest.service.QuestService;
 import com.dteam0928.sangsae.routine.service.RoutineService;
 import com.dteam0928.sangsae.user.exp.ExpPolicy;
 import com.dteam0928.sangsae.user.exp.ExperienceService;
+import com.dteam0928.sangsae.routine.repository.MyPlaceRepository;
+import com.dteam0928.sangsae.routine.repository.RoutineExploreRepository;
+import com.dteam0928.sangsae.routine.repository.jpa.JpaMyPlaceRepository;
+import com.dteam0928.sangsae.routine.repository.jpa.JpaRoutineExploreRepository;
+import com.dteam0928.sangsae.routine.service.MyPlaceService;
+import com.dteam0928.sangsae.routine.service.RoutineBookmarkService;
+import com.dteam0928.sangsae.routine.service.RoutineExploreService;
+import com.dteam0928.sangsae.routine.service.RoutineSettings;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletContext;
@@ -73,6 +81,9 @@ public class AppContext implements AutoCloseable {
 
     // ---- 루틴 ----
     private final RoutineService routineService;
+    private final RoutineExploreService routineExploreService;
+    private final RoutineBookmarkService routineBookmarkService;
+    private final MyPlaceService myPlaceService;
     
     public AppContext(AppConfig config) {
         this(config, DataSourceFactory.create(config));
@@ -127,6 +138,14 @@ public class AppContext implements AutoCloseable {
 
         // ---- 루틴 (지도·위치인증·경험치 서비스 주입) ----
         this.routineService = new RoutineService(tx, placeService, locationAuthService, experienceService);
+        
+        // ---- 루틴 탐색 (R-00 탐색 탭) ----
+        RoutineSettings routineSettings = RoutineSettings.from(config);
+        RoutineExploreRepository routineExploreRepository = new JpaRoutineExploreRepository();
+        MyPlaceRepository myPlaceRepository = new JpaMyPlaceRepository();
+        this.routineExploreService = new RoutineExploreService(tx, routineExploreRepository, myPlaceRepository, profileDao, routineSettings);
+        this.routineBookmarkService = new RoutineBookmarkService(tx, routineExploreRepository);
+        this.myPlaceService = new MyPlaceService(tx, myPlaceRepository, routineSettings);
     }
 
     /**
@@ -159,6 +178,9 @@ public class AppContext implements AutoCloseable {
     public ExperienceService experienceService() { return experienceService; }
     public QuestService questService() { return questService; }
     public RoutineService routineService() { return routineService; }
+    public RoutineExploreService routineExploreService() { return routineExploreService; }
+    public RoutineBookmarkService routineBookmarkService() { return routineBookmarkService; }
+    public MyPlaceService myPlaceService() { return myPlaceService; }
 
     @Override
     public void close() {
