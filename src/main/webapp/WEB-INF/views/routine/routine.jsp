@@ -32,6 +32,12 @@
   </section>
 </main>
 
+<!-- routine.jsp 메인 뷰 파일 하단에 삽입 -->
+<jsp:include page="/WEB-INF/views/modal/routine_detail_modal.jsp" />
+<jsp:include page="/WEB-INF/views/modal/place_detail_modal.jsp" />
+<jsp:include page="/WEB-INF/views/modal/place_filter_modal.jsp" />
+<jsp:include page="/WEB-INF/views/modal/routine_form_modal.jsp" />
+
 <!-- 공통 토스트 알림 -->
 <div id="toast" class="toast position-fixed ds-bottom-6 ds-right-6 surface-text color-white ds-px-5 ds-py-3 radius-md shadow-modal ds-z-100 type-sm"></div>
 
