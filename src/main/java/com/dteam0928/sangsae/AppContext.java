@@ -23,6 +23,7 @@ import com.dteam0928.sangsae.common.map.service.LocationAuthService;
 import com.dteam0928.sangsae.common.map.service.PlaceService;
 import com.dteam0928.sangsae.common.util.DBUtil;
 import com.dteam0928.sangsae.quest.service.QuestService;
+import com.dteam0928.sangsae.routine.service.RoutineService;
 import com.dteam0928.sangsae.user.exp.ExpPolicy;
 import com.dteam0928.sangsae.user.exp.ExperienceService;
 import jakarta.persistence.EntityManagerFactory;
@@ -69,6 +70,9 @@ public class AppContext implements AutoCloseable {
 
     // ---- 퀘스트 ----
     private final QuestService questService;
+
+    // ---- 루틴 ----
+    private final RoutineService routineService;
     
     public AppContext(AppConfig config) {
         this(config, DataSourceFactory.create(config));
@@ -120,6 +124,9 @@ public class AppContext implements AutoCloseable {
 
         // ---- 퀘스트 (지도·위치인증·경험치 서비스 주입) ----
         this.questService = new QuestService(tx, placeService, locationAuthService, experienceService);
+
+        // ---- 루틴 (지도·위치인증·경험치 서비스 주입) ----
+        this.routineService = new RoutineService(tx, placeService, locationAuthService, experienceService);
     }
 
     /**
@@ -151,6 +158,7 @@ public class AppContext implements AutoCloseable {
     public ExpPolicy expPolicy() { return expPolicy; }
     public ExperienceService experienceService() { return experienceService; }
     public QuestService questService() { return questService; }
+    public RoutineService routineService() { return routineService; }
 
     @Override
     public void close() {
