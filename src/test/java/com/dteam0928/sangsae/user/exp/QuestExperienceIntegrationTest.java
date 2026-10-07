@@ -101,6 +101,11 @@ class QuestExperienceIntegrationTest {
         // Repository 가짜 바인딩
         setField(questService, "userQuestRepository", new UserQuestRepository() {
             @Override public UserQuest findById(EntityManager em, Long id) { return userQuestDb.get(id); }
+            @Override public void delete(EntityManager em, UserQuest userQuest) {
+                if (userQuest != null) {
+                    userQuestDb.remove(userQuest.getId());
+                }
+            }
         });
         setField(questService, "questLogRepository", new QuestLogRepository() {
             @Override public QuestLog save(EntityManager em, QuestLog log) {
@@ -119,6 +124,7 @@ class QuestExperienceIntegrationTest {
         assertNotNull(result1);
         assertEquals(500, result1.questLog().getEarnedXp());
         assertEquals("COMPLETED", quest1.getStatus());
+        assertNull(userQuestDb.get(1L), "완료된 퀘스트는 일정(userQuestDb)에서 자동 삭제되어야 함");
         assertEquals(500, profileDb.get(userId).getTotalXp());
 
         ExpRewardResult reward1 = result1.expRewardResult();
@@ -134,6 +140,7 @@ class QuestExperienceIntegrationTest {
         assertNotNull(result2);
         assertEquals(500, result2.questLog().getEarnedXp());
         assertEquals("COMPLETED", quest2.getStatus());
+        assertNull(userQuestDb.get(2L), "완료된 퀘스트는 일정(userQuestDb)에서 자동 삭제되어야 함");
         assertEquals(1000, profileDb.get(userId).getTotalXp());
 
         ExpRewardResult reward2 = result2.expRewardResult();
@@ -142,6 +149,55 @@ class QuestExperienceIntegrationTest {
         assertEquals(2, reward2.currentLevel().level());
         assertEquals(0.0, reward2.currentLevel().progressPercent());
         assertTrue(reward2.isLevelUp(), "총 1,000 XP에 도달하여 2레벨로 레벨업해야 함");
+    }
+
+    @Test
+    @DisplayName("사용자 미완료 퀘스트를 일정에서 정상 삭제할 수 있고, 타인 또는 완료 퀘스트는 삭제가 차단된다")
+    void deleteUserQuest_validation() throws Exception {
+        Long ownerId = 1L;
+        Long otherId = 2L;
+
+        Map<Long, UserQuest> userQuestDb = new HashMap<>();
+
+        UserQuest todoQuest = new UserQuest();
+        todoQuest.setId(10L);
+        todoQuest.setUserId(ownerId);
+        todoQuest.setStatus("TODO");
+        userQuestDb.put(10L, todoQuest);
+
+        UserQuest completedQuest = new UserQuest();
+        completedQuest.setId(20L);
+        completedQuest.setUserId(ownerId);
+        completedQuest.setStatus("COMPLETED");
+        userQuestDb.put(20L, completedQuest);
+
+        TransactionTemplate fakeTx = new TransactionTemplate(null) {
+            @Override
+            public <T> T inTransaction(com.dteam0928.sangsae.common.db.EmFunction<T> action) {
+                return action.apply(null);
+            }
+        };
+
+        QuestService questService = new QuestService(fakeTx);
+        setField(questService, "userQuestRepository", new UserQuestRepository() {
+            @Override public UserQuest findById(EntityManager em, Long id) { return userQuestDb.get(id); }
+            @Override public void delete(EntityManager em, UserQuest userQuest) {
+                if (userQuest != null) {
+                    userQuestDb.remove(userQuest.getId());
+                }
+            }
+        });
+
+        // 1. 정상 삭제 성공
+        boolean deleted = questService.deleteUserQuest(10L, ownerId);
+        assertTrue(deleted);
+        assertNull(userQuestDb.get(10L), "삭제 후 DB에서 제거되어야 함");
+
+        // 2. 타인 퀘스트 삭제 시도 차단
+        assertThrows(IllegalArgumentException.class, () -> questService.deleteUserQuest(20L, otherId));
+
+        // 3. 완료된 퀘스트 직접 삭제 시도 차단
+        assertThrows(IllegalStateException.class, () -> questService.deleteUserQuest(20L, ownerId));
     }
 
     private static void setField(Object target, String name, Object value) throws Exception {
