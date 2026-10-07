@@ -3,8 +3,8 @@
 <html lang="ko">
 <head>
 <%@ include file="/WEB-INF/views/common/head.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/routine.css">
-<script src="${pageContext.request.contextPath}/resources/js/routine.js" defer></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/routine.css">
+<script src="${pageContext.request.contextPath}/assets/js/routine.js" defer></script>
 
 <title>일상을 새롭게, 상새</title>
 

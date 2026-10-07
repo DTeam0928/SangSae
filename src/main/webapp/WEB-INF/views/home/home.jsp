@@ -1,7 +1,7 @@
 <%@ page language="java"
          contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"
- %>
+%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
@@ -18,18 +18,13 @@
     </c:otherwise>
 </c:choose>
 
+<!-- 1. [수정됨] 루틴 성공 비율로 퍼센트 계산 (0으로 나누기 방지 및 Null 처리) -->
 <c:choose>
-    <c:when test="${empty home.userXpInfo.progressPercent}">
-        <c:set var="xpPercent" value="${0}" />
-    </c:when>
-    <c:when test="${home.userXpInfo.progressPercent lt 0}">
-        <c:set var="xpPercent" value="${0}" />
-    </c:when>
-    <c:when test="${home.userXpInfo.progressPercent gt 100}">
-        <c:set var="xpPercent" value="${100}" />
+    <c:when test="${empty home.dailyAggregate or empty home.dailyAggregate.routineTotalCount or home.dailyAggregate.routineTotalCount eq 0}">
+        <c:set var="xpPercent" value="0" />
     </c:when>
     <c:otherwise>
-        <c:set var="xpPercent" value="${home.userXpInfo.progressPercent}" />
+        <c:set var="xpPercent" value="${(home.dailyAggregate.routineSuccessCount / home.dailyAggregate.routineTotalCount) * 100}" />
     </c:otherwise>
 </c:choose>
 
@@ -39,7 +34,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<%@ include file="/WEB-INF/views/common/head.jsp" %>
+    <%@ include file="/WEB-INF/views/common/head.jsp" %>
 
     <title><c:out value="${ui.pageTitle}" /></title>
 
@@ -61,37 +56,38 @@
     </div>
 
     <div class="dashboard-grid">
+        <!-- 2. [수정됨] XP 카드 렌더링 (user_daily_aggregates 테이블 반영 및 Null 방어) -->
         <section class="dash-card xp-card">
             <div class="dash-card-header">
                 <div class="dash-title">
-                    <c:out value="${ui.xpTitle}" />
+                    <c:out value="${ui.xpTitle}" default="오늘의 달성도" />
                 </div>
 
                 <span class="badge xp-badge" id="user-title-badge">
-                    <c:out value="${home.userXpInfo.title}" />
+                    🔥 연속 <c:out value="${empty home.dailyAggregate.currentStreak ? 0 : home.dailyAggregate.currentStreak}" />일
                 </span>
             </div>
 
             <div class="xp-content-group">
                 <div class="xp-info-row">
                     <span class="stat-label">
-                        <c:out value="${ui.totalXpLabel}" />
+                        오늘 획득한 XP (퀘스트: <c:out value="${empty home.dailyAggregate.questSuccessCount ? 0 : home.dailyAggregate.questSuccessCount}"/>개)
                     </span>
 
                     <div class="stat-num stat-num-accent">
                         <fmt:formatNumber
-                                value="${home.userXpInfo.totalXp}"
+                                value="${empty home.dailyAggregate.earnedXp ? 0 : home.dailyAggregate.earnedXp}"
                                 type="number"
                                 maxFractionDigits="0" />
                         <span class="xp-unit">
-                            <c:out value="${ui.xpUnit}" />
+                            <c:out value="${ui.xpUnit}" default="XP" />
                         </span>
                     </div>
                 </div>
 
                 <div class="xp-progress-bar-container"
                      role="progressbar"
-                     aria-label="<c:out value='${ui.xpTitle}' />"
+                     aria-label="오늘의 진행도"
                      aria-valuemin="0"
                      aria-valuemax="100"
                      aria-valuenow="<c:out value='${xpPercent}' />">
@@ -102,19 +98,17 @@
                 </div>
 
                 <div class="xp-next-target">
-                    <span><c:out value="${ui.nextTitleLabel}" /></span>
+                    <span>루틴 완료 현황</span>
 
                     <span class="text-accent-bold">
-                        <fmt:formatNumber
-                                value="${home.userXpInfo.remainingXp}"
-                                type="number"
-                                maxFractionDigits="0" />
-                        <c:out value="${ui.remainingXpSuffix}" />
+                        <c:out value="${empty home.dailyAggregate.routineSuccessCount ? 0 : home.dailyAggregate.routineSuccessCount}" /> /
+                        <c:out value="${empty home.dailyAggregate.routineTotalCount ? 0 : home.dailyAggregate.routineTotalCount}" />개
                     </span>
                 </div>
             </div>
         </section>
 
+        <!-- 3. 관리 카드 렌더링 (이후 영역은 기존과 동일) -->
         <c:forEach var="card" items="${ui.managementCards}">
             <c:set var="items" value="${home[card.listKey]}" />
             <c:url var="addUrl" value="${card.addPath}" />
@@ -177,13 +171,10 @@
                                                href="<c:out value='${editUrl}' />#<c:out value='${card.editFragment}' />">
                                                 <c:out value="${ui.editLabel}" />
                                             </a>
-
-
                                         </div>
                                     </div>
                                 </c:forEach>
                             </c:when>
-
                             <c:otherwise>
                                 <%-- 빈 상태 문구는 아래 공통 요소에서 출력합니다. --%>
                             </c:otherwise>

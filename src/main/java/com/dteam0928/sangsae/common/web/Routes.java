@@ -22,7 +22,9 @@ public final class Routes {
     public static final String ONBOARDING_PROFILE = "/onboarding/profile";   // O-02
     public static final String ONBOARDING_LOCATION = "/onboarding/location"; // O-03
 
-    public static final String HOME = "/home";                 // H-00
+    public static final String HOME = "/home";
+
+    public static final String QUEST = "/quest";
 
     /** 로그인 직후 이동할 곳: 온보딩을 안 끝냈으면 O-02 */
     public static String afterLogin(LoginUser user) {
