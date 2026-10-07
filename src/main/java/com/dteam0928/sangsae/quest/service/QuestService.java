@@ -221,6 +221,32 @@ public class QuestService {
         });
     }
     
+    // 사용자가 일정에 등록한 미완료 퀘스트 삭제
+    public boolean deleteUserQuest(Long userQuestId, Long userId) {
+        return tx.inTransaction(em -> {
+
+            // 1. 사용자 퀘스트 조회
+            UserQuest userQuest = userQuestRepository.findById(em, userQuestId);
+            if (userQuest == null) {
+                return false;
+            }
+
+            // 2. 본인의 퀘스트인지 확인
+            if (!userId.equals(userQuest.getUserId())) {
+                throw new IllegalArgumentException("본인의 퀘스트만 삭제할 수 있습니다.");
+            }
+
+            // 3. 완료된 퀘스트는 수동 삭제 불가
+            if ("COMPLETED".equals(userQuest.getStatus())) {
+                throw new IllegalStateException("완료된 퀘스트는 일정에서 직접 삭제할 수 없습니다.");
+            }
+
+            // 4. 일정에서 삭제
+            userQuestRepository.delete(em, userQuest);
+            return true;
+        });
+    }
+    
     // 퀘스트 완료 처리 (좌표 미포함 시 하위 호환용)
     public QuestLog completeQuest(Long userQuestId, Long userId, String proofImageUrl, String proofText) {
         return completeQuest(userQuestId, userId, proofImageUrl, proofText, null, null);
@@ -306,7 +332,13 @@ public class QuestService {
             );
 
             // 9. QuestLog 저장
-            return questLogRepository.save(em, questLog);
+            QuestLog savedQuestLog = questLogRepository.save(em, questLog);
+
+            // 10. 완료된 UserQuest를 일정에서 삭제
+            userQuestRepository.delete(em, userQuest);
+
+            // 11. 완료 기록 반환
+            return savedQuestLog;
         });
     }
     
