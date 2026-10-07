@@ -3,8 +3,8 @@
 <html lang="ko">
 <head>
 <%@ include file="/WEB-INF/views/common/head.jsp" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/quest.css">
-<script src="${pageContext.request.contextPath}/resources/js/quest.js" defer></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/quest.css">
+<script src="${pageContext.request.contextPath}/assets/js/quest.js" defer></script>
 
     <title>상새 - 퀘스트</title>
 
