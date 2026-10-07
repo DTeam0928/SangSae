@@ -44,4 +44,54 @@ public class UserQuestServlet extends BaseServlet {
         //추후 통합되면 경로 바꾸기
         request.getRequestDispatcher("/views/quest/user-quest-list.jsp").forward(request, response);
     }
+    
+    //삭제버튼을 누를 시
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        QuestService questService = app().questService();
+
+        // 1. 로그인 사용자 확인
+        LoginUser loginUser = LoginSession.current(request);
+        if (loginUser == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+            return;
+        }
+        Long userId = loginUser.getId();
+
+        // 2. 삭제할 사용자 퀘스트 ID 확인
+        String userQuestIdParam = request.getParameter("userQuestId");
+        if (userQuestIdParam == null || userQuestIdParam.isBlank()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "삭제할 퀘스트가 지정되지 않았습니다.");
+            return;
+        }
+        Long userQuestId;
+        try {
+            userQuestId = Long.parseLong(userQuestIdParam);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 퀘스트 ID입니다.");
+            return;
+        }
+
+        // 3. 일정 삭제
+        try {
+            boolean deleted = questService.deleteUserQuest(userQuestId, userId);
+            if (!deleted) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "삭제할 퀘스트를 찾을 수 없습니다.");
+                return;
+            }
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            return;
+        }
+
+        // 4. 삭제 후 일정 목록으로 이동
+        String tripId = request.getParameter("tripId");
+        String date = request.getParameter("date");
+        String redirectUrl = request.getContextPath() + "/user-quests?date=" + date;
+        if (tripId != null && !tripId.isBlank()) {
+            redirectUrl += "&tripId=" + tripId;
+        }
+        response.sendRedirect(redirectUrl);
+    }
 }

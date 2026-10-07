@@ -53,4 +53,8 @@ public class UserQuestRepository {
     public UserQuest findById(EntityManager em, Long id) {
         return em.find(UserQuest.class, id);
     }
+    
+    public void delete(EntityManager em, UserQuest userQuest) {
+        em.remove(userQuest);
+    }
 }
