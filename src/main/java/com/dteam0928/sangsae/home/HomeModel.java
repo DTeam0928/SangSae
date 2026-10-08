@@ -193,6 +193,10 @@ public class HomeModel {
         public List<ManagementCardConfig> getManagementCards() { return managementCards; }
         public List<StatsCardConfig> getStatsCards() { return statsCards; }
         public List<FeatureCardConfig> getFeatureCards() { return featureCards; }
+
+        public void setXpTitle(String xpTitle) {
+            this.xpTitle = xpTitle;
+        }
     }
 
     public static class ManagementCardConfig {
