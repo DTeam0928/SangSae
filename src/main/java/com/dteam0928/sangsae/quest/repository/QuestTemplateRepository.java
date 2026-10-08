@@ -32,4 +32,10 @@ public class QuestTemplateRepository {
         .setParameter("ids", ids)
         .getResultList();
     }
+    
+    // 새로 생성된 퀘스트 템플릿 저장
+    public QuestTemplate save(EntityManager em, QuestTemplate quest) {
+        em.persist(quest);
+        return quest;
+    }
 }
