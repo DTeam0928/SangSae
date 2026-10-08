@@ -34,7 +34,10 @@
   </section>
 </main>
 
-<!-- 공통 토스트 알림 -->
+    <!-- 모달 불러오기 -->
+    <%@ include file="/WEB-INF/views/modal/modal_head.jsp" %>
+
+    <!-- 공통 토스트 알림 -->
 <div id="toast" class="toast position-fixed ds-bottom-6 ds-right-6 surface-text color-white ds-px-5 ds-py-3 radius-md shadow-modal ds-z-100 type-sm"></div>
 
 </body>
