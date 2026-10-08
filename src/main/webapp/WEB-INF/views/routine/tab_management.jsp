@@ -3,7 +3,7 @@
 <!-- 1. 통계 요약 카드 (3열 그리드) -->
 <div class="grid-12 mb-24">
   <div class="col-4 surface-gradient rounded-lg p-24 text-primary">
-    <div class="text-sm">선택 기간 달성률</div>
+    <div class="text-sm color-white">선택 기간 달성률</div>
     <div id="progressRatio" class="text-2xl font-bold mt-8">0%</div>
   </div>
   <div class="col-4 surface-white border-default rounded-lg p-24">

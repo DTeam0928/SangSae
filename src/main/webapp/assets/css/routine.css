@@ -11,10 +11,27 @@ body {
 
 button, input, select, textarea { font: inherit; }
 
-.tab-active {
-    color: var(--color-dark);
-    background: var(--color-main);
+.main-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--color-border2);
+    padding-bottom: 10px;
 }
+.main-tab-btn {
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    padding: 10px 17px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+.main-tab-btn.active {
+    background: var(--color-main);
+    color: var(--color-dark);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
 .modal-bg { display: none; }
 .modal-bg.show { display: flex; }
