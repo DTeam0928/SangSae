@@ -203,13 +203,8 @@ public class PlaceDao {
     }
 
     private PlaceResponseDto mapRowToDto(ResultSet rs) throws SQLException {
-        String themeCode = rs.getString("category");
-        SangsaeTheme theme = SangsaeTheme.WALK;
-        if (themeCode != null) {
-            try {
-                theme = SangsaeTheme.valueOf(themeCode.toUpperCase());
-            } catch (IllegalArgumentException ignored) {}
-        }
+        String categoryStr = rs.getString("category");
+        SangsaeTheme theme = SangsaeTheme.fromCodeOrName(categoryStr);
 
         return PlaceResponseDto.builder()
             .placeId(rs.getLong("id"))
