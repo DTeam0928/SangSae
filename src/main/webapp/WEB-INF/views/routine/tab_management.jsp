@@ -86,7 +86,7 @@
         <input id="taskTitle" required class="task-form-input" placeholder="루틴 내용을 입력하세요">
       </div>
 
-      <!-- 시간 & 카테고리 2열 배치 -->
+      <!-- 시간 & 알림 2열 배치 -->
       <div class="task-form-row">
         <div class="task-form-group">
           <label class="task-form-label" for="taskTime">시간</label>
@@ -99,17 +99,30 @@
 
       </div>
 
-      <div class="task-form-group">
-        <label class="task-form-label" for="taskCat">카테고리</label>
-        <select id="taskCat" class="task-form-category">
-          <option>💪 운동</option>
-          <option>💧 건강</option>
-          <option>📚 자기계발</option>
-          <option>🧠 공부</option>
-          <option>💼 업무</option>
-          <option>🏠 일상</option>
-        </select>
+      <!-- 카테고리 & 인증방식 2열 배치-->
+      <div class="task-form-row">
+        <div class="task-form-group">
+          <label class="task-form-label" for="taskCat">카테고리</label>
+          <select id="taskCat" class="task-form-category">
+            <option>💪 운동</option>
+            <option>💧 건강</option>
+            <option>📚 자기계발</option>
+            <option>🧠 공부</option>
+            <option>💼 업무</option>
+            <option>🏠 일상</option>
+          </select>
+        </div>
+        <div class="task-form-group">
+          <label class="task-form-label" for="taskAuth">인증 방식</label>
+          <select id="taskAuth" class="task-form-category">
+            <option>인증 없음</option>
+            <option>위치 인증</option>
+            <option>사진 인증</option>
+            <option>텍스트 인증</option>
+          </select>
+        </div>
       </div>
+
 
       <!-- 장소 및 반경 설정 -->
       <div class="task-form-group">
