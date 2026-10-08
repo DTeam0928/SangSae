@@ -23,8 +23,25 @@ let selectedRoutine = null;
 let selectedDate = App.dateKey();
 let calendarCursor = new Date(selectedDate + 'T00:00:00');
 let calendarView = 'week';
-let userLocation = { lat: 37.5665, lng: 126.9780 };
+let userLocation = { lat: 35.1434, lng: 129.0346 };
 let radiusKm = 3;
+
+const CATEGORY_LABEL_MAP = {
+    'EXERCISE': '운동',
+    'STUDY': '공부',
+    'HEALTH': '건강',
+    'MIRACLE_MORNING': '미라클 모닝',
+    'SLEEP': '숙면',
+    'WORKER': '직장인',
+    'DAILY': '일상',
+    'GROWTH': '성장'
+};
+
+function formatCategoryName(code) {
+    if (!code) return '일상';
+    const upper = String(code).trim().toUpperCase();
+    return CATEGORY_LABEL_MAP[upper] || code;
+}
 
 function toast(m, icon = '✨') {
     const e = document.getElementById('toast');
@@ -71,7 +88,7 @@ function fetchRoutinesFromServer() {
                     serverId: item.id,
                     name: item.title,
                     desc: item.description || '',
-                    cat: [item.category || '일상'],
+                    cat: [formatCategoryName(item.category || '일상')],
                     popular: item.adoptedCount || 0,
                     difficulty: 2,
                     tasks: []
@@ -510,27 +527,94 @@ function saveRoutineInfo(e) {
         searchNearbyRoutinePlaces();
     }
 
-    function searchNearbyRoutinePlaces(keyword) {
+    const CATEGORY_QUERY_MAP = {
+        '전체': ['공원', '피트니스', '도서관'],
+        '운동': ['헬스장', '피트니스', '클라이밍', '필라테스'],
+        '미라클 모닝': ['공원', '산책로', '러닝'],
+        '공부': ['도서관', '스터디카페', '북카페'],
+        '건강': ['공원', '산책로', '둘레길'],
+        '숙면': ['공원', '산책로'],
+        '직장인': ['피트니스', '카페', '도서관']
+    };
+
+    const NOISE_BLACKLIST = [
+        '새마을', '재활', '본부', '척추', '통증', '요양', '병원', '의원', '한의원', '치과',
+        '정형외과', '내과', '외과', '클리닉', '협의회', '지회', '지부', '사무소', '협회', '연맹',
+        '재단', '위원회', '공단', '공사', '판매', '도소매', '상사', '용품', '유통', '기구',
+        '교정', '치료', '보호', '복지', '장례', '관리실', '학회', '연구소', '정비'
+    ];
+
+    function isNoisePlace(place) {
+        if (!place) return true;
+        const targetText = ((place.name || '') + ' ' + (place.categoryName || '') + ' ' + (place.originalCategoryName || '') + ' ' + (place.roadAddress || '') + ' ' + (place.address || '')).toLowerCase();
+        return NOISE_BLACKLIST.some(kw => targetText.includes(kw));
+    }
+
+    async function searchNearbyRoutinePlaces(keyword) {
         if (!routineMap || typeof MapUtil === 'undefined') return;
-        const query = keyword || (routineCategory !== '전체' ? routineCategory : '운동');
-        MapUtil.searchPlaces({
-            query: query,
-            lat: userLocation.lat,
-            lng: userLocation.lng,
-            radius: radiusKm * 1000
-        })
-        .then(res => {
-            if (res && res.success && Array.isArray(res.data)) {
-                nearbyRoutinePlaces = res.data;
-            } else {
-                nearbyRoutinePlaces = [];
+
+        const lat = userLocation.lat;
+        const lng = userLocation.lng;
+        const searchRadius = Math.max(radiusKm * 1000, 4000);
+        const ctx = (document.body && document.body.dataset && document.body.dataset.contextPath) || '';
+
+        let combinedPlaces = [];
+
+        // 1단계: DB 등록 검증 루틴 스팟 우선 조회 (/api/places/nearby)
+        try {
+            const dbRes = await fetch(`${ctx}/api/places/nearby?lat=${lat}&lng=${lng}&radius=${searchRadius}`);
+            if (dbRes.ok) {
+                const dbJson = await dbRes.json();
+                if (dbJson && dbJson.success && Array.isArray(dbJson.data)) {
+                    combinedPlaces = dbJson.data
+                        .filter(p => !isNoisePlace(p))
+                        .map(p => ({
+                            ...p,
+                            isDbSpot: true,
+                            themeName: p.themeName || '#인증스팟'
+                        }));
+                }
             }
-            renderNearbyPlaces();
-        })
-        .catch(() => {
-            nearbyRoutinePlaces = [];
-            renderNearbyPlaces();
-        });
+        } catch (e) {
+            console.warn('[Routine] DB nearby places lookup failed, fallback to Kakao API:', e);
+        }
+
+        // 2단계: DB 장소가 부족할 경우 정제된 카카오 API 검색으로 폴백 채우기
+        if (combinedPlaces.length < 6) {
+            const queries = keyword ? [keyword] : (CATEGORY_QUERY_MAP[routineCategory] || ['공원', '피트니스']);
+            const existingNames = new Set(combinedPlaces.map(p => (p.name || '').trim()));
+
+            for (const query of queries) {
+                if (combinedPlaces.length >= 6) break;
+                try {
+                    const kakaoRes = await MapUtil.searchPlaces({
+                        query: query,
+                        lat: lat,
+                        lng: lng,
+                        radius: searchRadius
+                    });
+
+                    if (kakaoRes && kakaoRes.success && Array.isArray(kakaoRes.data)) {
+                        for (const place of kakaoRes.data) {
+                            const trimmedName = (place.name || '').trim();
+                            if (!existingNames.has(trimmedName) && !isNoisePlace(place)) {
+                                existingNames.add(trimmedName);
+                                combinedPlaces.push({
+                                    ...place,
+                                    isDbSpot: false
+                                });
+                                if (combinedPlaces.length >= 6) break;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[Routine] Kakao place fallback query failed:', query, err);
+                }
+            }
+        }
+
+        nearbyRoutinePlaces = combinedPlaces;
+        renderNearbyPlaces();
     }
 
     function renderNearbyPlaces() {
@@ -555,10 +639,11 @@ function saveRoutineInfo(e) {
             const distText = place.distanceInMeters
                 ? (place.distanceInMeters < 1000 ? place.distanceInMeters + 'm' : (place.distanceInMeters / 1000).toFixed(1) + 'km')
                 : '';
+            const badgeLabel = place.isDbSpot ? '⭐ ' + (place.themeName || '#인증스팟') : (place.themeName || '#루틴스팟');
             return `
                 <div class="card surface-white border-default border-color-border radius-md ds-p-4 cursor-pointer" onclick="App.routine.focusPlace(${place.latitude}, ${place.longitude})">
                     <div class="layout-row justify-between align-center">
-                        <span class="pill" style="font-size: 11px;">${App.escape(place.themeName || '#루틴스팟')}</span>
+                        <span class="pill" style="font-size: 11px;">${App.escape(badgeLabel)}</span>
                         <span class="type-xs color-muted">${distText ? '📍 ' + distText : ''}</span>
                     </div>
                     <h4 class="weight-bold type-sm ds-mt-2">${App.escape(place.name)}</h4>
