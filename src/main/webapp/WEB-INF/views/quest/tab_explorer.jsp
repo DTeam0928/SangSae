@@ -29,7 +29,7 @@
         </div>
         <div class="hero-actions">
             <button class="btn btn-secondary" onclick="App.quest.openCollectionModal()">♡ 내 북마크</button>
-            <button class="quest-detail-6 btn btn-primary" onclick="App.quest.createQuest()">＋ 퀘스트 만들기</button>
+            <button class="quest-detail-6 btn btn-primary" onclick="App.quest.openCreateModal()">＋ 퀘스트 만들기</button>
         </div>
     </div>
 
