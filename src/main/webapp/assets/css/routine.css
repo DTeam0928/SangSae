@@ -104,7 +104,7 @@
     /* 100%: 그림자 0 0 0 0 var(--color-pulse-clear)를 적용합니다. */
     100% {
         box-shadow: 0 0 0 0 var(--color-pulse-clear);
-    }
+    }}
 
 .empty {
     padding: 35px;
