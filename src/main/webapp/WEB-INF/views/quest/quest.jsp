@@ -23,7 +23,7 @@
         <div class="main-tabs">
             <button class="main-tab-btn title active" onclick="App.quest.switchTab('explorer', this)">퀘스트 탐색</button>
             <button class="main-tab-btn title" onclick="App.quest.switchTab('management', this)">
-                여행 관리 <span id="plannedCountBadge" class="desc"></span>
+                퀘스트 관리 <span id="plannedCountBadge" class="desc"></span>
             </button>
         </div>
 
