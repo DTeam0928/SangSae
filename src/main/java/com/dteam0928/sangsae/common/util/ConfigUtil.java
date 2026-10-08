@@ -45,6 +45,7 @@ public final class ConfigUtil {
         List<File> candidates = new ArrayList<>();
         candidates.add(new File("C:/Dev/Sangsae/.env"));
         candidates.add(new File("C:\\Dev\\Sangsae\\.env"));
+        candidates.add(new File("C:/Jsp/SangSae/.env"));
 
         // Tomcat 배포 구동 시 user.dir이 프로젝트 루트가 아닌 CATALINA_BASE/bin을 가리키므로,
         // 로컬 실행 및 다양한 배포 환경에서 프로젝트 루트 .env를 정상 감지하기 위해 상위 디렉터리 역추적 탐색 수행.
