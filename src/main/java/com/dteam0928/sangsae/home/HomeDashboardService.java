@@ -8,6 +8,7 @@ import com.dteam0928.sangsae.quest.repository.UserQuestRepository;
 import com.dteam0928.sangsae.routine.dto.UserRoutineTaskResponseDto;
 import com.dteam0928.sangsae.routine.service.RoutineService;
 import com.dteam0928.sangsae.user.dao.UserProfileDao;
+import com.dteam0928.sangsae.user.exp.ExpPolicy;
 import com.dteam0928.sangsae.user.exp.ExperienceService;
 import com.dteam0928.sangsae.user.exp.LevelInfo;
 import com.dteam0928.sangsae.user.model.UserProfile;
@@ -62,13 +63,16 @@ public class HomeDashboardService {
         }
         model.setNickname(nickname);
 
+        ExpPolicy policy = (experienceService != null)
+                ? experienceService.getExpPolicy()
+                : new ExpPolicy();
+
         LevelInfo levelInfo = (experienceService != null && userId != null)
                 ? experienceService.getUserLevelInfo(userId)
-                : new LevelInfo(1, "새싹 탐험가", totalXp, totalXp, 1000 - totalXp, 0.0, false);
+                : policy.calculateLevelInfo(totalXp);
 
-        model.getUi().setXpTitle(
-                "Lv." + levelInfo.level() + " " + levelInfo.title()
-        );
+        model.setLevelInfo(levelInfo);
+        model.getUi().setXpTitle("Lv." + levelInfo.level() + " " + levelInfo.title());
 
         // 2. 오늘의 퀘스트 현황 수집
         int questDoneCount = 0;

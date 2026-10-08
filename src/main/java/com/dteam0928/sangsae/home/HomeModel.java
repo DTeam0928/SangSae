@@ -1,5 +1,7 @@
 package com.dteam0928.sangsae.home;
 
+import com.dteam0928.sangsae.user.exp.LevelInfo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Map;
 public class HomeModel {
 
     private String nickname;
+    private LevelInfo levelInfo;
     private DailyAggregateDto dailyAggregate;
     private UiConfig ui;
     private List<ManagementItem> trips = new ArrayList<>();
@@ -27,6 +30,12 @@ public class HomeModel {
 
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
+
+    public LevelInfo getLevelInfo() { return levelInfo; }
+    public void setLevelInfo(LevelInfo levelInfo) { this.levelInfo = levelInfo; }
+
+    public String getUserTitle() { return levelInfo != null ? levelInfo.title() : ""; }
+    public int getLevel() { return levelInfo != null ? levelInfo.level() : 1; }
 
     public DailyAggregateDto getDailyAggregate() { return dailyAggregate; }
     public void setDailyAggregate(DailyAggregateDto dailyAggregate) { this.dailyAggregate = dailyAggregate; }
@@ -113,7 +122,7 @@ public class HomeModel {
     public static class UiConfig {
         private String pageTitle = "상새 - 일상을 새롭게";
         private String dashboardSuffix = "님의 대시보드";
-        private String xpTitle = "오늘의 달성도";
+        private String xpTitle = "나의 칭호";
         private String xpUnit = "XP";
         private String dateSeparator = " ~ ";
         private String editLabel = "이동";
