@@ -578,6 +578,7 @@ function saveRoutineInfo(e) {
     }
 
     function selectRoutinePlace(place) {
+        showPlaceDetail(place);
         if (routineMap && place.latitude && place.longitude) {
             MapUtil.moveTo(routineMap, place.latitude, place.longitude);
         }
@@ -596,13 +597,49 @@ function saveRoutineInfo(e) {
         toast(`'${placeName}' 장소가 Task에 설정되었습니다.`, '📍');
     }
 
+
+// 주변 장소 필터: 기존 지도 검색 로직 재사용
+function setRadius(km, button) {
+    radiusKm = Math.max(1, Math.min(10, Number(km) || 3));
+    document.querySelectorAll('#filterModal [data-radius]').forEach(el => {
+        el.classList.toggle('active', el === button);
+    });
+}
+function applyPlaceFilters() {
+    hide('filterModal');
+    searchNearbyRoutinePlaces();
+    toast('주변 장소 필터가 적용되었습니다.', '📍');
+}
+function showPlaceDetail(place) {
+    if (!place) return;
+    const fields = {
+        pmType: place.themeName || '루틴 스팟',
+        pmName: place.name || '',
+        pmAddress: place.roadAddress || place.address || '',
+        pmDistance: place.distanceInMeters != null ? place.distanceInMeters + 'm' : '-',
+        pmRoutineCount: place.routineCount != null ? String(place.routineCount) : '-',
+        pmHot: place.hotScore != null ? String(place.hotScore) : '-'
+    };
+    Object.entries(fields).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    });
+    const list = document.getElementById('pmRoutines');
+    if (list) list.textContent = '등록된 장소별 루틴 정보가 없습니다.';
+    document.getElementById('placeModal')?.classList.add('show');
+}
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') ['routineModal','placeModal','filterModal','routineFormModal'].forEach(hide);
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         initRoutineMap();
         if (location.hash === '#manage') switchTab('manage');
     });
 
     App.routine = {
-        toast, hide, closeModal, switchTab, filteredRoutines, routineCard, renderExplore,
+        setRadius, applyPlaceFilters, showPlaceDetail, toast, hide, closeModal, switchTab, filteredRoutines, routineCard, renderExplore,
         clearSearch, setCategory, openRoutine, toggleModalTasks, adoptRoutineToServer,
         addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters,
         renderManage, renderCalendar, calendarDayBox, selectCalendarDate, moveCalendar,
