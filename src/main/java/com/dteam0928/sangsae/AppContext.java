@@ -34,6 +34,8 @@ import com.dteam0928.sangsae.routine.service.MyPlaceService;
 import com.dteam0928.sangsae.routine.service.RoutineBookmarkService;
 import com.dteam0928.sangsae.routine.service.RoutineExploreService;
 import com.dteam0928.sangsae.routine.service.RoutineSettings;
+import com.dteam0928.sangsae.routine.repository.jpa.JpaMyRoutineRepository;
+import com.dteam0928.sangsae.routine.service.MyRoutineService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletContext;
@@ -84,6 +86,7 @@ public class AppContext implements AutoCloseable {
     private final RoutineExploreService routineExploreService;
     private final RoutineBookmarkService routineBookmarkService;
     private final MyPlaceService myPlaceService;
+    private final MyRoutineService myRoutineService;
 
     // ---- 홈 대시보드 ----
     private final com.dteam0928.sangsae.home.HomeDashboardService homeDashboardService;
@@ -149,6 +152,7 @@ public class AppContext implements AutoCloseable {
         this.routineExploreService = new RoutineExploreService(tx, routineExploreRepository, myPlaceRepository, profileDao, routineSettings);
         this.routineBookmarkService = new RoutineBookmarkService(tx, routineExploreRepository);
         this.myPlaceService = new MyPlaceService(tx, myPlaceRepository, routineSettings);
+        this.myRoutineService = new MyRoutineService(tx, new JpaMyRoutineRepository(), routineExploreRepository, myPlaceRepository, routineSettings);
 
         // ---- 홈 대시보드 ----
         this.homeDashboardService = new com.dteam0928.sangsae.home.HomeDashboardService(
@@ -191,6 +195,7 @@ public class AppContext implements AutoCloseable {
     public RoutineExploreService routineExploreService() { return routineExploreService; }
     public RoutineBookmarkService routineBookmarkService() { return routineBookmarkService; }
     public MyPlaceService myPlaceService() { return myPlaceService; }
+    public MyRoutineService myRoutineService() { return myRoutineService; }
     public com.dteam0928.sangsae.home.HomeDashboardService homeDashboardService() { return homeDashboardService; }
 
     @Override
