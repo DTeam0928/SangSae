@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
@@ -8,7 +9,7 @@
 <script src="${pageContext.request.contextPath}/assets/js/mapUtil.js?v=<%= System.currentTimeMillis() %>" defer></script>
 <script src="${pageContext.request.contextPath}/assets/js/routine.js?v=<%= System.currentTimeMillis() %>" defer></script>
 
-<title>일상을 새롭게, 상새</title>
+    <title>상새 - 일상을 새롭게</title>
 
 </head>
 <body data-page="routine" data-context-path="${pageContext.request.contextPath}" class="viewport-height">
