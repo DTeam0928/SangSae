@@ -1,67 +1,68 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!-- 통계 요약 카드 -->
-<div class="layout-grid columns-1 medium-columns-3 ds-gap-4">
-  <div class="surface-gradient radius-lg ds-p-5 color-white">
-    <div class="type-sm color-white">선택 기간 달성률</div>
-    <div id="progressRatio" class="type-3xl weight-heading ds-mt-1">0%</div>
+<!-- 1. 통계 요약 카드 (3열 그리드) -->
+<div class="grid-12 mb-24">
+  <div class="col-4 surface-gradient rounded-lg p-24 text-primary">
+    <div class="text-sm">선택 기간 달성률</div>
+    <div id="progressRatio" class="text-2xl font-bold mt-8">0%</div>
   </div>
-  <div class="surface-white border-default border-color-border radius-lg ds-p-5">
-    <div class="type-sm color-muted">연속 실천일</div>
-    <div class="type-3xl weight-heading ds-mt-1"><span id="userStreak">0</span><span class="type-base color-muted ds-ml-1">일</span></div>
+  <div class="col-4 surface-white border-default rounded-lg p-24">
+    <div class="text-sm text-secondary">연속 실천일</div>
+    <div class="text-2xl font-bold mt-8"><span id="userStreak">0</span><span class="text-sm text-secondary ml-auto">일</span></div>
   </div>
-  <div class="surface-white border-default border-color-border radius-lg ds-p-5">
-    <div class="type-sm color-muted">누적 XP</div>
-    <div id="totalXp" class="type-3xl weight-heading color-dark ds-mt-1">0 XP</div>
+  <div class="col-4 surface-white border-default rounded-lg p-24">
+    <div class="text-sm text-secondary">누적 XP</div>
+    <div id="totalXp" class="text-2xl font-bold text-primary mt-8">0 XP</div>
   </div>
 </div>
 
-<!-- 활성 루틴 선택 및 정보 -->
-<section class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card">
-  <div class="layout-row layout-column large-layout-horizontal ds-gap-4 large-align-center justify-between">
-    <div class="layout-row layout-column medium-layout-horizontal medium-align-center ds-gap-3">
-      <select id="activeRoutineSelect" onchange="App.routine.changeActiveRoutine(this.value)" class="surface-sub-bg border-default border-color-border type-lg weight-heading radius-md ds-px-4 ds-py-3 ds-min-w-260px"></select>
-      <div class="type-xs color-muted surface-sub-bg radius-md ds-px-3 ds-py-2">운영 기간 <b id="routinePeriodLabel"></b></div>
+<!-- 2. 활성 루틴 선택 및 정보 -->
+<section class="surface-white border-default rounded-lg p-24 mb-24">
+  <div class="flex items-center justify-between flex-wrap">
+    <div class="flex items-center flex-wrap">
+      <select id="activeRoutineSelect" onchange="App.routine.changeActiveRoutine(this.value)" class="form-select font-bold text-md rounded-md p-8"></select>
+      <div class="text-xs text-secondary surface-sub-bg rounded-md px-16 py-8 mt-8">운영 기간 <b id="routinePeriodLabel"></b></div>
     </div>
-    <div class="layout-row ds-gap-2">
-      <button type="button" onclick="App.routine.openRoutineInfo()" class="ds-px-4 ds-py-2 surface-sub-bg color-text weight-bold radius-md type-sm">⚙ 기본 정보</button>
-      <button type="button" onclick="App.routine.openRoutineCreateModal()" class="ds-px-4 ds-py-2 surface-main color-dark weight-bold radius-md type-sm">＋ 새 루틴</button>
+    <div class="flex items-center">
+      <button type="button" onclick="App.routine.openRoutineInfo()" class="btn btn-secondary text-sm font-bold rounded-md px-16 py-8">⚙ 기본 정보</button>
+      <button type="button" onclick="App.routine.openRoutineCreateModal()" class="btn btn-primary text-sm font-bold rounded-md px-16 py-8">＋ 새 루틴</button>
     </div>
   </div>
 </section>
 
-<!-- 루틴 캘린더 -->
-<section class="surface-white border-default border-color-border radius-lg ds-p-4 medium-ds-p-5 shadow-card">
-  <div class="layout-row layout-column medium-layout-horizontal medium-align-center justify-between ds-gap-3">
+<!-- 3. 루틴 캘린더 -->
+<section class="surface-white border-default rounded-lg p-24 mb-24">
+  <div class="flex items-center justify-between flex-wrap mb-16">
     <div>
-      <h2 class="weight-heading type-lg">📅 루틴 캘린더</h2>
-      <p class="type-xs color-muted ds-mt-1">주/월 보기로 수행 계획과 완료 상태를 확인하세요.</p>
+      <h2 class="text-lg font-bold">📅 루틴 캘린더</h2>
+      <p class="text-xs text-secondary mt-8">주/월 보기로 수행 계획과 완료 상태를 확인하세요.</p>
     </div>
-    <div class="layout-row align-center ds-gap-2">
-      <div class="layout-row ds-gap-1">
-        <button type="button" onclick="App.routine.moveCalendar(-1)" class="ds-w-9 ds-h-9 radius-sm surface-sub-bg weight-heading">‹</button>
-        <button type="button" onclick="App.routine.moveCalendar(1)" class="ds-w-9 ds-h-9 radius-sm surface-sub-bg weight-heading">›</button>
+    <div class="flex items-center">
+      <div class="flex items-center mr-auto">
+        <button type="button" onclick="App.routine.moveCalendar(-1)" class="btn btn-secondary rounded-md p-8 font-bold">‹</button>
+        <button type="button" onclick="App.routine.moveCalendar(1)" class="btn btn-secondary rounded-md p-8 font-bold">›</button>
       </div>
-      <button type="button" id="calendarViewBtn" onclick="App.routine.toggleCalendarView()" class="ds-px-4 ds-py-2 radius-md surface-main color-dark type-xs weight-heading">주</button>
+      <button type="button" id="calendarViewBtn" onclick="App.routine.toggleCalendarView()" class="btn btn-primary text-xs font-bold rounded-md px-16 py-8">주</button>
     </div>
   </div>
-  <div class="layout-row align-center justify-between ds-mt-4 ds-mb-3">
-    <div id="calendarTitle" class="weight-heading type-lg"></div>
-    <button type="button" onclick="App.routine.calendarToday()" class="type-xs weight-bold color-dark">오늘</button>
+  <div class="flex items-center justify-between mb-16">
+    <div id="calendarTitle" class="text-lg font-bold"></div>
+    <button type="button" onclick="App.routine.calendarToday()" class="text-xs font-bold text-primary">오늘</button>
   </div>
   <div id="calendarGrid" class="cal-grid"></div>
 </section>
 
-<!-- 타임테이블 및 Task 설정 -->
-<div class="layout-grid columns-1 large-columns-12 ds-gap-6 align-start">
-  <section class="large-span-8 surface-white border-default border-color-border radius-lg ds-p-4 medium-ds-p-5 shadow-card">
-    <div class="layout-row layout-column medium-layout-horizontal medium-align-center justify-between ds-gap-3 ds-pb-3 border-bottom border-color-sub-bg">
+<!-- 4. 타임테이블 및 Task 설정 (8:4 12컬럼 그리드) -->
+<div class="grid-12 items-start">
+  <!-- 타임테이블 (8컬럼) -->
+  <section class="col-8 surface-white border-default rounded-lg p-24">
+    <div class="flex items-center justify-between mb-16 pb-16 border-bottom">
       <div>
-        <h2 class="weight-heading type-lg">오늘의 루틴 타임테이블</h2>
-        <p id="selectedDateLabel" class="type-xs color-muted ds-mt-1"></p>
+        <h2 class="text-lg font-bold">오늘의 루틴 타임테이블</h2>
+        <p id="selectedDateLabel" class="text-xs text-secondary mt-8"></p>
       </div>
     </div>
-    <div class="timeline-table ds-mt-4">
+    <div class="timeline-table mt-16">
       <div class="tt-head">
         <div>#</div><div>시간</div><div>오늘 해야 할 루틴</div><div>상태</div>
       </div>
@@ -69,7 +70,8 @@
     </div>
   </section>
 
-  <aside class="task-form-container">
+  <!-- Task 설정 (4컬럼, 상단 sticky) -->
+  <aside class="col-4 sticky task-form-container">
     <!-- 폼 헤더 -->
     <div class="task-form-header">
       <h2 class="task-form-title">Task 설정</h2>
@@ -93,13 +95,12 @@
           <input id="taskTime" type="time" required class="task-form-time">
         </div>
         <div class="task-form-group">
-          <label class="task-form-label" for="taskTime">알림</label>
-          <input id="taskTime" type="time" required class="task-form-time">
+          <label class="task-form-label" for="taskAlarm">알림</label>
+          <input id="taskAlarm" type="time" required class="task-form-time">
         </div>
-
       </div>
 
-      <!-- 카테고리 & 인증방식 2열 배치-->
+      <!-- 카테고리 & 인증방식 2열 배치 -->
       <div class="task-form-row">
         <div class="task-form-group">
           <label class="task-form-label" for="taskCat">카테고리</label>
@@ -122,7 +123,6 @@
           </select>
         </div>
       </div>
-
 
       <!-- 장소 및 반경 설정 -->
       <div class="task-form-group">
