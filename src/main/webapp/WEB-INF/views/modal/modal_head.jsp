@@ -8,3 +8,4 @@
 <%@ include file="placeModal.jsp" %>
 <%@ include file="filterModal.jsp" %>
 <%@ include file="routineFormModal.jsp" %>
+<%@ include file="authRadiusModal.jsp"%>

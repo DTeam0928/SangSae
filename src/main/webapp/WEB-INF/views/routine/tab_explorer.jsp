@@ -4,7 +4,7 @@
 <section class="surface-gradient color-white radius-lg ds-p-6 medium-ds-p-8 shadow-card">
   <div class="max-width-3xl">
     <div class="type-xs weight-heading letter-spacing-wide color-main">PLACE MAKES HABIT</div>
-    <h1 class="type-3xl medium-type-4xl weight-heading ds-mt-2">장소가 습관을 만든다.</h1>
+    <h1 class="type-3xl medium-type-4xl weight-heading ds-mt-2 color-text">장소가 습관을 만든다.</h1>
     <p class="ds-mt-3 type-sm medium-type-base color-main line-height-relaxed">루틴을 검색하는 것에서 끝나지 않습니다. 지금 있는 장소와 주변 스팟, 사람들이 실제로 수행하는 루틴을 연결해 오늘의 행동을 찾아보세요.</p>
   </div>
   <div class="ds-mt-6 layout-row layout-column medium-layout-horizontal ds-gap-3">
