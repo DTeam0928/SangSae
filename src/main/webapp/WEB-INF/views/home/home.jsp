@@ -47,7 +47,30 @@
             </div>
         </section>
 
-        <!-- 1. 내 여행 관리 -->
+        <!-- 1. 통계 카드 (퀘스트 & 루틴 달성도) -->
+        <div class="dash-card">
+            <div class="dash-title">🔥 내 달성 현황</div>
+            <div class="stats-row">
+                <div>
+                    <div class="stat-label">달성한 퀘스트</div>
+                    <div class="stat-num" id="stat-completed-quests">0개</div>
+                </div>
+                <div>
+                    <div class="stat-label">남은 퀘스트</div>
+                    <div class="stat-num stat-num-accent" id="stat-remaining-quests">0개</div>
+                </div>
+                <div style="border-left: 1px solid var(--color-border); padding-left: 12px;">
+                    <div class="stat-label">달성한 할 일</div>
+                    <div class="stat-num" id="stat-completed-routines">0개</div>
+                </div>
+                <div>
+                    <div class="stat-label">남은 할 일</div>
+                    <div class="stat-num stat-num-accent" id="stat-remaining-quests">0개</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 내 여행 관리 -->
         <div class="dash-card">
             <div>
                 <div class="dash-card-header">
@@ -66,7 +89,7 @@
             <a href="${pageContext.request.contextPath}/quest#management" class="detail-btn">여행 및 퀘스트 추가하기</a>
         </div>
 
-        <!-- 2. 내 루틴 관리 -->
+        <!-- 3. 내 루틴 관리 -->
         <div class="dash-card">
             <div>
                 <div class="dash-card-header">
@@ -82,25 +105,6 @@
                 </div>
             </div>
             <a href="${pageContext.request.contextPath}/routine#manage" class="detail-btn">루틴 추가하기</a>
-        </div>
-
-        <!-- 3. 통계 카드 (퀘스트 & 루틴 달성도) -->
-        <div class="dash-card">
-            <div class="dash-title">🔥 내 달성 현황</div>
-            <div class="stats-row">
-                <div>
-                    <div class="stat-label">달성한 퀘스트</div>
-                    <div class="stat-num" id="stat-completed-quests">0개</div>
-                </div>
-                <div>
-                    <div class="stat-label">남은 퀘스트</div>
-                    <div class="stat-num stat-num-accent" id="stat-remaining-quests">0개</div>
-                </div>
-                <div style="border-left: 1px solid var(--color-border); padding-left: 12px;">
-                    <div class="stat-label">달성한 할 일</div>
-                    <div class="stat-num" id="stat-completed-routines">0개</div>
-                </div>
-            </div>
         </div>
     </div>
 

@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>상새</title>
+    <%@ include file="/WEB-INF/views/common/head.jsp" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/variables.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/onboarding.css">
 <script src="${pageContext.request.contextPath}/assets/js/api-client.js" defer></script>
