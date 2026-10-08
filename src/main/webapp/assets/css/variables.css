@@ -23,6 +23,9 @@
     --color-dark: #87BBBE;        /* 프라이머리 다크 버전 / 버튼 호버용 */
     --color-bg: #EFFAFA;          /* 기본 배경색 / 매우 연한 민트빛 화이트 */
 
+    --color-dark-hover: #75a7a9;    /* --color-dark보다 살짝 짙은 호버용 민트 */
+    --color-danger-border: #f7a3a6; /* --color-danger와 어울리는 연한 에러 테두리 선 */
+
     /* 2. 조화로운 서브 및 배경 컬러 */
     --color-main: #E2F5F5;        /* 기존 메인 컬러를 배경 톤에 맞게 은은하게 조율 */
     --color-sub-bg: #E8F4F4;      /* 배경 박스 및 연한 서브 배경 */
