@@ -791,27 +791,6 @@
         }
     });
 
-
-    /* 나만의 퀘스트 생성: 서버 응답에 따라 UI 갱신 */
-    async function createQuest() {
-        const input = document.getElementById('newTitle');
-        const title = input?.value.trim();
-        if (!title) { showToast('퀘스트 제목을 입력해주세요.', '⚠️'); input?.focus(); return; }
-        try {
-            const response = await fetch(contextPath + '/quest', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
-                body: new URLSearchParams({ title })
-            });
-            const json = await response.json();
-            if (!response.ok || !json.success) throw new Error(json.message || '퀘스트 생성에 실패했습니다.');
-            closeModal('createModal');
-            input.value = '';
-            showToast('퀘스트가 생성되었습니다.');
-            fetchQuestsFromServer();
-        } catch (error) { showToast(error.message || '서버 통신 오류가 발생했습니다.', '⚠️'); }
-    }
-
     App.quest = {
         createQuest, switchTab, showToast, closeModal, closeModalOutside, cardTemplate, renderQuestCards,
         toggleSave, addSchedule, completeQuestAction, deleteScheduleItem,
@@ -819,6 +798,6 @@
         openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
         addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
         initQuestMap, renderQuestMapMarkers, focusUserLocation, openCreateModal, 
-		toggleCreatePlaceSearch, searchCreatePlaces, createQuest, confirmAuthRadius
+		toggleCreatePlaceSearch, searchCreatePlaces, confirmAuthRadius
     };
 })();
