@@ -3,7 +3,7 @@
 <!-- 통계 요약 카드 -->
 <div class="layout-grid columns-1 medium-columns-3 ds-gap-4">
   <div class="surface-gradient radius-lg ds-p-5 color-white">
-    <div class="type-sm color-main">선택 기간 달성률</div>
+    <div class="type-sm color-white">선택 기간 달성률</div>
     <div id="progressRatio" class="type-3xl weight-heading ds-mt-1">0%</div>
   </div>
   <div class="surface-white border-default border-color-border radius-lg ds-p-5">

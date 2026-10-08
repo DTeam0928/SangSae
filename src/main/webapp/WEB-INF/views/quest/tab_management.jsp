@@ -2,12 +2,9 @@
 
 <!-- 상단 여행 선택 컨트롤 -->
 <div class="trip-header">
-    <div class="trip-selector" onclick="App.quest.openTripPickerModal()">
-        <div>
-            <h2 id="currentTripName" class="title">오늘의 퀘스트 일정</h2>
-            <span id="currentTripDates" class="desc">실천할 퀘스트를 담고 위치 인증을 진행하세요</span>
-        </div>
-        <span class="subtitle">▾</span>
+    <div>
+        <h2 class="title">오늘의 퀘스트 일정</h2>
+        <span class="desc">실천할 퀘스트를 담고 위치 인증을 진행하세요</span>
     </div>
     <button class="btn btn-secondary" onclick="App.quest.switchTab('explorer', document.querySelectorAll('.main-tab-btn')[0])">＋ 퀘스트 추가</button>
 </div>
