@@ -54,6 +54,8 @@ public class MyRoutineService {
     private static final int TAG_LENGTH_MAX = 20;
     private static final int CONTENT_MAX = 150;
     private static final int MEMO_MAX = 255;
+    private static final int RADIUS_MIN = 50;      // GPS 인증 반경 (팀원 완료 API 와 같은 50m~1km)
+    private static final int RADIUS_MAX = 1000;
     private static final int CALENDAR_MAX_DAYS = 42;   // 월 보기 6주
     private static final int STREAK_LOOKBACK = 400;
 
@@ -287,7 +289,7 @@ public class MyRoutineService {
                 .filter(t -> RepeatRule.plannedOn(t, day))
                 .map(t -> new MyTask(t.id(), t.content(), t.time(), t.categoryCode(), t.categoryName(), t.categoryEmoji(),
                         t.repeatType(), RepeatRule.label(t), t.daysOfWeek(), str(t.onceDate()), t.alertTime(), t.memo(),
-                        t.place(), doneAt.containsKey(t.id()), doneAt.get(t.id())))
+                        t.place(), t.allowedRadiusMeters(), doneAt.containsKey(t.id()), doneAt.get(t.id())))
                 .toList();
         int done = (int) tasks.stream().filter(MyTask::done).count();
         return new Timeline(routine.id(), day.toString(), tasks, done);
@@ -405,8 +407,12 @@ public class MyRoutineService {
         String memo = trim(f.memo());
         if (memo != null && memo.length() > MEMO_MAX) throw new BusinessException(ErrorCode.TASK_MEMO_INVALID, MEMO_MAX);
 
+        // 반경: 없으면 50m, 범위 밖이면 50m~1km 안으로 맞춤 (화면 슬라이더 범위와 같음)
+        int radius = f.allowedRadiusMeters() == null ? RADIUS_MIN
+                : Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, f.allowedRadiusMeters()));
+
         return new ValidTask(new TaskValues(content, time, categoryName, f.placeId(), type, onceDate, alert, memo,
-                settings.taskRewardXp()), days);
+                settings.taskRewardXp(), radius), days);
     }
 
     private static LocalDate parseDate(String s, LocalDate whenBlank, ErrorCode error) {

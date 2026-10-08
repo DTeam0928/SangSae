@@ -51,6 +51,13 @@ public class MyPlaceService {
         });
     }
 
+    /** 장소만 저장 (내가 다니는 장소에는 추가하지 않음). Task 장소 검색용. 반환: places.id */
+    public long savePlace(PlaceRegisterRequest req) {
+        NewPlace p = NewPlace.from(req);
+        return tx.inTransaction(em -> myPlaceRepository.upsertKakaoPlace(em, p.kakaoPlaceId, p.name, p.roadAddress,
+                p.region1, p.region2, p.region3, p.point, p.category));
+    }
+
     public List<PlaceSummary> remove(long userId, long placeId) {
         return tx.inTransaction(em -> {
             myPlaceRepository.removeMyPlace(em, userId, placeId);

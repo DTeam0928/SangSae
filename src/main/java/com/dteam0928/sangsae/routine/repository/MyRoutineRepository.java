@@ -84,6 +84,7 @@ public interface MyRoutineRepository {
 
     /** Task 저장값 (검증 끝난 값). category 는 카테고리 이름 */
     record TaskValues(String content, LocalTime time, String category, Long placeId, String repeatType,
-                      LocalDate onceDate, LocalTime alertTime, String memo, int rewardXp) {
+                      LocalDate onceDate, LocalTime alertTime, String memo, int rewardXp,
+                      int allowedRadiusMeters) {
     }
 }

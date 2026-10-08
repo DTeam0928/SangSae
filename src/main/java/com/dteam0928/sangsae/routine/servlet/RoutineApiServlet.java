@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * R-00 루틴 탐색 API. 모든 GET 은 lat, lng(선택)을 받는다. 없으면 O-03 저장 위치 → 기본 위치(동의대학교).
+ * 
  * <pre>
  * GET    /api/routines?q=&amp;category=&amp;placeCategory=&amp;sort=&amp;page=   검색 · 칩 · 장소 유형 · 정렬
  *                                                    (sort: distance|popular|latest|recommend)
@@ -21,6 +22,7 @@ import java.util.Map;
  * DELETE /api/routines/{id}/bookmark                 찜 해제
  * 내 루틴에 추가는 POST /user-routines/adopt (UserRoutineServlet) 를 사용한다.
  * </pre>
+ * 
  * 장소 관리(/api/routines/my-places)는 {@link MyPlaceApiServlet} 이 처리한다.
  */
 @WebServlet(Routes.API_ROUTINES + "/*")
@@ -52,6 +54,14 @@ public class RoutineApiServlet extends JsonApiServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<String> seg = segments(req);
+        if (seg.size() == 1 && seg.get(0).equals("places")) { // POST /api/routines/places → {placeId}
+            var form = MyPlaceApiServlet.placeForm(req);
+            respond(resp, () -> {
+                userId(req);
+                return Map.of("placeId", app().myPlaceService().savePlace(form));
+            });
+            return;
+        }
         if (seg.size() != 2 || !isId(seg.get(0))) {
             notFound(resp);
             return;

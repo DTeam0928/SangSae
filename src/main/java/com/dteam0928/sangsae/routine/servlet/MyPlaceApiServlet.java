@@ -38,6 +38,12 @@ public class MyPlaceApiServlet extends JsonApiServlet {
             notFound(resp);
             return;
         }
+                PlaceRegisterRequest form = placeForm(req);
+        respond(resp, () -> app().myPlaceService().register(userId(req), form));
+    }
+
+    /** 카카오 장소 form 값 (Task 장소 저장 POST /api/routines/places 에서도 사용) */
+    static PlaceRegisterRequest placeForm(HttpServletRequest req) {
         PlaceRegisterRequest form = new PlaceRegisterRequest();
         form.setPlaceId(longParam(req, "placeId"));
         form.setKakaoPlaceId(param(req, "kakaoPlaceId"));
@@ -50,7 +56,7 @@ public class MyPlaceApiServlet extends JsonApiServlet {
         form.setLatitude(doubleParam(req, "latitude"));
         form.setLongitude(doubleParam(req, "longitude"));
         form.setCategory(param(req, "category"));
-        respond(resp, () -> app().myPlaceService().register(userId(req), form));
+        return form;
     }
 
     @Override

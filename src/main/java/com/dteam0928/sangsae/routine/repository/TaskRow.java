@@ -17,5 +17,6 @@ import java.util.List;
  */
 public record TaskRow(long id, String content, String time, String categoryName, String categoryCode,
                       String categoryEmoji, String repeatType, LocalDate onceDate, String alertTime, String memo,
-                      LocalDate createdDate, Long originTemplateTaskId, List<String> daysOfWeek, PlaceSummary place) {
+                      LocalDate createdDate, Long originTemplateTaskId, List<String> daysOfWeek, int allowedRadiusMeters,
+                      PlaceSummary place) {
 }
