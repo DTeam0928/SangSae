@@ -38,14 +38,34 @@ function toast(m, icon = '✨') {
 function hide(id) { const el = document.getElementById(id); if (el) el.classList.remove('show'); }
 function closeModal(id, e) { if (e.target.id === id) hide(id); }
 
-function switchTab(tab) {
-    document.getElementById('tab-explore').classList.toggle('is-hidden', tab !== 'explore');
-    document.getElementById('tab-manage').classList.toggle('is-hidden', tab !== 'manage');
-    document.getElementById('tabExplore').className = tab === 'explore' ? 'tab-active ds-px-4 ds-py-2_5 radius-md weight-bold type-base' : 'ds-px-4 ds-py-2_5 radius-md weight-bold type-base color-muted';
-    document.getElementById('tabManage').className = tab === 'manage' ? 'tab-active ds-px-4 ds-py-2_5 radius-md weight-bold type-base' : 'ds-px-4 ds-py-2_5 radius-md weight-bold type-base color-muted';
-    if (tab === 'manage') {
+/* 루틴 탭 전환 (탐색 / 관리) */
+function switchTab(id, btn) {
+    // 1. 모든 탭 콘텐츠 비활성화 및 대상 탭(#tab-explore, #tab-manage) 활성화
+    document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // 'explorer' -> 'explore', 'management' -> 'manage' 대응
+    const targetId = id === 'explorer' ? 'explore' : (id === 'management' ? 'manage' : id);
+    const targetTab = document.getElementById('tab-' + targetId);
+    if (targetTab) {
+        targetTab.classList.add('active');
+    }
+
+    // 2. 모든 탭 버튼 비활성화 및 선택된 버튼 활성화
+    document.querySelectorAll('.main-tab-btn').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    const targetBtn = btn || (targetId === 'explore' ? document.getElementById('tabExplore') : document.getElementById('tabManage'));
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+
+    // 3. 탭 전환 후 후속 동작 (관리 탭: 렌더링 / 탐색 탭: 카카오 지도 relayout)
+    if (targetId === 'manage') {
         renderManage();
-    } else if (tab === 'explore' && routineMap) {
+    } else if (targetId === 'explore' && routineMap) {
         setTimeout(() => {
             routineMap.relayout();
             if (userLocation && typeof kakao !== 'undefined' && kakao.maps) {

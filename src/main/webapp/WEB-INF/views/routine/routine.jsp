@@ -18,18 +18,18 @@
 
 <main class="routine-container margin-auto ds-py-7 space-y-6">
   <!-- 탭 메뉴 컨트롤 -->
-  <div class="layout-row ds-gap-2 border-bottom-strong border-color-border ds-pb-2">
-    <button id="tabExplore" onclick="App.routine.switchTab('explore')" class="tab-active ds-px-4 ds-py-2_5 radius-md weight-bold type-base">✨ 루틴 탐색</button>
-    <button id="tabManage" onclick="App.routine.switchTab('manage')" class="ds-px-4 ds-py-2_5 radius-md weight-bold type-base color-muted">📅 루틴 관리</button>
+  <div class="main-tabs">
+    <button id="tabExplore" onclick="App.routine.switchTab('explorer', this)" class="main-tab-btn title active">✨ 루틴 탐색</button>
+    <button id="tabManage" onclick="App.routine.switchTab('management', this)" class="main-tab-btn title">📅 루틴 관리</button>
   </div>
 
   <!-- 탭 1: 루틴 탐색 -->
-  <section id="tab-explore" class="space-y-6">
+  <section id="tab-explore" class="tab-content active">
     <%@ include file="/WEB-INF/views/routine/tab_explorer.jsp" %>
   </section>
 
   <!-- 탭 2: 루틴 관리 -->
-  <section id="tab-manage" class="is-hidden space-y-6">
+  <section id="tab-manage" class="tab-content">
     <%@ include file="/WEB-INF/views/routine/tab_management.jsp" %>
   </section>
 </main>
