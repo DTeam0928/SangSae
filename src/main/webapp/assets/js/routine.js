@@ -124,27 +124,9 @@ function fetchRoutinesFromServer() {
         });
 }
 
-/* 2. 서버 타임테이블 조회 (DB 조회만 허용) */
-function fetchTimelineFromServer() {
-    fetch(contextPath + '/user-routines?date=' + selectedDate)
-        .then(res => res.ok ? res.json() : null)
-        .then(json => {
-            if (json && json.success && Array.isArray(json.data)) {
-                serverTimelineTasks = json.data;
-            } else {
-                serverTimelineTasks = [];
-            }
-            renderTimetableWithServer(serverTimelineTasks);
-        })
-        .catch(() => {
-            serverTimelineTasks = [];
-            renderTimetableWithServer([]);
-        });
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     fetchRoutinesFromServer();
-    renderManage();
+    loadManage();
 });
 
 function filteredRoutines() {
@@ -229,11 +211,10 @@ function adoptRoutineToServer(templateId) {
     .then(res => res.json())
     .then(json => {
         if (json && json.success) {
-            activeUserRoutineServerId = json.data && json.data.id;
-            toast('루틴을 내 일상에 추가했습니다! (Fork 완료)', '✨');
+            toast('루틴을 내 일상에 추가했습니다!', '✨');
             hide('routineModal');
             switchTab('manage');
-            fetchTimelineFromServer();
+            loadManage(json.data && json.data.id);
         } else {
             toast(json.message || '루틴 담기에 실패했습니다.', '⚠️');
         }
@@ -277,45 +258,145 @@ function openPlaceFilters() {
     }
 }
 
-function renderManage() {
+/* ============================================================
+   루틴 관리 탭 (백엔드: /api/my-routines, 문서 docs/ROUTINE_MANAGE_API.md)
+   ============================================================ */
+const MY_API = contextPath + '/api/my-routines';
+let myRoutines = [];          // 내 루틴 (드롭다운)
+let manageCategories = [];    // Task·공개 카테고리 선택지
+let timelineTasks = [];       // 선택한 날짜의 타임테이블
+let taskPlaceResults = [];    // 장소 검색 결과
+
+/* fetch 공통: 비로그인이면 401 JSON 을 받도록 헤더를 붙인다. params(URLSearchParams)가 있으면 form 전송 */
+function api(method, url, params) {
+    const opt = { method: method, headers: { 'X-Requested-With': 'XMLHttpRequest' } };
+    if (params) opt.body = params;
+    return fetch(url, opt).then(res => res.json());
+}
+function fail(json, fallback) { toast((json && json.message) || fallback, '⚠️'); }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+function emptyBox(msg) { return '<div class="empty" style="padding: 30px; text-align: center; color: var(--color-muted);">' + msg + '</div>'; }
+function activeRoutine() { return myRoutines.find(r => r.id === activeRoutineId) || null; }
+
+/* 관리 탭 데이터 불러오기. selectId 를 주면 그 루틴을 선택 상태로 */
+function loadManage(selectId) {
+    return api('GET', MY_API).then(json => {
+        if (!json.success) return fail(json, '루틴 정보를 불러오지 못했습니다.');
+        myRoutines = json.data.routines;
+        manageCategories = json.data.categories;
+        if (selectId) activeRoutineId = Number(selectId);
+        if (!activeRoutine()) activeRoutineId = myRoutines.length ? myRoutines[0].id : null;
+        renderRoutineSelects();
+        renderCategoryOptions();
+        openTaskForm();
+        renderManage();
+    }).catch(() => toast('루틴 정보를 불러오는 중 오류가 발생했습니다.', '⚠️'));
+}
+
+/* 활성 루틴 드롭다운 + Task 폼의 루틴 선택 */
+function renderRoutineSelects() {
+    const options = myRoutines.map(r => '<option value="' + r.id + '">' + App.escape(r.title) + '</option>').join('');
     const sel = document.getElementById('activeRoutineSelect');
     if (sel) {
-        sel.innerHTML = routines.length
-            ? routines.map(x => '<option value="' + x.id + '">' + App.escape(x.name) + '</option>').join('')
-            : '<option value="default">내 활성 루틴</option>';
+        sel.innerHTML = options || '<option value="">아직 루틴이 없습니다</option>';
+        if (activeRoutineId) sel.value = String(activeRoutineId);
     }
+    const taskSel = document.getElementById('taskRoutine');
+    if (taskSel) {
+        taskSel.innerHTML = options;
+        if (activeRoutineId) taskSel.value = String(activeRoutineId);
+    }
+}
+
+function renderCategoryOptions() {
+    const sel = document.getElementById('taskCat');
+    if (!sel) return;
+    sel.innerHTML = manageCategories.map(c =>
+        '<option value="' + c.code + '">' + (c.emoji || '') + ' ' + App.escape(c.name) + '</option>').join('');
+}
+
+/* 드롭다운에서 루틴 변경 (tab_management.jsp 의 onchange) */
+function changeActiveRoutine(id) {
+    activeRoutineId = id ? Number(id) : null;
+    openTaskForm();
+    renderManage();
+}
+
+/* 운영 기간 + 캘린더 + 타임테이블 */
+function renderManage() {
+    const r = activeRoutine();
     const period = document.getElementById('routinePeriodLabel');
-    if (period) period.textContent = selectedDate.replaceAll('-', '.') + ' 기준';
+    if (period) {
+        period.textContent = r
+            ? r.startDate.replaceAll('-', '.') + ' ~ ' + (r.endDate ? r.endDate.replaceAll('-', '.') : '종료일 없음')
+            : '-';
+    }
     renderCalendar();
-    fetchTimelineFromServer();
+    fetchTimeline();
+}
+
+/* ---------------- 캘린더 + 요약 카드 ---------------- */
+function calendarRange() {
+    const c = new Date(calendarCursor);
+    if (calendarView === 'week') {
+        const from = new Date(c); from.setDate(c.getDate() - c.getDay());
+        const to = new Date(from); to.setDate(from.getDate() + 6);
+        return { from: from, to: to, count: 7 };
+    }
+    const first = new Date(c.getFullYear(), c.getMonth(), 1);
+    const from = new Date(first); from.setDate(1 - first.getDay());
+    const to = new Date(from); to.setDate(from.getDate() + 41);
+    return { from: from, to: to, count: 42 };
 }
 
 function renderCalendar() {
-    const grid = document.getElementById('calendarGrid'), title = document.getElementById('calendarTitle'), c = new Date(calendarCursor);
+    const grid = document.getElementById('calendarGrid'), title = document.getElementById('calendarTitle');
     if (!grid || !title) return;
-    if (calendarView === 'week') {
-        const day = c.getDay(), sun = new Date(c);
-        sun.setDate(c.getDate() - day);
-        const endDay = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate() + 6);
-        title.textContent = sun.getFullYear() + '년 ' + (sun.getMonth() + 1) + '월 ' + sun.getDate() + '일 ~ ' + (endDay.getMonth() + 1) + '월 ' + endDay.getDate() + '일';
+    const range = calendarRange(), c = new Date(calendarCursor);
+    title.textContent = calendarView === 'week'
+        ? range.from.getFullYear() + '년 ' + (range.from.getMonth() + 1) + '월 ' + range.from.getDate() + '일 ~ '
+          + (range.to.getMonth() + 1) + '월 ' + range.to.getDate() + '일'
+        : c.getFullYear() + '년 ' + (c.getMonth() + 1) + '월';
+
+    const draw = (stats) => {
         let html = '';
-        for (let i = 0; i < 7; i++) { const d = new Date(sun); d.setDate(sun.getDate() + i); html += calendarDayBox(d, false); }
+        for (let i = 0; i < range.count; i++) {
+            const d = new Date(range.from); d.setDate(range.from.getDate() + i);
+            const muted = calendarView === 'month' && d.getMonth() !== c.getMonth();
+            html += calendarDayBox(d, muted, stats[App.dateKey(d)]);
+        }
         grid.innerHTML = html;
-    } else {
-        title.textContent = c.getFullYear() + '년 ' + (c.getMonth() + 1) + '월';
-        const first = new Date(c.getFullYear(), c.getMonth(), 1), start = new Date(first);
-        start.setDate(1 - first.getDay());
-        let html = '';
-        for (let i = 0; i < 42; i++) { const d = new Date(start); d.setDate(start.getDate() + i); html += calendarDayBox(d, d.getMonth() !== c.getMonth()); }
-        grid.innerHTML = html;
-    }
+    };
+    draw({});
+    if (!activeRoutineId) { setSummary(0, 0, null); return; }
+
+    api('GET', MY_API + '/' + activeRoutineId + '/calendar?from=' + App.dateKey(range.from) + '&to=' + App.dateKey(range.to))
+        .then(json => {
+            if (!json.success) return fail(json, '캘린더를 불러오지 못했습니다.');
+            const stats = {};
+            json.data.days.forEach(d => { stats[d.date] = d; });
+            draw(stats);
+            setSummary(json.data.achievementRate, json.data.streakDays, json.data.totalXp);
+        });
 }
 
-function calendarDayBox(d, muted) {
+function setSummary(rate, streak, xp) {
+    document.getElementById('progressRatio').textContent = rate + '%';
+    document.getElementById('userStreak').textContent = String(streak);
+    if (xp != null) document.getElementById('totalXp').textContent = xp.toLocaleString() + ' XP';
+}
+
+/* 날짜 칸: 완료 ●, 남은 Task ○ (최대 5개) */
+function calendarDayBox(d, muted, stat) {
     const ds = App.dateKey(d);
+    let dots = '';
+    if (stat && stat.planned) {
+        const done = Math.min(stat.done, 5), left = Math.min(stat.planned, 5) - done;
+        dots = '<div style="font-size: 8px; letter-spacing: 2px; margin-top: 4px;">' + '●'.repeat(done) + '○'.repeat(Math.max(left, 0)) + '</div>';
+    }
     return '<div class="cal-day-box ' + (muted ? 'muted' : '') + ' ' + (ds === selectedDate ? 'selected' : '') + '" onclick="App.routine.selectCalendarDate(\'' + ds + '\')">' +
            '<div class="cal-day-name">' + ['일','월','화','수','목','금','토'][d.getDay()] + '</div>' +
-           '<div class="cal-date-num">' + d.getDate() + '</div>' +
+           '<div class="cal-date-num">' + d.getDate() + '</div>' + dots +
            '</div>';
 }
 
@@ -324,39 +405,43 @@ function moveCalendar(n) { if (calendarView === 'week') calendarCursor.setDate(c
 function toggleCalendarView() { calendarView = calendarView === 'week' ? 'month' : 'week'; document.getElementById('calendarViewBtn').textContent = calendarView === 'week' ? '주' : '월'; renderCalendar(); }
 function calendarToday() { selectedDate = App.dateKey(); calendarCursor = new Date(selectedDate + 'T00:00:00'); renderManage(); }
 
-/* 서버 기반 타임테이블 렌더링 (순수 DB 데이터만 출력) */
-function renderTimetableWithServer(serverTasks) {
-    const box = document.getElementById('manageTimetable');
-    if (!box) return;
-
-    document.getElementById('selectedDateLabel').textContent = selectedDate.replaceAll('-', '.') + ' 기준 타임테이블';
-
-    if (!serverTasks.length) {
-        box.innerHTML = '<div class="empty" style="padding: 30px; text-align: center; color: var(--color-muted);">등록된 루틴 Task가 없습니다.<br>우측에서 Task를 추가하거나 탐색 탭에서 루틴을 담아보세요!</div>';
-        document.getElementById('progressRatio').textContent = '0%';
-        return;
-    }
-
-    box.innerHTML = serverTasks.map(function(item, i) {
-        const isDone = item.completed;
-        const icon = '🌱';
-        const radiusText = (item.allowedRadiusMeters && item.allowedRadiusMeters > 0) ? (' · 📍 ' + item.allowedRadiusMeters + 'm 반경 인증') : '';
-        const subInfo = (item.category || '일상') + ' · ' + (item.repeatType || '매일') + radiusText + (item.placeName ? ' · ' + item.placeName : '');
-
-        return '<div class="tt-row ' + (isDone ? 'done' : '') + '" onclick="App.routine.selectServerTask(' + item.taskId + ')">' +
-               '<div class="layout-row align-start justify-center weight-heading color-muted">' + (i + 1) + '</div>' +
-               '<div class="weight-heading color-text">' + App.escape(item.targetTime ? item.targetTime.slice(0, 5) : '07:00') + '</div>' +
-               '<div class="layout-row align-center ds-gap-3 min-width-zero"><span class="color-muted cursor-grab">≡</span><span class="type-xl">' + icon + '</span>' +
-               '<div class="min-width-zero"><div class="task-title weight-bold">' + App.escape(item.content) + '</div><div class="type-10px color-muted ds-mt-1">' + App.escape(subInfo) + '</div></div></div>' +
-               '<div class="layout-row align-center justify-center"><button type="button" onclick="event.stopPropagation();App.routine.toggleServerDone(' + item.taskId + ')" class="ds-w-9 ds-h-9 radius-pill border-default ' + (isDone ? 'surface-success border-color-success color-white' : 'surface-white border-color-muted color-muted') + '">' + (isDone ? '✓' : '○') + '</button></div>' +
-               '</div>';
-    }).join('');
-
-    const all = serverTasks.length, done = serverTasks.filter(x => x.completed).length;
-    document.getElementById('progressRatio').textContent = all ? Math.round(done / all * 100) + '%' : '0%';
+/* ---------------- 타임테이블 ---------------- */
+function fetchTimeline() {
+    if (!activeRoutineId) { renderTimetable(null); return; }
+    api('GET', MY_API + '/' + activeRoutineId + '/timeline?date=' + selectedDate)
+        .then(json => json.success ? renderTimetable(json.data) : fail(json, '타임테이블을 불러오지 못했습니다.'));
 }
 
-/* 루틴 완료 및 가변 반경(50m~1km) GPS 인증 */
+function renderTimetable(timeline) {
+    const box = document.getElementById('manageTimetable');
+    if (!box) return;
+    document.getElementById('selectedDateLabel').textContent = selectedDate.replaceAll('-', '.') + ' 기준 · Task를 클릭하면 상세 설정이 열립니다.';
+    timelineTasks = timeline ? timeline.tasks : [];
+
+    if (!activeRoutineId) {
+        box.innerHTML = emptyBox('아직 루틴이 없습니다.<br>＋ 새 루틴을 만들거나 탐색 탭에서 루틴을 담아보세요!');
+        return;
+    }
+    if (!timelineTasks.length) {
+        box.innerHTML = emptyBox('이 날짜에 할 Task가 없습니다.<br>우측에서 Task를 추가해 보세요!');
+        return;
+    }
+    box.innerHTML = timelineTasks.map(function(t, i) {
+        const sub = (t.categoryEmoji || '') + ' ' + (t.categoryName || '') + ' · ' + t.repeatLabel
+                  + (t.place ? ' · 📍 ' + t.place.name + ' (' + t.allowedRadiusMeters + 'm 인증)' : '');
+        // 완료한 Task 는 체크 해제 불가 → 버튼 동작 없음
+        const btnClick = t.done ? 'event.stopPropagation()' : 'event.stopPropagation();App.routine.toggleServerDone(' + t.id + ')';
+        return '<div class="tt-row ' + (t.done ? 'done' : '') + '" onclick="App.routine.selectServerTask(' + t.id + ')">' +
+               '<div class="layout-row align-start justify-center weight-heading color-muted">' + (i + 1) + '</div>' +
+               '<div class="weight-heading color-text">' + App.escape(t.time) + '</div>' +
+               '<div class="layout-row align-center ds-gap-3 min-width-zero"><span class="color-muted cursor-grab">≡</span><span class="type-xl">' + (t.categoryEmoji || '🌱') + '</span>' +
+               '<div class="min-width-zero"><div class="task-title weight-bold">' + App.escape(t.content) + '</div><div class="type-10px color-muted ds-mt-1">' + App.escape(sub) + '</div></div></div>' +
+               '<div class="layout-row align-center justify-center"><button type="button" onclick="' + btnClick + '" class="ds-w-9 ds-h-9 radius-pill border-default ' + (t.done ? 'surface-success border-color-success color-white' : 'surface-white border-color-muted color-muted') + '">' + (t.done ? '✓' : '○') + '</button></div>' +
+               '</div>';
+    }).join('');
+}
+
+/* 완료 체크: 팀원 API (POST /user-routines/tasks/complete, GPS 인증 + XP 지급) */
 function toggleServerDone(taskId) {
     toast('📍 실천 위치를 확인하고 있습니다…', '🧭');
     if (navigator.geolocation) {
@@ -374,160 +459,252 @@ function sendCompleteRoutineTask(taskId, lat, lng) {
     const params = new URLSearchParams({ taskId: String(taskId) });
     if (lat != null) params.append('latitude', String(lat));
     if (lng != null) params.append('longitude', String(lng));
-
-    fetch(contextPath + '/user-routines/tasks/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-    })
-    .then(res => res.json())
-    .then(json => {
-        if (json && json.success) {
-            const resData = json.data;
-            const earned = resData.earnedXp || 100;
-            const streak = resData.streakCount || 1;
-            totalXp += earned;
-            userStreak = streak;
-
-            const xpElem = document.getElementById('totalXp');
-            if (xpElem) xpElem.textContent = totalXp.toLocaleString() + ' XP';
-            const streakElem = document.getElementById('userStreak');
-            if (streakElem) streakElem.textContent = String(userStreak);
-
-            if (resData.reward && resData.reward.isLevelUp) {
-                toast(`🎉 레벨업! [Lv.${resData.reward.currentLevel.level} ${resData.reward.currentLevel.title}] 달성! (+${earned} XP)`, '🏆');
+    api('POST', contextPath + '/user-routines/tasks/complete', params)
+        .then(json => {
+            if (!json.success) return fail(json, '인증 범위를 벗어났거나 완료 처리에 실패했습니다.');
+            const data = json.data || {};
+            const reward = data.reward || data.rewardResult;
+            const earned = data.earnedXp || 0;
+            if (reward && reward.isLevelUp && reward.currentLevel) {
+                toast('🎉 레벨업! [Lv.' + reward.currentLevel.level + ' ' + reward.currentLevel.title + '] 달성! (+' + earned + ' XP)', '🏆');
             } else {
-                toast(`🎉 루틴 실천 완료! +${earned} XP (연속 ${streak}일 달성!)`);
+                toast('🎉 루틴 실천 완료! +' + earned + ' XP');
             }
-            fetchTimelineFromServer();
-        } else {
-            toast(json.message || '인증 범위를 벗어났거나 완료 처리에 실패했습니다.', '⚠️');
-        }
-    })
-    .catch(() => {
-        toast('루틴 완료 통신 중 오류가 발생했습니다.', '⚠️');
-    });
+            renderManage();   // 타임테이블·캘린더·요약 카드(XP, 연속 실천일) 다시 조회
+        })
+        .catch(() => toast('루틴 완료 통신 중 오류가 발생했습니다.', '⚠️'));
 }
 
+/* ---------------- Task 설정 폼 ---------------- */
 function selectServerTask(taskId) {
-    const item = serverTimelineTasks.find(x => x.taskId === taskId);
-    if (!item) return;
-    document.getElementById('editingTaskId').value = String(taskId);
-    document.getElementById('taskTitle').value = item.content || '';
-    document.getElementById('taskTime').value = item.targetTime ? item.targetTime.slice(0, 5) : '07:00';
-    document.getElementById('taskCat').value = item.category || '일상';
-    document.getElementById('taskLocation').value = item.placeName || '';
-    const hasRadius = item.allowedRadiusMeters && item.allowedRadiusMeters > 0;
-    const chk = document.getElementById('taskLocationReq');
-    if (chk) chk.checked = hasRadius;
-    toggleLocationRadius(hasRadius);
-    if (hasRadius) {
-        document.getElementById('taskRadius').value = item.allowedRadiusMeters;
-        document.getElementById('radiusValueLabel').textContent = item.allowedRadiusMeters + 'm';
-    }
-    document.getElementById('taskMemo').value = item.memo || '';
+    const t = timelineTasks.find(x => x.id === taskId);
+    if (!t) return;
+    setVal('editingTaskId', String(t.id));
+    setVal('taskRoutine', String(activeRoutineId));
+    document.getElementById('taskRoutine').disabled = true;   // 다른 루틴으로 옮기기는 지원하지 않음
+    setVal('taskTitle', t.content);
+    setVal('taskTime', t.time);
+    setVal('taskAlarm', t.alertTime || '');
+    if (t.categoryCode) setVal('taskCat', t.categoryCode);
+    setVal('taskRepeat', t.repeatType);
+    onRepeatChange(t.repeatType);
+    document.querySelectorAll('input[name="taskDays"]').forEach(cb => { cb.checked = (t.daysOfWeek || []).includes(cb.value); });
+    setVal('taskOnceDate', t.onceDate || '');
+    setVal('taskMemo', t.memo || '');
+    if (t.place) setTaskPlace(t.place.id, t.place.name, t.allowedRadiusMeters); else clearTaskPlace();
 }
 
+/* [＋ 추가] 또는 저장 후: 빈 폼 */
 function openTaskForm() {
-    document.getElementById('taskForm').reset();
-    document.getElementById('taskTime').value = '07:00';
-    document.getElementById('taskAlarm').value = '07:00';
-    document.getElementById('editingTaskId').value = 'NEW';
-    const chk = document.getElementById('taskLocationReq');
-    if (chk) chk.checked = false;
-    toggleLocationRadius(false);
+    const form = document.getElementById('taskForm');
+    if (!form) return;
+    form.reset();
+    setVal('editingTaskId', 'NEW');
+    setVal('taskTime', '07:00');
+    setVal('taskAlarm', '');
+    const routineSel = document.getElementById('taskRoutine');
+    if (routineSel) {
+        routineSel.disabled = false;
+        if (activeRoutineId) routineSel.value = String(activeRoutineId);
+    }
+    onRepeatChange('DAILY');
+    clearTaskPlace();
 }
 
-/* 세부 Task 저장: 오직 백엔드 DB 통신만 수행 (POST /user-routines/tasks) */
+/* 반복: 사용자 지정이면 요일, 1회성이면 날짜 입력 표시 */
+function onRepeatChange(type) {
+    const days = document.getElementById('repeatDays'), once = document.getElementById('taskOnceDate');
+    if (days) days.classList.toggle('is-hidden', type !== 'CUSTOM');
+    if (once) {
+        once.classList.toggle('is-hidden', type !== 'ONCE');
+        if (type === 'ONCE' && !once.value) once.value = selectedDate;
+    }
+}
+
 function saveTask(e) {
     e.preventDefault();
-    const title = document.getElementById('taskTitle').value.trim();
-    const time = document.getElementById('taskTime').value;
-    const cat = document.getElementById('taskCat').value;
-    const locationReq = document.getElementById('taskLocationReq') ? document.getElementById('taskLocationReq').checked : false;
-    const radius = locationReq ? parseInt(document.getElementById('taskRadius').value) : 50;
-    const memo = document.getElementById('taskMemo').value;
+    const routineId = document.getElementById('taskRoutine').value;
+    if (!routineId) return toast('먼저 ＋ 새 루틴으로 루틴을 만들어 주세요.', '⚠️');
+    const taskId = document.getElementById('editingTaskId').value;
+    const isNew = !taskId || taskId === 'NEW';
 
-    if (!title) return;
+    const p = new URLSearchParams();
+    p.append('content', document.getElementById('taskTitle').value.trim());
+    p.append('time', document.getElementById('taskTime').value);
+    p.append('category', document.getElementById('taskCat').value);
+    p.append('repeatType', document.getElementById('taskRepeat').value);
+    document.querySelectorAll('input[name="taskDays"]:checked').forEach(cb => p.append('daysOfWeek', cb.value));
+    p.append('onceDate', document.getElementById('taskOnceDate').value);
+    p.append('alertTime', document.getElementById('taskAlarm').value);
+    p.append('memo', document.getElementById('taskMemo').value);
+    const placeId = document.getElementById('taskPlaceId').value;
+    if (placeId) {
+        p.append('placeId', placeId);
+        p.append('allowedRadiusMeters', document.getElementById('taskRadius').value);
+    }
 
-    const userRoutineId = activeUserRoutineServerId || 1;
-    const params = new URLSearchParams({
-        userRoutineId: String(userRoutineId),
-        content: title,
-        targetTime: time + ':00',
-        category: cat,
-        repeatType: 'DAILY',
-        allowedRadiusMeters: String(radius),
-        memo: memo
-    });
-
-    fetch(contextPath + '/user-routines/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-    })
-    .then(res => res.json())
-    .then(json => {
-        if (json && json.success) {
-            toast('새 Task를 DB에 저장했습니다!');
-            fetchTimelineFromServer();
+    const url = MY_API + '/' + routineId + '/tasks' + (isNew ? '' : '/' + taskId) + '?date=' + selectedDate;
+    api('POST', url, p)
+        .then(json => {
+            if (!json.success) return fail(json, 'Task 저장에 실패했습니다.');
+            toast(isNew ? 'Task를 추가했습니다.' : 'Task를 수정했습니다.');
+            if (Number(routineId) !== activeRoutineId) {   // 다른 루틴에 추가했으면 그 루틴으로 전환
+                activeRoutineId = Number(routineId);
+                renderRoutineSelects();
+            }
             openTaskForm();
-        } else {
-            toast(json.message || 'Task 저장에 실패했습니다.', '⚠️');
-        }
-    })
-    .catch(() => {
-        toast('Task 저장 중 통신 오류가 발생했습니다.', '⚠️');
-    });
+            renderManage();
+        })
+        .catch(() => toast('Task 저장 중 통신 오류가 발생했습니다.', '⚠️'));
 }
 
 function deleteActiveTask() {
-    toast('Task를 선택 후 관리하세요.');
+    const taskId = document.getElementById('editingTaskId').value;
+    if (!taskId || taskId === 'NEW') return toast('삭제할 Task를 타임테이블에서 먼저 선택해 주세요.');
+    if (!confirm('이 Task를 삭제할까요? 완료 기록은 남습니다.')) return;
+    api('DELETE', MY_API + '/' + activeRoutineId + '/tasks/' + taskId + '?date=' + selectedDate)
+        .then(json => {
+            if (!json.success) return fail(json, 'Task 삭제에 실패했습니다.');
+            toast('Task를 삭제했습니다.');
+            openTaskForm();
+            renderManage();
+        });
+}
+
+/* ---------------- Task 장소: 카카오 검색 → 선택 → places 저장 → placeId ---------------- */
+function searchTaskPlace() {
+    const q = document.getElementById('taskPlaceSearch').value.trim();
+    if (!q) return toast('검색할 장소 이름을 입력해 주세요.');
+    if (typeof MapUtil === 'undefined' || !MapUtil.searchPlaces) {
+        return toast('장소 검색을 사용할 수 없습니다. (카카오 지도 SDK 확인 필요)', '⚠️');
+    }
+    MapUtil.searchPlaces({ query: q, lat: userLocation.lat, lng: userLocation.lng, radius: 20000 })
+        .then(res => {
+            taskPlaceResults = (res && res.success && Array.isArray(res.data)) ? res.data.slice(0, 8) : [];
+            const box = document.getElementById('taskPlaceResults');
+            box.classList.remove('is-hidden');
+            box.innerHTML = taskPlaceResults.length
+                ? taskPlaceResults.map((pl, i) =>
+                    '<div style="cursor: pointer; padding: 8px 4px; border-bottom: 1px solid #eee;" onclick="App.routine.pickTaskPlace(' + i + ')">' +
+                    '<div class="weight-bold type-sm">' + App.escape(pl.name || '') + '</div>' +
+                    '<div class="type-xs color-muted">' + App.escape(pl.roadAddress || pl.address || '') + '</div></div>').join('')
+                : '<div class="type-xs color-muted" style="padding: 8px 4px;">검색 결과가 없습니다.</div>';
+        })
+        .catch(() => toast('장소 검색 중 오류가 발생했습니다.', '⚠️'));
+}
+
+function pickTaskPlace(i) {
+    const pl = taskPlaceResults[i];
+    if (!pl) return;
+    const body = new URLSearchParams({
+        kakaoPlaceId: String(pl.kakaoPlaceId || pl.id || ''),
+        name: pl.name || '',
+        latitude: String(pl.latitude),
+        longitude: String(pl.longitude),
+        roadAddress: pl.roadAddress || '',
+        addressName: pl.address || pl.addressName || ''
+    });
+    api('POST', contextPath + '/api/routines/places', body)
+        .then(json => {
+            if (!json.success) return fail(json, '장소를 저장하지 못했습니다.');
+            setTaskPlace(json.data.placeId, pl.name, 50);
+            document.getElementById('taskPlaceResults').classList.add('is-hidden');
+        });
+}
+
+function setTaskPlace(id, name, radius) {
+    setVal('taskPlaceId', String(id));
+    setVal('taskPlaceSearch', '');
+    document.getElementById('taskPlaceName').textContent = '📍 ' + name;
+    document.getElementById('taskPlaceSelected').classList.remove('is-hidden');
+    document.getElementById('radiusControl').classList.remove('is-hidden');
+    setVal('taskRadius', String(radius || 50));
+    document.getElementById('radiusValueLabel').textContent = (radius || 50) + 'm';
+}
+
+function clearTaskPlace() {
+    setVal('taskPlaceId', '');
+    const sel = document.getElementById('taskPlaceSelected'), results = document.getElementById('taskPlaceResults'), radius = document.getElementById('radiusControl');
+    if (sel) sel.classList.add('is-hidden');
+    if (results) results.classList.add('is-hidden');
+    if (radius) radius.classList.add('is-hidden');
+}
+
+/* ---------------- 새 루틴 / 기본 정보 모달 (modal/routineFormModal.jsp) ---------------- */
+function fillRoutineForm(r) {
+    setVal('rfRoutineId', r ? String(r.id) : '');
+    setVal('rfName', r ? r.title : '');
+    setVal('rfStart', r ? r.startDate : App.dateKey());
+    setVal('rfEnd', r && r.endDate ? r.endDate : '');
+    setVal('rfDesc', r && r.description ? r.description : '');
+    setVal('rfTags', r ? r.tags.join(', ') : '');
+    const visibility = r ? r.visibility : 'PRIVATE';
+    const adopted = !!(r && r.adopted);
+    document.querySelectorAll('input[name="rfVisibility"]').forEach(x => { x.checked = x.value === visibility; x.disabled = adopted; });
+    document.getElementById('rfAdoptedNote').classList.toggle('is-hidden', !adopted);
+    const picked = r ? r.categories.map(c => c.code) : [];
+    document.getElementById('rfCategories').innerHTML = manageCategories.map(c =>
+        '<label><input type="checkbox" name="rfCategory" value="' + c.code + '"' + (picked.includes(c.code) ? ' checked' : '') + '> '
+        + (c.emoji || '') + ' ' + App.escape(c.name) + '</label>').join('');
+    document.getElementById('rfDeleteBtn').classList.toggle('is-hidden', !r);
+    togglePublicFields();
+}
+
+/* 공개를 고르면 설명·카테고리·태그 입력 표시 */
+function togglePublicFields() {
+    const checked = document.querySelector('input[name="rfVisibility"]:checked');
+    document.getElementById('rfPublicFields').classList.toggle('is-hidden', !(checked && checked.value === 'PUBLIC'));
 }
 
 function openRoutineCreateModal() {
     document.getElementById('rfTitle').textContent = '새 루틴 만들기';
-    document.getElementById('rfName').value = '';
-    document.getElementById('rfDesc').value = '';
-    document.getElementById('rfStart').value = App.dateKey();
-    let d = new Date(); d.setDate(d.getDate() + 30);
-    document.getElementById('rfEnd').value = App.dateKey(d);
+    fillRoutineForm(null);
     document.getElementById('routineFormModal').classList.add('show');
 }
 
 function openRoutineInfo() {
+    const r = activeRoutine();
+    if (!r) return toast('먼저 ＋ 새 루틴으로 루틴을 만들어 주세요.');
     document.getElementById('rfTitle').textContent = '루틴 기본 정보';
-    document.getElementById('rfName').value = '내 일상 루틴';
-    document.getElementById('rfDesc').value = '';
-    document.getElementById('rfStart').value = selectedDate;
+    fillRoutineForm(r);
     document.getElementById('routineFormModal').classList.add('show');
 }
 
 function saveRoutineInfo(e) {
     e.preventDefault();
-    const n = document.getElementById('rfName').value.trim(), s = document.getElementById('rfStart').value, en = document.getElementById('rfEnd').value;
-    if (en < s) return toast('종료일은 시작일보다 빠를 수 없습니다.');
+    const id = document.getElementById('rfRoutineId').value;
+    const visibility = document.querySelector('input[name="rfVisibility"]:checked');
+    const p = new URLSearchParams();
+    p.append('title', document.getElementById('rfName').value.trim());
+    p.append('startDate', document.getElementById('rfStart').value);
+    p.append('endDate', document.getElementById('rfEnd').value);
+    p.append('visibility', visibility ? visibility.value : 'PRIVATE');
+    p.append('description', document.getElementById('rfDesc').value);
+    document.querySelectorAll('input[name="rfCategory"]:checked').forEach(x => p.append('categories', x.value));
+    document.getElementById('rfTags').value.split(',').map(s => s.trim()).filter(Boolean).forEach(t => p.append('tags', t));
 
-    const params = new URLSearchParams({ title: n, startDate: s, endDate: en });
-    fetch(contextPath + '/user-routines', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-    })
-    .then(res => res.json())
-    .then(json => {
-        if (json && json.success) {
-            activeUserRoutineServerId = json.data && json.data.id;
-            toast('새 루틴을 DB에 생성했습니다!');
+    api('POST', MY_API + (id ? '/' + id : ''), p)
+        .then(json => {
+            if (!json.success) return fail(json, '루틴 저장에 실패했습니다.');
+            toast(id ? '루틴 정보를 저장했습니다.' : '새 루틴을 만들었습니다!');
             hide('routineFormModal');
-            fetchTimelineFromServer();
-        } else {
-            toast(json.message || '루틴 생성에 실패했습니다.', '⚠️');
-        }
-    })
-    .catch(() => {
-        toast('루틴 생성 중 오류가 발생했습니다.', '⚠️');
-    });
+            loadManage(json.data.id);
+        })
+        .catch(() => toast('루틴 저장 중 오류가 발생했습니다.', '⚠️'));
+}
+
+function deleteRoutine() {
+    const id = document.getElementById('rfRoutineId').value;
+    if (!id) return;
+    if (!confirm('이 루틴을 삭제할까요? 완료 기록과 XP는 남습니다.')) return;
+    api('DELETE', MY_API + '/' + id)
+        .then(json => {
+            if (!json.success) return fail(json, '루틴 삭제에 실패했습니다.');
+            toast('루틴을 삭제했습니다.');
+            hide('routineFormModal');
+            activeRoutineId = null;
+            loadManage();
+        });
 }
 
     function initRoutineMap() {
@@ -689,17 +866,12 @@ function saveRoutineInfo(e) {
         }
     }
 
+       /* "이 장소로 루틴 만들기": 관리 탭 Task 폼에서 그 이름으로 장소 검색 */
     function selectRoutinePlaceForTask(placeName) {
         switchTab('manage');
         openTaskForm();
-        const locInput = document.getElementById('taskLocation');
-        if (locInput) locInput.value = placeName;
-        const chk = document.getElementById('taskLocationReq');
-        if (chk) {
-            chk.checked = true;
-            toggleLocationRadius(true);
-        }
-        toast(`'${placeName}' 장소가 Task에 설정되었습니다.`, '📍');
+        setVal('taskPlaceSearch', placeName);
+        searchTaskPlace();
     }
 
 
@@ -743,14 +915,14 @@ function showPlaceDetail(place) {
         if (location.hash === '#manage') switchTab('manage');
     });
 
-    App.routine = {
+        App.routine = {
         setRadius, applyPlaceFilters, showPlaceDetail, toast, hide, closeModal, switchTab, filteredRoutines, routineCard, renderExplore,
         clearSearch, setCategory, openRoutine, toggleModalTasks, adoptRoutineToServer,
         addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters,
-        renderManage, renderCalendar, calendarDayBox, selectCalendarDate, moveCalendar,
-        toggleCalendarView, calendarToday, renderTimetableWithServer, toggleServerDone,
-        selectServerTask, openTaskForm, saveTask, deleteActiveTask, openRoutineCreateModal,
-        openRoutineInfo, saveRoutineInfo, toggleLocationRadius,
+        loadManage, changeActiveRoutine, renderManage, renderCalendar, selectCalendarDate, moveCalendar,
+        toggleCalendarView, calendarToday, toggleServerDone, selectServerTask, openTaskForm, onRepeatChange,
+        saveTask, deleteActiveTask, searchTaskPlace, pickTaskPlace, clearTaskPlace,
+        openRoutineCreateModal, openRoutineInfo, saveRoutineInfo, togglePublicFields, deleteRoutine,
         initRoutineMap, searchNearbyRoutinePlaces, renderNearbyPlaces, focusPlace, selectRoutinePlace, selectRoutinePlaceForTask
     };
 })();

@@ -107,7 +107,8 @@ public class MyRoutineApiServlet extends JsonApiServlet {
     private static TaskForm taskForm(HttpServletRequest req) {
         return new TaskForm(param(req, "content"), param(req, "time"), param(req, "category"),
                 longParam(req, "placeId"), param(req, "repeatType"), values(req, "daysOfWeek"),
-                param(req, "onceDate"), param(req, "alertTime"), param(req, "memo"));
+                param(req, "onceDate"), param(req, "alertTime"), param(req, "memo"),
+                intParam(req, "allowedRadiusMeters", 50));
     }
 
     private static List<String> values(HttpServletRequest req, String name) {

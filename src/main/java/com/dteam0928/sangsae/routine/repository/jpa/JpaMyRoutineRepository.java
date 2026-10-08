@@ -166,13 +166,13 @@ public class JpaMyRoutineRepository implements MyRoutineRepository {
 
     // ------------------------------------------------------------------ Task
 
-    /** 0~13 Task, 14~21 장소(PLACE_COLUMNS + 거리 자리) */
+    /** 0~13 Task(13 = 인증 반경), 14~21 장소(PLACE_COLUMNS + 거리 자리) */
     private static final String TASK_SELECT =
             "SELECT t.id, t.content, t.target_time, t.category, rc.code, rc.emoji, t.repeat_type,"
                     + " t.once_date, t.alert_time, t.memo, DATE(t.created_at),"
                     + " t.origin_template_task_id,"
                     + " (SELECT GROUP_CONCAT(s.day_of_week) FROM routine_task_schedules s"
-                    + "   WHERE s.user_routine_task_id = t.id), NULL,"
+                    + "   WHERE s.user_routine_task_id = t.id), t.allowed_radius_meters,"
                     + " " + PLACE_COLUMNS + ", NULL"
                     + " FROM user_routine_tasks t"
                     + " LEFT JOIN routine_categories rc ON rc.name = t.category"
@@ -194,17 +194,18 @@ public class JpaMyRoutineRepository implements MyRoutineRepository {
 
     private static TaskRow task(Object[] r) {
         return new TaskRow(l(r[0]), s(r[1]), hhmm(r[2]), s(r[3]), s(r[4]), s(r[5]), s(r[6]), date(r[7]), hhmm(r[8]), s(r[9]),
-                date(r[10]), r[11] == null ? null : l(r[11]), csv(r[12]), place(r, 14));
+                date(r[10]), r[11] == null ? null : l(r[11]), csv(r[12]), i(r[13]), place(r, 14));
     }
 
     @Override
     public long insertTask(EntityManager em, long routineId, TaskValues v) {
         Params p = new Params();
         String sql = "INSERT INTO user_routine_tasks (user_routine_id, place_id, content, target_time, category,"
-                + " repeat_type, once_date, alert_time, memo, reward_xp) VALUES (" + p.add(routineId) + ", "
+                + " repeat_type, once_date, alert_time, memo, reward_xp, allowed_radius_meters) VALUES (" + p.add(routineId) + ", "
                 + p.nullable(v.placeId()) + ", " + p.add(v.content()) + ", " + p.add(v.time()) + ", "
                 + p.add(v.category()) + ", " + p.add(v.repeatType()) + ", " + p.nullable(v.onceDate()) + ", "
-                + p.nullable(v.alertTime()) + ", " + p.nullable(v.memo()) + ", " + p.add(v.rewardXp()) + ")";
+                + p.nullable(v.alertTime()) + ", " + p.nullable(v.memo()) + ", " + p.add(v.rewardXp()) + ", "
+                + p.add(v.allowedRadiusMeters()) + ")";
         p.bind(em.createNativeQuery(sql)).executeUpdate();
         return lastId(em);
     }
@@ -216,6 +217,7 @@ public class JpaMyRoutineRepository implements MyRoutineRepository {
                 + p.add(v.content()) + ", target_time = " + p.add(v.time()) + ", category = " + p.add(v.category())
                 + ", repeat_type = " + p.add(v.repeatType()) + ", once_date = " + p.nullable(v.onceDate())
                 + ", alert_time = " + p.nullable(v.alertTime()) + ", memo = " + p.nullable(v.memo())
+                + ", allowed_radius_meters = " + p.add(v.allowedRadiusMeters())
                 + " WHERE id = " + p.add(taskId);
         p.bind(em.createNativeQuery(sql)).executeUpdate();
     }

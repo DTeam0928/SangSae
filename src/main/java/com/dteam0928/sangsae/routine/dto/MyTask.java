@@ -11,12 +11,13 @@ import java.util.List;
  * @param repeatLabel   "매일 반복", "매주 월·수·금", "1회 · 10월 8일" 등 화면 표시용
  * @param daysOfWeek    CUSTOM 일 때 요일 (MON~SUN)
  * @param onceDate      ONCE 일 때 실행일 "yyyy-MM-dd"
+ * @param allowedRadiusMeters GPS 인증 허용 반경(m)
  * @param done          조회한 날짜에 완료했는지
  * @param completedAt   완료 시각 "19:03" (미완료면 null)
  */
 public record MyTask(long id, String content, String time,
                      String categoryCode, String categoryName, String categoryEmoji,
                      String repeatType, String repeatLabel, List<String> daysOfWeek, String onceDate,
-                     String alertTime, String memo, PlaceSummary place,
+                     String alertTime, String memo, PlaceSummary place, int allowedRadiusMeters,
                      boolean done, String completedAt) {
 }

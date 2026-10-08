@@ -79,7 +79,7 @@ fetch('/sangsae/api/my-routines', {method: 'POST', body, headers: {'X-Requested-
     "categoryCode": "EXERCISE", "categoryName": "운동", "categoryEmoji": "💪",
     "repeatType": "DAILY", "repeatLabel": "매일 반복",      // 화면 "💪 운동 · 매일 반복"
     "daysOfWeek": [], "onceDate": null,
-    "alertTime": "06:50", "memo": null, "place": {장소} | null,
+    "alertTime": "06:50", "memo": null, "place": {장소} | null, "allowedRadiusMeters": 50,
     "done": true, "completedAt": "07:03"                    // done 이면 ○ 대신 완료 표시 + 취소선
   }]
 }
@@ -130,6 +130,7 @@ Task 를 클릭하면 이 값으로 Task 설정 폼을 채운다.
 | `onceDate` | ONCE 면 O | 운영 기간 안의 날짜 |
 | `alertTime` | | `HH:mm` |
 | `memo` | | 255자 이내 |
+| `allowedRadiusMeters` | | 장소 Task 의 GPS 인증 허용 반경(m). 50~1000, 없으면 50 (범위 밖이면 가장 가까운 값으로 저장) |
 
 ## 에러 코드
 
