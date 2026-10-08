@@ -1,304 +1,226 @@
+/* quest.css — 퀘스트 탐색·여행 관리 화면의 고유 배치와 모달 규격입니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
 
-        /* Q-00 전용 메인 탭 스타일 */
-        .main-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            border-bottom: 2px solid var(--color-border2);
-            padding-bottom: 10px;
-        }
-        .main-tab-btn {
-            border: 0;
-            background: transparent;
-            color: var(--color-muted);
-            padding: 10px 17px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-        }
-        .main-tab-btn.active {
-            background: var(--color-main);
-            color: var(--color-dark);
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+/* 모달 배경: 배경 var(--color-overlay-strong), 안쪽 여백 15px, z-index var(--z-modal-large)를 적용합니다. */
+.modal-bg {
+    background: var(--color-overlay-strong);
+    padding: 15px;
+    z-index: var(--z-modal-large);
+}
 
-        /* 공통 뱃지 그룹 */
-        .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
+/* 모달 본체: 너비 min(760px,100%), 안쪽 여백 25px를 적용합니다. */
+.modal {
+    width: min(760px,100%);
+    padding: 25px;
+}
 
-        /* 모달 백드롭 및 모달 스타일 */
-        .modal-bg {
-            position: fixed; inset: 0; background: rgba(18, 38, 48, 0.6);
-            display: none; align-items: center; justify-content: center; padding: 15px; z-index: 200;
-        }
-        .modal-bg.show { display: flex; }
-        .modal {
-            background: var(--color-white); border-radius: var(--radius-lg);
-            width: min(760px, 100%); max-height: 90vh; overflow-y: auto; padding: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-        }
-        .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-head h2 { margin: 0; font-size: var(--fs-h2); font-weight: var(--fw-h2); }
-        .close { border: 0; background: var(--color-sub-bg); border-radius: 8px; width: 34px; height: 34px; font-size: 19px; cursor: pointer; }
+/* .hero: 배경 var(--color-sub-bg), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 28px, 표시 방식 flex를 적용합니다. */
+.hero {
+    background: var(--color-sub-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-        /* 토스트 알림 */
-        .toast {
-            position: fixed;
-            right: 24px;
-            bottom: 24px;
-            background: var(--color-text);
-            color: var(--color-white);
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            opacity: 0;
-            transform: translateY(12px);
-            transition: .3s;
-            z-index: 300;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toast.show { opacity: 1; transform: none; }
+/* .hero-actions: 표시 방식 flex, 요소 간 간격 9px, flex-wrap wrap를 적용합니다. */
+.hero-actions {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+}
 
-        /* 컨텍스트 메뉴 */
-        .context-menu {
-            position: fixed;
-            background: var(--color-white);
-            border: 1px solid var(--color-border);
-            box-shadow: var(--shadow-card);
-            border-radius: var(--radius-sm);
-            padding: 5px;
-            z-index: 150;
-            display: none;
-        }
-        .context-menu button {
-            display: block;
-            width: 140px;
-            text-align: left;
-            border: 0;
-            background: var(--color-white);
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .context-menu button:hover { background: var(--color-bg); }
-        .context-menu button.danger { color: var(--color-danger); }
+/* .quick: 표시 방식 flex, 요소 간 간격 9px, overflow-x auto, 안쪽 여백 bottom 5px, 바깥 여백 bottom 22px를 적용합니다. */
+.quick {
+    display: flex;
+    gap: 9px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    margin-bottom: 22px;
+}
 
-        .collection-row { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--color-border2); }
-        .collection-row:last-child { border-bottom: 0; }
-    
+/* .search-results: 표시 방식 none를 적용합니다. */
+.search-results {
+    display: none;
+}
 
-    /* 탐색 탭 전용 스타일 */
-    .hero {
-        background: var(--color-sub-bg);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        padding: 28px;
-        display: flex;
-        justify-content: space-between;
-        gap: 24px;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-    .hero-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+/* .search-results / .active 활성 상태: 표시 방식 block를 적용합니다. */
+.search-results.active {
+    display: block;
+}
 
-    .searchbar { display: flex; gap: 8px; margin-bottom: 18px; position: relative; }
-    .search-wrapper { flex: 1; position: relative; display: flex; align-items: center; }
-    .clear-search {
-        position: absolute;
-        right: 12px;
-        background: var(--color-sub-bg);
-        border: 0;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-    .select-btn {
-        height: 46px;
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-sm);
-        background: var(--color-white);
-        padding: 0 16px;
-        cursor: pointer;
-    }
+/* .explore-home / .is-hidden: 표시 방식 none를 적용합니다. */
+.explore-home.is-hidden {
+    display: none;
+}
 
-    .quick { display: flex; gap: 9px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 22px; }
-    .chip {
-        white-space: nowrap;
-        border: 1px solid var(--color-border);
-        background: var(--color-white);
-        border-radius: 999px;
-        padding: 8px 16px;
-        cursor: pointer;
-    }
-    .chip.active, .chip:hover {
-        border-color: var(--color-dark);
-        background: var(--color-main);
-        color: var(--color-dark);
+/* .feature: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 20px, 표시 방식 grid를 적용합니다. */
+.feature {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 20px;
+}
+
+/* .feature-main: 최소 높이 220px, 모서리 곡률 var(--radius-md), 배경 var(--color-main), 안쪽 여백 24px, 표시 방식 flex를 적용합니다. */
+.feature-main {
+    min-height: 220px;
+    border-radius: var(--radius-md);
+    background: var(--color-main);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* .feature-side: 표시 방식 flex, 배치 방향 column, 요소 간 간격 10px, 주축 정렬 space-between를 적용합니다. */
+.feature-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+/* .layout-grid / 12칼럼 그리드 / 퀘스트 코스 카드 배치: 표시 방식 grid, 그리드 열 구성 repeat(3, 1fr), 요소 간 간격 14px를 적용합니다. */
+.layout-grid:not(.grid-12), .course-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+/* .map-layout: 표시 방식 grid, 그리드 열 구성 1.2fr .8fr, 요소 간 간격 15px를 적용합니다. */
+.map-layout {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 15px;
+}
+
+/* .map: 높이 380px, 모서리 곡률 var(--radius-lg), 배경 var(--color-sub-bg), 배치 기준 relative, 테두리 1px solid var(--color-border)를 적용합니다. */
+.map {
+    height: 380px;
+    border-radius: var(--radius-lg);
+    background: var(--color-sub-bg);
+    position: relative;
+    border: 1px solid var(--color-border);
+}
+
+/* .map-list: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 16px, max-height 380px를 적용합니다. */
+.map-list {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(max-width: 850px) */
+@media(max-width: 850px) {
+    /* .feature / .map-layout: 그리드 열 구성 1fr를 적용합니다. */
+    .feature, .map-layout {
+        grid-template-columns: 1fr;
     }
 
-    .search-results { display: none; }
-    .search-results.active { display: block; }
-    .explore-home.is-hidden { display: none; }
-
-    .section { margin: 28px 0; }
-    .section-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 13px; }
-
-    .feature {
-        background: var(--color-white);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        display: grid;
-        grid-template-columns: 1.25fr 0.75fr;
-        gap: 20px;
-    }
-    .feature-main {
-        min-height: 220px;
-        border-radius: var(--radius-md);
-        background: var(--color-main);
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-    }
-    .feature-side { display: flex; flex-direction: column; gap: 10px; justify-content: space-between; }
-
-    .layout-grid, .course-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .card { cursor: pointer; transition: transform .15s; }
-    .card:hover { transform: translateY(-3px); }
-    .thumb {
-        height: 120px;
-        border-radius: var(--radius-md);
-        background: var(--color-sub-bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 36px;
-        margin-bottom: 12px;
+    /* .layout-grid / 퀘스트 코스 카드 배치: 그리드 열 구성 repeat(2, 1fr)를 적용합니다. */
+    .layout-grid, .course-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 12px; }
-    .card-actions { display: flex; gap: 6px; }
-
-    .map-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 15px; }
-    .map {
-        height: 380px;
-        border-radius: var(--radius-lg);
-        background: var(--color-sub-bg);
-        position: relative;
-        border: 1px solid var(--color-border);
-    }
-    .map-list {
-        background: var(--color-white);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        padding: 16px;
-        max-height: 380px;
-        overflow-y: auto;
-    }
-    .map-item { padding: 12px 0; border-bottom: 1px solid var(--color-border2); cursor: pointer; }
-    .map-item:last-child { border-bottom: 0; }
-
-    @media(max-width: 850px) {
-        .feature, .map-layout { grid-template-columns: 1fr; }
-        .layout-grid, .course-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media(max-width: 600px) {
-        .layout-grid, .course-grid { grid-template-columns: 1fr; }
+}
+/* 반응형 또는 사용자 동작 설정: @media(max-width: 600px) */
+@media(max-width: 600px) {
+    /* .layout-grid / 퀘스트 코스 카드 배치: 그리드 열 구성 1fr를 적용합니다. */
+    .layout-grid, .course-grid {
+        grid-template-columns: 1fr;
     }
 
+}
+/* .trip-header: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 flex-end, 바깥 여백 bottom 18px를 적용합니다. */
+.trip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 18px;
+}
 
-    /* 여행 관리 전용 스타일 */
-    .trip-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 18px;
-    }
-    .trip-selector {
-        border: 1px solid var(--color-border);
-        background: var(--color-white);
-        border-radius: var(--radius-md);
-        padding: 12px 18px;
-        min-width: 260px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+/* .trip-selector: 테두리 1px solid var(--color-border), 배경 var(--color-white), 모서리 곡률 var(--radius-md), 안쪽 여백 12px 18px, min-width 260px를 적용합니다. */
+.trip-selector {
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    min-width: 260px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-    .calendar {
-        background: var(--color-white);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-card);
-    }
-    .calendar-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .cal-nav-btn { display: flex; gap: 8px; align-items: center; }
+/* .management-grid: 표시 방식 grid, 그리드 열 구성 1.2fr .8fr, 요소 간 간격 16px를 적용합니다. */
+.management-grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 16px;
+}
 
-    .toggle { display: flex; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 2px; background: var(--color-bg); }
-    .toggle button { border: 0; background: transparent; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-    .toggle button.active { background: var(--color-dark); color: var(--color-white); }
+/* .quest-row: 표시 방식 flex, 요소 간 간격 12px, 교차축 정렬 center, 안쪽 여백 14px 0, border-bottom 1px solid var(--color-border2)를 적용합니다. */
+.quest-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border2);
+}
 
-    .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .day {
-        border: 1px solid var(--color-border2);
-        border-radius: var(--radius-sm);
-        padding: 10px;
-        text-align: center;
-        background: var(--color-white);
-        cursor: pointer;
-    }
-    .day.selected { background: var(--color-dark); color: var(--color-white); border-color: var(--color-dark); }
-    .day.selected .desc { color: var(--color-white); }
+/* .quest-row: border-bottom 0를 적용합니다. */
+.quest-row:last-child {
+    border-bottom: 0;
+}
 
-    .management-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; }
-    .progressbar { height: 8px; background: var(--color-sub-bg); border-radius: 999px; overflow: hidden; margin: 12px 0; }
-    .progressbar i { display: block; height: 100%; background: var(--color-dark); width: 0%; transition: width 0.3s; }
+/* .quest-info: flex 1를 적용합니다. */
+.quest-info {
+    flex: 1;
+}
 
-    .quest-row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        padding: 14px 0;
-        border-bottom: 1px solid var(--color-border2);
-    }
-    .quest-row:last-child { border-bottom: 0; }
-    .quest-info { flex: 1; }
-
-    .status {
-        padding: 4px 8px;
-        border-radius: 6px;
-        background: var(--color-main);
-        color: var(--color-dark);
-    }
-    .status.done { background: var(--color-sub-bg); color: var(--color-success); }
-
-    @media(max-width: 850px) {
-        .management-grid { grid-template-columns: 1fr; }
+/* 반응형 또는 사용자 동작 설정: @media(max-width: 850px) */
+@media(max-width: 850px) {
+    /* .management-grid: 그리드 열 구성 1fr를 적용합니다. */
+    .management-grid {
+        grid-template-columns: 1fr;
     }
 
-.quest-detail-1 {padding:15px; text-align:center;}
-.quest-detail-2 {width:min(480px, 100%)}
-.quest-detail-3 {margin-bottom:16px;}
-.quest-detail-4 {width:100%}
-.quest-detail-5 {margin-bottom: 8px;}
-.quest-detail-6 {margin-top:0;}
-.quest-detail-7 {margin-bottom: 14px;}
-.quest-detail-8 {margin-top:15px; display:flex; gap:8px;}
-.quest-detail-9 {min-height: auto; padding: 14px;}
-.quest-detail-10 {color: var(--color-accent); font-weight: var(--fw-h3);}
-.quest-detail-11 {color: var(--color-dark); cursor: pointer;}
-.quest-detail-12 {position: absolute; top: 12px; left: 12px; background: var(--color-white); padding: 6px 12px; border-radius: var(--radius-sm);}
-.quest-detail-13 {font-size: var(--fs-b); font-weight: var(--fw-h1); margin-top: 10px; color: var(--color-dark);}
-.quest-detail-14 {margin-bottom: 16px;}
-.quest-detail-15 {border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 14px; background: var(--color-bg);}
-.quest-detail-16 {display: block; margin-bottom: 4px;}
-.quest-detail-17 {width: 40%;}
+}
+/* .quest-detail-12: 배치 기준 absolute, top 12px, left 12px, 배경 var(--color-white), 안쪽 여백 6px 12px를 적용합니다. */
+.quest-detail-12 {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--color-white);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+}
+
+/* .quest-detail-13: 글자 크기 var(--fs-b), 글자 두께 var(--fw-h1), 바깥 여백 top 10px, 글자색 var(--color-dark)를 적용합니다. */
+.quest-detail-13 {
+    font-size: var(--fs-b);
+    font-weight: var(--fw-h1);
+    margin-top: 10px;
+    color: var(--color-dark);
+}
+
+/* .quest-detail-15: 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-md), 안쪽 여백 14px, 배경 var(--color-bg)를 적용합니다. */
+.quest-detail-15 {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    background: var(--color-bg);
+}
+

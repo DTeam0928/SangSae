@@ -98,10 +98,115 @@
         <div class="quest-detail-3">
           <label class="form-label">퀘스트 제목</label>
           <input id="newTitle" class="form-input" placeholder="예: 광안리 일몰 보기">
+              <label class="form-label" for="newDescription">퀘스트 설명</label>
+      <textarea id="newDescription" class="form-input" rows="3"
+                placeholder="퀘스트 내용을 설명해 주세요"></textarea>
+
+      <label class="form-label" for="newCategory">카테고리</label>
+      <select id="newCategory" class="form-input">
+        <option value="WALK">산책</option>
+        <option value="CAFE">카페</option>
+        <option value="EXERCISE">운동</option>
+        <option value="CULTURE">문화</option>
+        <option value="OTHER">기타</option>
+      </select>
+
+      <label class="form-label" for="newEstimatedMinutes">예상 소요 시간 (분)</label>
+      <input id="newEstimatedMinutes" class="form-input"
+             type="number" min="1" value="30">
+
+      <label class="form-label" for="newRewardXp">보상 XP</label>
+      <input id="newRewardXp" class="form-input"
+             type="number" min="0" value="100">
+
+      <label class="form-label" for="newAuthType">인증 방식</label>
+      <select id="newAuthType" class="form-input"
+              onchange="App.quest.toggleCreatePlaceSearch()">
+        <option value="NONE">인증 없음</option>
+        <option value="LOCATION">위치 인증 (GPS)</option>
+        <option value="PHOTO">사진 인증</option>
+        <option value="TEXT">텍스트 인증</option>
+      </select>
+
+      <!-- LOCATION 선택 시에만 표시 -->
+      <div id="createPlaceSection" style="display:none;">
+        <label class="form-label" for="createPlaceQuery">장소 검색</label>
+        <div style="display:flex; gap:8px;">
+          <input id="createPlaceQuery" class="form-input"
+                 placeholder="예: 부산시민공원">
+          <button type="button" class="btn btn-primary"
+                  onclick="App.quest.searchCreatePlaces()">검색</button>
+        </div>
+        <div id="createPlaceResults"></div>
+        <div id="createSelectedPlace"></div>
+      </div>
+      <label class="form-label" for="newVisibility">공개 범위</label>
+      <select id="newVisibility" class="form-input">
+        <option value="PUBLIC">전체 공개</option>
+        <option value="PRIVATE">비공개</option>
+      </select>
         </div>
         <button class="quest-detail-4 btn btn-primary" onclick="App.quest.createQuest()">퀘스트 발행하기</button>
       </div>
     </div>
+
+	<!-- 위치 인증 반경 선택 모달 -->
+	<div class="modal-bg" id="authRadiusModal"
+	     onclick="App.quest.closeModalOutside(event, 'authRadiusModal')">
+	
+	    <div class="modal">
+	        <div class="modal-head">
+	            <h2 class="title">📍 위치 인증 반경 설정</h2>
+	            <button type="button" class="close"
+	                    onclick="App.quest.closeModal('authRadiusModal')">×</button>
+	        </div>
+	
+	        <div style="margin-top: 20px;">
+	            <div style="display:flex; justify-content:space-between;
+	                        align-items:center; margin-bottom:12px;">
+	
+	                <label for="authRadiusM" class="subtitle">
+	                    GPS 인증 허용 반경
+	                </label>
+	
+	                <strong id="authRadiusValue">300m</strong>
+	            </div>
+	
+	            <input type="range"
+	                   id="authRadiusM"
+	                   min="100"
+	                   max="1000"
+	                   step="50"
+	                   value="300"
+	                   style="width:100%; cursor:pointer;"
+	                   oninput="
+	                       document.getElementById('authRadiusValue').textContent =
+	                           this.value + 'm';
+	                       document.getElementById('authRadiusDescription').textContent =
+	                           '목표 장소에서 ' + this.value +
+	                           'm 이내에 도착하면 GPS 인증이 가능합니다.';
+	                   ">
+	
+	            <div style="display:flex; justify-content:space-between;
+	                        font-size:12px; margin-top:6px;">
+	                <span>100m</span>
+	                <span>1000m</span>
+	            </div>
+	
+	            <p class="desc" id="authRadiusDescription"
+	               style="margin-top:14px;">
+	                목표 장소에서 300m 이내에 도착하면 GPS 인증이 가능합니다.
+	            </p>
+	
+	            <button type="button"
+	                    class="btn btn-primary"
+	                    style="width:100%; margin-top:20px;"
+	                    onclick="App.quest.confirmAuthRadius()">
+	                이 반경으로 일정 추가하기
+	            </button>
+	        </div>
+	    </div>
+	</div>
 
     <!-- 컨텍스트 메뉴 및 토스트 -->
     <div class="context-menu" id="rowMenu"></div>
