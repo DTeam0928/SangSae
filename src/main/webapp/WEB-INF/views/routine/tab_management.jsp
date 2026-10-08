@@ -69,60 +69,90 @@
     </div>
   </section>
 
-  <aside class="large-span-4 surface-white border-default border-color-border radius-lg ds-p-5 shadow-card large-position-sticky large-ds-top-24">
-    <div class="layout-row justify-between align-center ds-pb-3 border-bottom border-color-sub-bg">
-      <h2 class="weight-heading">Task 설정</h2>
-      <button type="button" onclick="App.routine.openTaskForm()" class="ds-px-3 ds-py-2 surface-dark color-white radius-sm type-xs weight-bold">＋ 추가</button>
+  <aside class="task-form-container">
+    <!-- 폼 헤더 -->
+    <div class="task-form-header">
+      <h2 class="task-form-title">Task 설정</h2>
+      <button type="button" onclick="App.routine.openTaskForm()" class="task-form-add-btn">＋ 추가</button>
     </div>
-    <form id="taskForm" class="space-y-4 ds-mt-4" onsubmit="App.routine.saveTask(event)">
+
+    <!-- 메인 폼 영역 -->
+    <form id="taskForm" class="task-form" onsubmit="App.routine.saveTask(event)">
       <input type="hidden" id="editingTaskId">
-      <div>
-        <label class="type-xs weight-bold" for="taskTitle">루틴 내용</label>
-        <input id="taskTitle" required class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3 type-sm">
+
+      <!-- 루틴 내용 -->
+      <div class="task-form-group">
+        <label class="task-form-label" for="taskTitle">루틴 내용</label>
+        <input id="taskTitle" required class="task-form-input" placeholder="루틴 내용을 입력하세요">
       </div>
-      <div class="layout-grid columns-2 ds-gap-3">
-        <div>
-          <label class="type-xs weight-bold" for="taskTime">시간</label>
-          <input id="taskTime" type="time" required class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3">
+
+      <!-- 시간 & 카테고리 2열 배치 -->
+      <div class="task-form-row">
+        <div class="task-form-group">
+          <label class="task-form-label" for="taskTime">시간</label>
+          <input id="taskTime" type="time" required class="task-form-time">
         </div>
-        <div>
-          <label class="type-xs weight-bold" for="taskCat">카테고리</label>
-          <select id="taskCat" class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-2 ds-py-3 type-xs">
-            <option>💪 운동</option><option>💧 건강</option><option>📚 자기계발</option><option>🧠 공부</option><option>💼 업무</option><option>🏠 일상</option>
-          </select>
+        <div class="task-form-group">
+          <label class="task-form-label" for="taskTime">알림</label>
+          <input id="taskTime" type="time" required class="task-form-time">
         </div>
+
       </div>
-      <div>
-        <div class="layout-row justify-between align-center">
-          <label class="type-xs weight-bold" for="taskLocation">장소</label>
-          <label class="type-xs"><input type="checkbox" id="taskLocationReq" onchange="App.routine.toggleLocationRadius(this.checked)"> 위치 인증 필수</label>
+
+      <div class="task-form-group">
+        <label class="task-form-label" for="taskCat">카테고리</label>
+        <select id="taskCat" class="task-form-category">
+          <option>💪 운동</option>
+          <option>💧 건강</option>
+          <option>📚 자기계발</option>
+          <option>🧠 공부</option>
+          <option>💼 업무</option>
+          <option>🏠 일상</option>
+        </select>
+      </div>
+
+      <!-- 장소 및 반경 설정 -->
+      <div class="task-form-group">
+        <div class="task-form-label-row">
+          <label class="task-form-label" for="taskLocation">장소</label>
+          <label class="task-form-checkbox-label">
+            <input type="checkbox" id="taskLocationReq" onchange="App.routine.toggleLocationRadius(this.checked)"> 위치 인증 필수
+          </label>
         </div>
-        <input id="taskLocation" class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3 type-sm" placeholder="예: 집 / 헬스장 / 광안리">
-        <div id="radiusControl" class="ds-mt-2 is-hidden">
-          <div class="layout-row justify-between type-xs color-muted">
+        <input id="taskLocation" class="task-form-input" placeholder="예: 집 / 헬스장 / 광안리">
+
+        <!-- 위치 반경 설정 컨트롤 -->
+        <div id="radiusControl" class="task-form-radius-control is-hidden">
+          <div class="task-form-radius-label-row">
             <span>허용 인증 반경</span>
             <span id="radiusValueLabel">100m</span>
           </div>
-          <input type="range" id="taskRadius" min="50" max="1000" step="50" value="100" class="width-full ds-mt-1" oninput="document.getElementById('radiusValueLabel').textContent = this.value + 'm'">
+          <input type="range" id="taskRadius" min="50" max="1000" step="50" value="100" class="task-form-range" oninput="document.getElementById('radiusValueLabel').textContent = this.value + 'm'">
         </div>
       </div>
-      <div>
-        <label class="type-xs weight-bold" for="taskRepeat">반복</label>
-        <select id="taskRepeat" class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3 type-sm">
-          <option>매일 반복</option><option>평일 반복</option><option>주말 반복</option><option>사용자 지정</option><option>1회성</option>
+
+      <!-- 반복 설정 -->
+      <div class="task-form-group">
+        <label class="task-form-label" for="taskRepeat">반복</label>
+        <select id="taskRepeat" class="task-form-select">
+          <option>매일 반복</option>
+          <option>평일 반복</option>
+          <option>주말 반복</option>
+          <option>사용자 지정</option>
+          <option>1회성</option>
         </select>
       </div>
-      <div>
-        <label class="type-xs weight-bold" for="taskAlarm">알림</label>
-        <input id="taskAlarm" type="time" class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3">
+
+      <!-- 메모 입력 -->
+      <div class="task-form-group">
+        <label class="task-form-label" for="taskMemo">메모</label>
+        <textarea id="taskMemo" class="task-form-textarea" rows="3" placeholder="메모를 입력하세요"></textarea>
       </div>
-      <div>
-        <label class="type-xs weight-bold" for="taskMemo">메모</label>
-        <textarea id="taskMemo" class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3 type-sm" rows="3"></textarea>
-      </div>
-      <div class="layout-row ds-gap-2">
-        <button type="submit" class="layout-grow surface-dark color-white weight-bold radius-md ds-py-3">저장</button>
-        <button type="button" onclick="App.routine.deleteActiveTask()" class="ds-px-4 border-default border-color-danger-bg color-danger radius-md">삭제</button>
+
+      <!-- 하단 버튼 영역 -->
+      <div class="task-form-btns">
+        <button type="submit" class="task-form-submit-btn">저장</button>
+        <button type="button" onclick="App.routine.deleteActiveTask()" class="task-form-delete-btn">삭제</button>
       </div>
     </form>
   </aside>

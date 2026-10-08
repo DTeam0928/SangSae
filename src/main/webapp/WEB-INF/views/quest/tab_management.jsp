@@ -56,11 +56,11 @@
 
     <!-- 진행도 및 대시보드 -->
     <div class="dash-card">
-        <div class="title">🎒 여행 진행도</div>
+        <div class="title">🎒 퀘스트 진행도</div>
         <div class="quest-detail-13">
             <span id="xpTotal">0</span> XP
         </div>
-        <div class="quest-detail-14 desc">이번 여행에서 획득한 경험치</div>
+        <div class="quest-detail-14 desc">이번 퀘스트에서 획득한 경험치</div>
 
         <div class="quest-detail-15">
             <strong class="quest-detail-16 subtitle">위치 인증 팁</strong>

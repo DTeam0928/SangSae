@@ -217,3 +217,198 @@ button, input, select, textarea { font: inherit; }
     .cal-date-num { font-size: 15px; }
 }
 
+
+
+/* ==========================================================================
+   Task 설정 사이드바 폼 (Task Setting Sidebar Form)
+   ========================================================================== */
+
+/* 1. 사이드바 컨테이너 (고정 위치 및 카드 디자인) */
+.task-form-container {
+    position: sticky;
+    top: 1.5rem;
+    background-color: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-lg, 16px);
+    padding: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+}
+
+/* 2. 폼 상단 헤더 (제목 & +추가 버튼) */
+.task-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-sub-bg, #f3f4f6);
+}
+
+.task-form-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+    margin: 0;
+}
+
+.task-form-add-btn {
+    padding: 0.35rem 0.75rem;
+    background-color: var(--color-dark, #111827);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.task-form-add-btn:hover {
+    background-color: var(--color-dark-hover, #1f2937);
+}
+
+/* 3. 메인 폼 및 그룹 간격 */
+.task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.task-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* 시간 + 카테고리 2열 행 배치 */
+.task-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+/* 4. 라벨 스타일 */
+.task-form-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text, #374151);
+}
+
+.task-form-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-form-checkbox-label {
+    font-size: 0.75rem;
+    color: var(--color-muted, #6b7280);
+    cursor: pointer;
+}
+
+/* 5. 입력 폼 필드 공통 (Input, Select, Time, Textarea) */
+.task-form-input,
+.task-form-time,
+.task-form-category,
+.task-form-select,
+.task-form-textarea {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    background-color: var(--color-sub-bg, #f9fafb);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 8px);
+    font-size: 0.875rem;
+    color: var(--color-text, #111827);
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-form-category,
+.task-form-select {
+    font-size: 0.75rem;
+}
+
+.task-form-textarea {
+    resize: vertical;
+}
+
+/* 입력창 Focus 상태 */
+.task-form-input:focus,
+.task-form-time:focus,
+.task-form-category:focus,
+.task-form-select:focus,
+.task-form-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 6. 위치 반경 조절 슬라이더 */
+.task-form-radius-control {
+    margin-top: 0.5rem;
+    padding: 0.65rem;
+    background-color: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border, #f3f4f6);
+    border-radius: var(--radius-sm, 6px);
+}
+
+.task-form-radius-control.is-hidden {
+    display: none !important;
+}
+
+.task-form-radius-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-muted, #6b7280);
+    margin-bottom: 0.25rem;
+}
+
+.task-form-range {
+    width: 100%;
+    accent-color: var(--color-primary, #3b82f6);
+    cursor: pointer;
+}
+
+/* 7. 하단 버튼 영역 (저장 / 삭제) */
+.task-form-btns {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* 저장 버튼 */
+.task-form-submit-btn {
+    flex: 1;
+    padding: 0.75rem;
+    background-color: var(--color-dark, #111827);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.task-form-submit-btn:hover {
+    background-color: var(--color-dark-hover, #1f2937);
+}
+
+/* 삭제 버튼 */
+.task-form-delete-btn {
+    padding: 0.75rem 1rem;
+    background-color: transparent;
+    border: 1px solid var(--color-danger-border, #fca5a5);
+    color: var(--color-danger, #ef4444);
+    border-radius: var(--radius-md, 8px);
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.task-form-delete-btn:hover {
+    background-color: var(--color-danger-bg, #fef2f2);
+}
