@@ -1,261 +1,551 @@
 (() => {
 'use strict';
 
-        /* 데이터 정의 */
-        const defaultQuests = [
-            {id:1, title:'광안리에서 일몰 사진 남기기', cat:'사진', place:'부산 수영구 · 광안리', time:'40분', xp:120, rating:4.8, popular:1420, new:false, icon:'🌅'},
-            {id:2, title:'부산 로컬 카페 하나 찾아보기', cat:'카페', place:'부산진구 · 전포동', time:'60분', xp:150, rating:4.7, popular:1180, new:false, icon:'☕'},
-            {id:3, title:'해운대 30분 산책하기', cat:'산책', place:'부산 해운대구', time:'30분', xp:100, rating:4.6, popular:950, new:true, icon:'🚶'},
-            {id:4, title:'부산에서 돼지국밥 먹어보기', cat:'맛집', place:'부산 전역', time:'60분', xp:180, rating:4.9, popular:890, new:false, icon:'🍲'}
-        ];
+    const contextPath = document.body.dataset.contextPath || '';
 
-        const quests = defaultQuests.concat(App.storage.read('q_custom_quests', []).filter(q => q && Number.isSafeInteger(q.id) && typeof q.title === 'string' && Number.isFinite(q.xp)));
-        let saved = App.storage.read('q_saved', []);
-        let planned = App.storage.read('q_planned', []);
-        let done = App.storage.read('q_done', []);
-        let xp = Number(App.storage.raw('q_xp') || 0);
+    function getCategoryIcon(cat) {
+        if (!cat) return '✨';
+        if (cat.includes('사진')) return '🌅';
+        if (cat.includes('카페')) return '☕';
+        if (cat.includes('산책') || cat.includes('걷기')) return '🚶';
+        if (cat.includes('맛집') || cat.includes('음식')) return '🍲';
+        if (cat.includes('문화') || cat.includes('예술')) return '🎨';
+        if (cat.includes('액티비티') || cat.includes('운동')) return '🎢';
+        return '✨';
+    }
 
-        const getQ = id => quests.find(q => q.id === id);
-        saved = [...new Set(saved)].filter(getQ);
-        planned = [...new Set(planned)].filter(getQ);
-        done = [...new Set(done)].filter(id => planned.includes(id));
-        xp = Number.isFinite(xp) ? Math.max(0, xp) : 0;
+    // 순수 DB 데이터 저장소 (더미 데이터 전면 삭제)
+    let quests = [];
+    let serverUserQuests = [];
+    let savedQuestIds = [];
+    let currentXp = 0;
+    let questMap = null;
 
-        function saveState() {
-            App.storage.set('q_custom_quests', JSON.stringify(quests.filter(q => !defaultQuests.some(d => d.id === q.id))));
-            App.storage.set('q_saved', JSON.stringify(saved));
-            App.storage.set('q_planned', JSON.stringify(planned));
-            App.storage.set('q_done', JSON.stringify(done));
-            App.storage.set('q_xp', xp);
+    let calendarMode = 'week';
+    let questCalendarCursor = new Date();
+    let questCategory = '전체';
+
+    /* 탭 전환 */
+    function switchTab(id, btn) {
+        document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+        const targetTab = document.getElementById('tab-' + id);
+        if (targetTab) targetTab.classList.add('active');
+        document.querySelectorAll('.main-tab-btn').forEach(x => x.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        if (id === 'management') {
+            fetchUserQuestsFromServer();
+        } else if (id === 'explorer' && questMap) {
+            setTimeout(() => {
+                questMap.relayout();
+                renderQuestMapMarkers();
+            }, 50);
         }
+    }
 
-        /* 탭 전환 */
-        function switchTab(id, btn) {
-            document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            document.querySelectorAll('.main-tab-btn').forEach(x => x.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-            if(id === 'management') renderManagement();
-        }
+    /* 토스트 알림 */
+    function showToast(msg, icon = '✨') {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = icon + ' ' + msg;
+        t.classList.add('show');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
 
-        /* 토스트 함수 */
-        function showToast(msg, icon = '✨') {
-            const t = document.getElementById('toast');
-            t.textContent = icon + ' ' + msg;
-            t.classList.add('show');
-            clearTimeout(window.toastTimer);
-            window.toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-        }
+    function closeModal(id) {
+        const target = document.getElementById(id);
+        if (target) target.classList.remove('show');
+    }
+    function closeModalOutside(e, id) {
+        if (e.target.id === id) closeModal(id);
+    }
 
-        function closeModal(id) {
-            const target = document.getElementById(id);
-            if(target) target.classList.remove('show');
-        }
-        function closeModalOutside(e, id) {
-            if(e.target.id === id) closeModal(id);
-        }
-
-        /* 탐색 탭 카드 템플릿 및 렌더링 */
-        function cardTemplate(q) {
-            const isSaved = saved.includes(q.id);
-            const isPlanned = planned.includes(q.id);
-            return `
-                <div class="dash-card card" onclick="App.quest.openDetailModal(${q.id})">
-                    <div class="thumb">${App.escape(q.icon)}</div>
-                    <div class="badges">
-                        <span class="badge">${App.escape(q.cat)}</span>
-                        <span class="badge orange">+${q.xp} XP</span>
-                    </div>
-                    <h3 class="subtitle" style="margin: 8px 0;">${App.escape(q.title)}</h3>
-                    <div class="desc">📍 ${App.escape(q.place)} · ⏱ ${App.escape(q.time)}</div>
-                    <div class="card-bottom">
-                        <span class="desc" style="color:var(--color-accent); font-weight:bold;">⭐ ${q.rating}</span>
-                        <div class="card-actions">
-                            <button class="small-btn" onclick="event.stopPropagation(); App.quest.toggleSave(${q.id})">
-                                ${isSaved ? '♥' : '♡'}
-                            </button>
-                            <button class="small-btn" onclick="event.stopPropagation(); App.quest.addSchedule(${q.id})">
-                                ${isPlanned ? '일정 ✓' : '+ 일정'}
-                            </button>
-                        </div>
-                    </div>
-                </div>`;
-        }
-
-        function renderQuestCards() {
-            const popularGrid = document.getElementById('popularGrid');
-            const newGrid = document.getElementById('newGrid');
-            if(popularGrid) popularGrid.innerHTML = [...quests].sort((a,b) => b.popular-a.popular).map(cardTemplate).join('');
-            renderManagement();
-            renderExplorerExtras();
-            document.getElementById('plannedCountBadge').textContent = '(' + planned.length + ')';
-            if(newGrid) newGrid.innerHTML = quests.filter(x => x.new).map(cardTemplate).join('');
-        }
-
-        /* 저장/일정 추가 핸들러 */
-        function toggleSave(id) {
-            if(saved.includes(id)) {
-                saved = saved.filter(x => x !== id);
-                showToast('컬렉션에서 제외했습니다.', '🤍');
-            } else {
-                saved.push(id);
-                showToast('♡ 내 컬렉션에 저장했습니다.');
-            }
-            saveState();
-            renderQuestCards();
-        }
-
-        function addSchedule(id) {
-            if(!planned.includes(id)) {
-                planned.push(id);
-                saveState();
-                showToast('📅 여행 일정에 추가되었습니다.');
+    /* 1. 서버 카탈로그 로드 (DB 조회만 허용) */
+    function fetchQuestsFromServer() {
+        fetch(contextPath + '/quest', { headers: { 'Accept': 'application/json' } })
+            .then(res => res.ok ? res.json() : null)
+            .then(json => {
+                if (json && json.success && Array.isArray(json.data)) {
+                    quests = json.data.map(item => {
+                        const placeObj = item.place || null;
+                        return {
+                            id: item.id,
+                            title: item.title,
+                            cat: item.category || '일반',
+                            place: placeObj ? (placeObj.roadAddress || placeObj.name) : '추천 장소',
+                            placeName: placeObj ? placeObj.name : '',
+                            latitude: placeObj ? placeObj.latitude : null,
+                            longitude: placeObj ? placeObj.longitude : null,
+                            themeCode: placeObj ? placeObj.themeCode : 'WALK',
+                            time: (item.estimatedMinutes || 30) + '분',
+                            xp: item.rewardXp || 500,
+                            rating: 5.0,
+                            popular: item.completionCount || 0,
+                            icon: getCategoryIcon(item.category)
+                        };
+                    });
+                } else {
+                    quests = [];
+                }
                 renderQuestCards();
-            } else {
-                showToast('이미 일정에 추가된 퀘스트입니다.');
-            }
-        }
+                renderRecommendedHero();
+                renderQuestMapMarkers();
+            })
+            .catch(() => {
+                quests = [];
+                renderQuestCards();
+            });
+    }
 
-        /* 관리 탭 렌더링 */
-        function renderManagement() {
-            const list = document.getElementById('todayList');
-            if(!list) return;
+    /* 2. 서버 사용자 일정 로드 (DB 조회만 허용) */
+    function fetchUserQuestsFromServer() {
+        const dateStr = App.dateKey(questCalendarCursor);
+        fetch(contextPath + '/user-quests?date=' + dateStr, { headers: { 'Accept': 'application/json' } })
+            .then(res => res.ok ? res.json() : null)
+            .then(json => {
+                if (json && json.success && Array.isArray(json.data)) {
+                    serverUserQuests = json.data;
+                } else {
+                    serverUserQuests = [];
+                }
+                renderManagement();
+            })
+            .catch(() => {
+                serverUserQuests = [];
+                renderManagement();
+            });
+    }
 
-            if(!planned.length) {
-                list.innerHTML = '<div class="desc" style="text-align:center; padding: 20px;">일정에 담긴 퀘스트가 없습니다.</div>';
-            } else {
-                list.innerHTML = planned.map(id => {
-                    const q = getQ(id);
-                    if(!q) return '';
-                    const isDone = done.includes(id);
-                    return `
-                        <div class="quest-row">
-                            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="App.quest.toggleDone(${id})">
-                            <div class="quest-info">
-                                <strong class="subtitle">${App.escape(q.icon)} ${App.escape(q.title)}</strong>
-                                <div class="desc">📍 ${App.escape(q.place)} · +${q.xp} XP</div>
-                            </div>
-                            <span class="status ${isDone ? 'done' : ''}">${isDone ? '완료 ✓' : '예정'}</span>
-                        </div>`;
-                }).join('');
-            }
+    /* 상단 오늘의 추천 퀘스트 영역 동적 렌더링 */
+    function renderRecommendedHero() {
+        const heroContainer = document.getElementById('heroRecommendContainer');
+        if (!heroContainer) return;
 
-            document.getElementById('totalCount').textContent = planned.length;
-            document.getElementById('doneCount').textContent = done.length;
-            document.getElementById('xpTotal').textContent = xp;
-
-            const pct = planned.length ? (done.length / planned.length) * 100 : 0;
-            document.getElementById('progressBar').style.width = pct + '%';
-        }
-
-        function toggleDone(id) {
-            const q = getQ(id);
-            if (!q || !planned.includes(id)) return;
-            if(done.includes(id)) {
-                done = done.filter(x => x !== id);
-                xp = Math.max(0, xp - q.xp);
-            } else {
-                done.push(id);
-                xp += q.xp;
-                showToast(`🎉 퀘스트 완료! +${q.xp} XP 획득`);
-            }
-            saveState();
-            renderManagement();
-        }
-
-        /* 모달 제어 함수들 */
-        function openRegionModal() { document.getElementById('regionModal').classList.add('show'); }
-        function applyRegions() { closeModal('regionModal'); showToast('부산 지역 필터 적용됨', '📍'); }
-
-        function openCollectionModal() {
-            const container = document.getElementById('collectionBody');
-            const savedQs = saved.map(getQ).filter(Boolean);
-            if(!savedQs.length) {
-                container.innerHTML = '<div class="desc" style="text-align:center; padding:20px;">저장된 컬렉션이 없습니다.</div>';
-            } else {
-                container.innerHTML = savedQs.map(q => `
-                    <div class="collection-row">
-                        <div style="font-size:24px;">${App.escape(q.icon)}</div>
-                        <div style="flex:1;">
-                            <div class="subtitle">${App.escape(q.title)}</div>
-                            <div class="desc">📍 ${App.escape(q.place)}</div>
-                        </div>
-                        <button class="small-btn" onclick="App.quest.addSchedule(${q.id})">+ 일정</button>
-                    </div>
-                `).join('');
-            }
-            document.getElementById('collectionModal').classList.add('show');
-        }
-
-        function openTripPickerModal() { document.getElementById('tripListContent').innerHTML='<button type="button" class="btn btn-secondary" onclick="App.quest.closeModal(\'tripModal\')">부산 여행 · 현재 여행</button>'; document.getElementById('tripModal').classList.add('show'); }
-        function openCreateModal() { document.getElementById('createModal').classList.add('show'); }
-
-        function createQuest() {
-            const titleInput = document.getElementById('newTitle');
-            const title = titleInput.value.trim();
-            if(!title) return showToast('제목을 입력해 주세요.');
-
-            const newQ = { id: Date.now(), title: title, cat: '자작', place: '부산', time: '30분', xp: 100, rating: 5.0, popular: 0, new: true, icon: '✨' };
-            quests.push(newQ);
-            planned.push(newQ.id);
-            saveState();
-
-            titleInput.value = '';
-            closeModal('createModal');
-            showToast('✨ 나만의 퀘스트가 일정에 추가되었습니다.');
-            renderQuestCards();
-        }
-
-        function openDetailModal(id) {
-            const q = getQ(id);
-            if(!q) return;
-            document.getElementById('detailContent').innerHTML = `
-                <div style="text-align:center; padding: 10px 0;">
-                    <div style="font-size:48px;">${App.escape(q.icon)}</div>
-                    <h3 class="title" style="margin:10px 0;">${App.escape(q.title)}</h3>
-                    <p class="desc">${App.escape(q.place)} · ⏱ ${App.escape(q.time)}</p>
-                    <button class="btn btn-primary" onclick="App.quest.addSchedule(${q.id}); App.quest.closeModal('detailModal');">일정에 추가하기</button>
+        if (!quests.length) {
+            heroContainer.innerHTML = `
+                <div class="feature-main" style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+                    <h2 class="title" style="color: var(--color-muted);">🌟 등록된 추천 퀘스트가 없습니다</h2>
+                    <p class="desc" style="margin-top: 8px;">DB에 퀘스트 템플릿을 등록하면 여기에 추천 퀘스트가 표시됩니다.</p>
                 </div>
             `;
-            document.getElementById('detailModal').classList.add('show');
+            return;
         }
 
-        /* 초기화 실행 */
-        document.addEventListener('DOMContentLoaded', () => {
-            renderQuestCards();
-        });
-    
-let questCategory = '전체';
-function handleSearch(value) {
-    const term = value.trim().toLocaleLowerCase();
-    document.getElementById('clearSearchBtn').style.display = term ? 'flex' : 'none';
-    document.getElementById('searchResults').classList.toggle('active', !!term || questCategory !== '전체');
-    document.getElementById('exploreHome').classList.toggle('is-hidden', !!term);
-    document.getElementById('searchResultTitle').textContent = term ? '“' + value.trim() + '” 검색 결과' : questCategory + ' 퀘스트';
-    document.getElementById('searchGrid').innerHTML = quests.filter(q => (questCategory === '전체' || q.cat === questCategory) && [q.title,q.place,q.cat].join(' ').toLocaleLowerCase().includes(term)).map(cardTemplate).join('') || '<p class="empty-state">검색 결과가 없습니다.</p>';
-}
-function clearSearch() { document.getElementById('searchInput').value=''; handleSearch(''); }
-function setCategory(button, category) { questCategory=category; document.querySelectorAll('.quick .chip').forEach(x=>x.classList.toggle('active',x===button)); handleSearch(document.getElementById('searchInput').value); }
-function renderExplorerExtras() {
-    document.getElementById('mapList').innerHTML=quests.map(q=>'<button type="button" class="map-item" onclick="App.quest.openDetailModal('+q.id+')">'+App.escape(q.icon+' '+q.title)+'</button>').join('');
-    document.getElementById('courseGrid').innerHTML='<button type="button" class="btn btn-secondary" onclick="App.quest.addCourse()">부산 하루 코스 · 모든 기본 퀘스트 담기</button>';
-    handleSearch(document.getElementById('searchInput').value);
-}
-function addCourse() { defaultQuests.forEach(q=>addSchedule(q.id)); }
-let calendarMode='week', questCalendarCursor=new Date();
-function switchCalendarMode(mode) {
-    calendarMode=mode;
-    document.getElementById('weekToggleBtn').classList.toggle('active',mode==='week');
-    document.getElementById('monthToggleBtn').classList.toggle('active',mode==='month');
-    const first=new Date(questCalendarCursor); first.setHours(0,0,0,0);
-    if(mode==='month') first.setDate(1);
-    first.setDate(first.getDate()-first.getDay());
-    const count=mode==='week'?7:42;
-    document.getElementById('periodLabel').textContent=questCalendarCursor.getFullYear()+'년 '+(questCalendarCursor.getMonth()+1)+'월';
-    document.getElementById('calendarBody').innerHTML='<div class="week-grid">'+Array.from({length:count},(_,i)=>{const d=new Date(first);d.setDate(first.getDate()+i);return '<button type="button" class="day '+(App.dateKey(d)===App.dateKey()?'selected':'')+'">'+d.getDate()+'</button>';}).join('')+'</div>';
-}
-function moveQuestCalendar(direction) { if(calendarMode==='week') questCalendarCursor.setDate(questCalendarCursor.getDate()+direction*7); else {questCalendarCursor.setDate(1);questCalendarCursor.setMonth(questCalendarCursor.getMonth()+direction);} switchCalendarMode(calendarMode); }
-document.addEventListener('DOMContentLoaded',()=>{switchCalendarMode('week'); if(location.hash==='#management') switchTab('management',document.querySelectorAll('.main-tab-btn')[1]);});
+        const topQ = quests[0];
+        heroContainer.innerHTML = `
+            <div class="feature-main">
+                <div class="badges">
+                    <span class="badge">오늘 추천</span>
+                    <span class="badge orange">+${topQ.xp} XP</span>
+                </div>
+                <h2 class="quest-detail-5 title">${App.escape(topQ.title)}</h2>
+                <p class="quest-detail-7 desc">${App.escape(topQ.place)}</p>
+                <div class="desc">📍 ${App.escape(topQ.place)} · ⏱ ${App.escape(topQ.time)}</div>
+                <div class="quest-detail-8">
+                    <button class="quest-detail-6 btn btn-primary" onclick="App.quest.openDetailModal(${topQ.id})">퀘스트 보기</button>
+                    <button class="btn btn-secondary" onclick="App.quest.toggleSave(${topQ.id})">♡</button>
+                </div>
+            </div>
+            <div class="feature-side">
+                <div class="quest-detail-9 dash-card">
+                    <strong class="subtitle">🎯 분류</strong>
+                    <span class="desc">${App.escape(topQ.cat)}</span>
+                </div>
+                <div class="quest-detail-9 dash-card">
+                    <strong class="subtitle">🏆 완료 보상</strong>
+                    <span class="quest-detail-10 desc">+${topQ.xp} XP (위치인증)</span>
+                </div>
+            </div>
+        `;
+    }
 
-App.quest = {saveState, switchTab, showToast, closeModal, closeModalOutside, cardTemplate, renderQuestCards, toggleSave, addSchedule, renderManagement, toggleDone, openRegionModal, applyRegions, openCollectionModal, openTripPickerModal, openCreateModal, createQuest, openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras, addCourse, switchCalendarMode, moveQuestCalendar};
+    /* 탐색 탭 카드 템플릿 */
+    function cardTemplate(q) {
+        const isSaved = savedQuestIds.includes(q.id);
+        const isPlanned = serverUserQuests.some(uq => uq.originTemplateId === q.id);
+        return `
+            <div class="dash-card card" onclick="App.quest.openDetailModal(${q.id})">
+                <div class="thumb">${App.escape(q.icon)}</div>
+                <div class="badges">
+                    <span class="badge">${App.escape(q.cat)}</span>
+                    <span class="badge orange">+${q.xp} XP</span>
+                </div>
+                <h3 class="subtitle" style="margin: 8px 0;">${App.escape(q.title)}</h3>
+                <div class="desc">📍 ${App.escape(q.place)} · ⏱ ${App.escape(q.time)}</div>
+                <div class="card-bottom">
+                    <span class="desc" style="color:var(--color-accent); font-weight:bold;">인증 완료 ${q.popular}회</span>
+                    <div class="card-actions">
+                        <button class="small-btn" onclick="event.stopPropagation(); App.quest.toggleSave(${q.id})">
+                            ${isSaved ? '♥' : '♡'}
+                        </button>
+                        <button class="small-btn" onclick="event.stopPropagation(); App.quest.addSchedule(${q.id})">
+                            ${isPlanned ? '담김 ✓' : '+ 일정'}
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function renderQuestCards() {
+        const popularGrid = document.getElementById('popularGrid');
+        const newGrid = document.getElementById('newGrid');
+        const badge = document.getElementById('plannedCountBadge');
+
+        if (badge) badge.textContent = '(' + serverUserQuests.length + ')';
+
+        if (!quests.length) {
+            const emptyHtml = '<div class="desc" style="text-align:center; padding: 40px; grid-column: 1 / -1; width:100%;">DB에 등록된 퀘스트가 없습니다.</div>';
+            if (popularGrid) popularGrid.innerHTML = emptyHtml;
+            if (newGrid) newGrid.innerHTML = emptyHtml;
+            return;
+        }
+
+        if (popularGrid) popularGrid.innerHTML = quests.map(cardTemplate).join('');
+        if (newGrid) newGrid.innerHTML = quests.map(cardTemplate).join('');
+        renderExplorerExtras();
+    }
+
+    function toggleSave(id) {
+        if (savedQuestIds.includes(id)) {
+            savedQuestIds = savedQuestIds.filter(x => x !== id);
+            showToast('컬렉션에서 제외했습니다.', '🤍');
+        } else {
+            savedQuestIds.push(id);
+            showToast('♡ 내 컬렉션에 저장했습니다.');
+        }
+        renderQuestCards();
+    }
+
+    /* 일정 추가 (오직 백엔드 DB 통신만 수행) */
+    function addSchedule(id) {
+        const dateStr = App.dateKey(questCalendarCursor);
+        fetch(contextPath + '/quest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+            body: new URLSearchParams({ templateId: String(id), scheduledDate: dateStr })
+        })
+        .then(res => res.json())
+        .then(json => {
+            if (json && json.success) {
+                showToast('📅 DB 일정에 추가되었습니다!');
+                fetchUserQuestsFromServer();
+            } else {
+                showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
+            }
+        })
+        .catch(() => {
+            showToast('일정 추가 중 통신 오류가 발생했습니다.', '⚠️');
+        });
+    }
+
+    /* 관리 탭 렌더링 (순수 DB 데이터만 출력) */
+    function renderManagement() {
+        const list = document.getElementById('todayList');
+        const totalElem = document.getElementById('totalCount');
+        const doneElem = document.getElementById('doneCount');
+        const xpElem = document.getElementById('xpTotal');
+        const barElem = document.getElementById('progressBar');
+        const badge = document.getElementById('plannedCountBadge');
+
+        if (!list) return;
+
+        const total = serverUserQuests.length;
+        const doneCount = serverUserQuests.filter(x => x.status === 'COMPLETED').length;
+
+        if (totalElem) totalElem.textContent = String(total);
+        if (doneElem) doneElem.textContent = String(doneCount);
+        if (badge) badge.textContent = '(' + total + ')';
+
+        const pct = total ? (doneCount / total) * 100 : 0;
+        if (barElem) barElem.style.width = pct + '%';
+
+        if (!serverUserQuests.length) {
+            list.innerHTML = '<div class="desc" style="text-align:center; padding: 30px;">일정에 담긴 퀘스트가 없습니다.<br>퀘스트 탐색 탭에서 퀘스트를 추가해 보세요!</div>';
+            return;
+        }
+
+        list.innerHTML = serverUserQuests.map(item => {
+            const isCompleted = item.status === 'COMPLETED';
+            return `
+                <div class="quest-row" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px; border-bottom:1px solid var(--color-border, #eee);">
+                    <input type="checkbox" ${isCompleted ? 'checked disabled' : ''} onchange="App.quest.completeQuestAction(${item.id})">
+                    <div class="quest-info" style="flex:1;">
+                        <strong class="subtitle">${App.escape(item.title)}</strong>
+                        <div class="desc">📍 인증반경 ${item.authRadiusM || 100}m · 보상 +${item.rewardXp || 500} XP</div>
+                    </div>
+                    <span class="status ${isCompleted ? 'done' : ''}">${isCompleted ? '완료 ✓' : '미완료'}</span>
+                    <button type="button" class="small-btn" style="color:var(--color-danger, #e53e3e); border:none; background:transparent; cursor:pointer;" onclick="App.quest.deleteScheduleItem(${item.id})">✕</button>
+                </div>`;
+        }).join('');
+    }
+
+    /* 퀘스트 GPS 인증 완료 (백엔드 DB 연동) */
+    function completeQuestAction(userQuestId) {
+        showToast('📍 GPS 위치를 확인하고 있습니다…', '🧭');
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => sendCompleteQuest(userQuestId, pos.coords.latitude, pos.coords.longitude),
+                () => sendCompleteQuest(userQuestId, null, null),
+                { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+            );
+        } else {
+            sendCompleteQuest(userQuestId, null, null);
+        }
+    }
+
+    function sendCompleteQuest(userQuestId, lat, lng) {
+        const params = new URLSearchParams({ userQuestId: String(userQuestId) });
+        if (lat != null) params.append('latitude', String(lat));
+        if (lng != null) params.append('longitude', String(lng));
+
+        fetch(contextPath + '/user-quests/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+            body: params
+        })
+        .then(res => res.json())
+        .then(json => {
+            if (json && json.success) {
+                const reward = json.data && json.data.reward;
+                const earned = (json.data && json.data.earnedXp) || 500;
+                currentXp += earned;
+                const xpElem = document.getElementById('xpTotal');
+                if (xpElem) xpElem.textContent = String(currentXp);
+
+                if (reward && reward.isLevelUp) {
+                    showToast(`🎉 레벨업! [Lv.${reward.currentLevel.level} ${reward.currentLevel.title}] 달성! (+${earned} XP)`, '🏆');
+                } else {
+                    showToast(`🎉 퀘스트 완료! +${earned} XP 획득`);
+                }
+                // 완료된 퀘스트는 DB에서 삭제되므로 서버 일정 목록 즉시 재조회
+                fetchUserQuestsFromServer();
+            } else {
+                showToast(json.message || '위치 인증에 실패했습니다.', '⚠️');
+                fetchUserQuestsFromServer();
+            }
+        })
+        .catch(() => {
+            showToast('완료 처리 중 통신 오류가 발생했습니다.', '⚠️');
+            fetchUserQuestsFromServer();
+        });
+    }
+
+    /* 일정에서 삭제 (오직 백엔드 DB 삭제 요청만 수행) */
+    function deleteScheduleItem(userQuestId) {
+        if (!confirm('이 퀘스트를 여행 일정에서 삭제하시겠습니까?')) return;
+        fetch(contextPath + '/user-quests', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+            body: new URLSearchParams({ userQuestId: String(userQuestId) })
+        })
+        .then(res => res.json())
+        .then(json => {
+            if (json && json.success) {
+                showToast('일정에서 삭제했습니다.', '🗑️');
+                fetchUserQuestsFromServer();
+            } else {
+                showToast(json.message || '삭제에 실패했습니다.', '⚠️');
+            }
+        })
+        .catch(() => {
+            showToast('일정 삭제 요청 중 오류가 발생했습니다.', '⚠️');
+        });
+    }
+
+    function openRegionModal() { document.getElementById('regionModal')?.classList.add('show'); }
+    function applyRegions() { closeModal('regionModal'); showToast('지역 필터 적용됨', '📍'); }
+
+    function openCollectionModal() {
+        const container = document.getElementById('collectionBody');
+        const savedList = quests.filter(q => savedQuestIds.includes(q.id));
+        if (!container) return;
+        if (!savedList.length) {
+            container.innerHTML = '<div class="desc" style="text-align:center; padding:20px;">저장된 컬렉션이 없습니다.</div>';
+        } else {
+            container.innerHTML = savedList.map(q => `
+                <div class="collection-row">
+                    <div style="font-size:24px;">${App.escape(q.icon)}</div>
+                    <div style="flex:1;">
+                        <div class="subtitle">${App.escape(q.title)}</div>
+                        <div class="desc">📍 ${App.escape(q.place)}</div>
+                    </div>
+                    <button class="small-btn" onclick="App.quest.addSchedule(${q.id})">+ 일정</button>
+                </div>
+            `).join('');
+        }
+        document.getElementById('collectionModal')?.classList.add('show');
+    }
+
+    function openTripPickerModal() {
+        document.getElementById('tripListContent').innerHTML = '<button type="button" class="btn btn-secondary" onclick="App.quest.closeModal(\'tripModal\')">오늘의 일정 (기본)</button>';
+        document.getElementById('tripModal')?.classList.add('show');
+    }
+
+    function openDetailModal(id) {
+        const q = quests.find(item => item.id === id);
+        if (!q) return;
+        document.getElementById('detailContent').innerHTML = `
+            <div style="text-align:center; padding: 10px 0;">
+                <div style="font-size:48px;">${App.escape(q.icon)}</div>
+                <h3 class="title" style="margin:10px 0;">${App.escape(q.title)}</h3>
+                <p class="desc">${App.escape(q.place)} · ⏱ ${App.escape(q.time)}</p>
+                <div class="desc" style="margin:10px 0; color:var(--color-primary);">완료 보상: +${q.xp} XP</div>
+                <button class="btn btn-primary" onclick="App.quest.addSchedule(${q.id}); App.quest.closeModal('detailModal');">일정에 추가하기</button>
+            </div>
+        `;
+        document.getElementById('detailModal')?.classList.add('show');
+    }
+
+    function handleSearch(value) {
+        const term = value.trim().toLocaleLowerCase();
+        const clearBtn = document.getElementById('clearSearchBtn');
+        if (clearBtn) clearBtn.style.display = term ? 'flex' : 'none';
+        const searchResults = document.getElementById('searchResults');
+        if (searchResults) searchResults.classList.toggle('active', !!term || questCategory !== '전체');
+        const exploreHome = document.getElementById('exploreHome');
+        if (exploreHome) exploreHome.classList.toggle('is-hidden', !!term);
+        const searchTitle = document.getElementById('searchResultTitle');
+        if (searchTitle) searchTitle.textContent = term ? '“' + value.trim() + '” 검색 결과' : questCategory + ' 퀘스트';
+
+        const filtered = quests.filter(q => (questCategory === '전체' || q.cat === questCategory) && [q.title, q.place, q.cat].join(' ').toLocaleLowerCase().includes(term));
+        const searchGrid = document.getElementById('searchGrid');
+        if (searchGrid) {
+            searchGrid.innerHTML = filtered.length ? filtered.map(cardTemplate).join('') : '<p class="empty-state">검색 결과가 없습니다.</p>';
+        }
+    }
+    function clearSearch() { const inp = document.getElementById('searchInput'); if (inp) inp.value = ''; handleSearch(''); }
+    function setCategory(button, category) {
+        questCategory = category;
+        document.querySelectorAll('.quick .chip').forEach(x => x.classList.toggle('active', x === button));
+        handleSearch(document.getElementById('searchInput')?.value || '');
+    }
+    function renderExplorerExtras() {
+        const mapList = document.getElementById('mapList');
+        if (mapList) {
+            mapList.innerHTML = quests.length
+                ? quests.map(q => '<button type="button" class="map-item" onclick="App.quest.openDetailModal(' + q.id + ')">' + App.escape(q.icon + ' ' + q.title) + '</button>').join('')
+                : '<div class="desc" style="padding:10px;">등록된 퀘스트가 없습니다.</div>';
+        }
+        const courseGrid = document.getElementById('courseGrid');
+        if (courseGrid) {
+            courseGrid.innerHTML = quests.length
+                ? '<button type="button" class="btn btn-secondary" onclick="App.quest.addCourse()">모든 공개 퀘스트 담기</button>'
+                : '<div class="desc">등록된 코스가 없습니다.</div>';
+        }
+    }
+    function addCourse() { quests.forEach(q => addSchedule(q.id)); }
+
+    function switchCalendarMode(mode) {
+        calendarMode = mode;
+        document.getElementById('weekToggleBtn')?.classList.toggle('active', mode === 'week');
+        document.getElementById('monthToggleBtn')?.classList.toggle('active', mode === 'month');
+        const first = new Date(questCalendarCursor);
+        first.setHours(0, 0, 0, 0);
+        if (mode === 'month') first.setDate(1);
+        first.setDate(first.getDate() - first.getDay());
+        const count = mode === 'week' ? 7 : 42;
+        const period = document.getElementById('periodLabel');
+        if (period) period.textContent = questCalendarCursor.getFullYear() + '년 ' + (questCalendarCursor.getMonth() + 1) + '월';
+        const calBody = document.getElementById('calendarBody');
+        if (calBody) {
+            calBody.innerHTML = '<div class="week-grid">' + Array.from({ length: count }, (_, i) => {
+                const d = new Date(first);
+                d.setDate(first.getDate() + i);
+                const isSelected = App.dateKey(d) === App.dateKey(questCalendarCursor);
+                return '<button type="button" class="day ' + (isSelected ? 'selected' : '') + '" onclick="App.quest.selectDate(\'' + App.dateKey(d) + '\')">' + d.getDate() + '</button>';
+            }).join('') + '</div>';
+        }
+    }
+    function selectDate(dateStr) {
+        questCalendarCursor = new Date(dateStr + 'T00:00:00');
+        switchCalendarMode(calendarMode);
+        fetchUserQuestsFromServer();
+    }
+    function moveQuestCalendar(direction) {
+        if (calendarMode === 'week') questCalendarCursor.setDate(questCalendarCursor.getDate() + direction * 7);
+        else { questCalendarCursor.setDate(1); questCalendarCursor.setMonth(questCalendarCursor.getMonth() + direction); }
+        switchCalendarMode(calendarMode);
+        fetchUserQuestsFromServer();
+    }
+
+    function initQuestMap() {
+        if (typeof MapUtil === 'undefined' || typeof kakao === 'undefined' || !kakao.maps) {
+            return;
+        }
+        const container = document.getElementById('questMapContainer');
+        if (!container) return;
+
+        questMap = MapUtil.init('questMapContainer', {
+            lat: 35.1587,
+            lng: 129.1604,
+            level: 6,
+            showControls: true
+        });
+
+        renderQuestMapMarkers();
+    }
+
+    function renderQuestMapMarkers() {
+        if (!questMap || typeof MapUtil === 'undefined') return;
+
+        const markersData = quests
+            .filter(q => q.latitude && q.longitude)
+            .map(q => ({
+                placeId: q.id,
+                name: q.title,
+                latitude: q.latitude,
+                longitude: q.longitude,
+                roadAddress: q.place,
+                themeName: q.cat,
+                themeCode: q.themeCode || 'WALK'
+            }));
+
+        const badge = document.getElementById('questMapBadge');
+        if (badge) {
+            badge.textContent = markersData.length
+                ? ('부산 · 주변 ' + markersData.length + '개')
+                : '부산 · 주변 퀘스트';
+        }
+
+        if (markersData.length > 0) {
+            MapUtil.renderPlaceMarkers(questMap, markersData, {
+                clearPrevious: true,
+                onSelect: (item) => {
+                    openDetailModal(item.placeId);
+                }
+            });
+        }
+    }
+
+    function focusUserLocation() {
+        if (!questMap || typeof MapUtil === 'undefined') {
+            showToast('지도가 아직 준비되지 않았습니다.', '⚠️');
+            return;
+        }
+        showToast('📍 현재 위치로 이동합니다…', '🧭');
+        MapUtil.moveToCurrentLocation(
+            questMap,
+            () => showToast('현재 위치로 이동했습니다.', '📍'),
+            () => showToast('현재 위치를 가져올 수 없습니다.', '⚠️')
+        );
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchQuestsFromServer();
+        fetchUserQuestsFromServer();
+        switchCalendarMode('week');
+        initQuestMap();
+        if (location.hash === '#management') {
+            switchTab('management', document.querySelectorAll('.main-tab-btn')[1]);
+        }
+    });
+
+    App.quest = {
+        switchTab, showToast, closeModal, closeModalOutside, cardTemplate, renderQuestCards,
+        toggleSave, addSchedule, completeQuestAction, deleteScheduleItem,
+        openRegionModal, applyRegions, openCollectionModal, openTripPickerModal,
+        openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
+        addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
+        initQuestMap, renderQuestMapMarkers, focusUserLocation
+    };
 })();

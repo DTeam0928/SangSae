@@ -4,8 +4,8 @@
 <div class="trip-header">
     <div class="trip-selector" onclick="App.quest.openTripPickerModal()">
         <div>
-            <h2 id="currentTripName" class="title">부산 여행</h2>
-            <span id="currentTripDates" class="desc">2026. 9. 22 - 9. 25</span>
+            <h2 id="currentTripName" class="title">오늘의 퀘스트 일정</h2>
+            <span id="currentTripDates" class="desc">실천할 퀘스트를 담고 위치 인증을 진행하세요</span>
         </div>
         <span class="subtitle">▾</span>
     </div>
@@ -63,10 +63,8 @@
         <div class="quest-detail-14 desc">이번 여행에서 획득한 경험치</div>
 
         <div class="quest-detail-15">
-            <strong class="quest-detail-16 subtitle">현재 목표</strong>
-            <span class="desc">부산 퀘스트 10개 완료하기</span>
-            <div class="progressbar"><i class="quest-detail-17"></i></div>
-            <span class="desc">4 / 10 완료</span>
+            <strong class="quest-detail-16 subtitle">위치 인증 팁</strong>
+            <span class="desc">해당 장소 반경 내에서 체크박스를 누르면 즉시 500 XP가 적립됩니다.</span>
         </div>
     </div>
 </div>

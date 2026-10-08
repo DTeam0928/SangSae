@@ -19,13 +19,16 @@ import com.dteam0928.sangsae.web.page.BaseServlet;
 
 //공개 퀘스트를 조회, 상세조회, 일정에 등록
 //QuestTemplate 조회, UserQuest에 등록
-@WebServlet("/quest")
+@WebServlet({"/quest", "/quests"})
 public class QuestServlet extends BaseServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		QuestService questService = app().questService();
+		String accept = request.getHeader("Accept");
+		boolean wantsJson = accept != null && accept.contains("application/json");
+
 		String idParam = request.getParameter("id");
 		if (idParam != null && !idParam.isBlank()) {
 		    Long id = Long.parseLong(idParam);
@@ -36,21 +39,31 @@ public class QuestServlet extends BaseServlet {
 		    	response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		    	return;
 		    }
+		    if (wantsJson) {
+		        response.setContentType("application/json;charset=UTF-8");
+		        response.getWriter().write(com.dteam0928.sangsae.common.util.JsonUtil.toJson(com.dteam0928.sangsae.common.web.ApiResponse.ok(questDetail)));
+		        return;
+		    }
 		    request.setAttribute("quest", questDetail);
 		    request.setAttribute("place", questDetail.place());
-		    //경로는 추후 통합되고 나면 수정
 		    request.getRequestDispatcher("/WEB-INF/views/quest/quest.jsp").forward(request, response);
 		    return;
 		}
 		String category = request.getParameter("category");
-		List<QuestTemplate> quests;
-		if(category==null||category.isBlank()) {
-			quests = questService.getPublicQuests();
-		}else {
-			quests = questService.getPublicQuestsByCategory(category);
+		LoginUser loginUser = LoginSession.current(request);
+		Long userId = (loginUser != null) ? loginUser.getId() : null;
+		List<QuestDetailResponseDto> quests;
+		if (category == null || category.isBlank()) {
+			quests = questService.getPublicQuestDetails(userId);
+		} else {
+			quests = questService.getPublicQuestDetailsByCategory(category, userId);
+		}
+		if (wantsJson) {
+		    response.setContentType("application/json;charset=UTF-8");
+		    response.getWriter().write(com.dteam0928.sangsae.common.util.JsonUtil.toJson(com.dteam0928.sangsae.common.web.ApiResponse.ok(quests)));
+		    return;
 		}
 		request.setAttribute("quests", quests);
-		//경로는 추후 통합되고 나면 수정
 		request.getRequestDispatcher("/WEB-INF/views/quest/quest.jsp").forward(request, response);
 	}
 	
@@ -59,7 +72,15 @@ public class QuestServlet extends BaseServlet {
 	        throws ServletException, IOException {
 		QuestService questService = app().questService();
 	    request.setCharacterEncoding("UTF-8");
-	    Long templateId = Long.parseLong(request.getParameter("templateId"));
+	    String accept = request.getHeader("Accept");
+	    boolean wantsJson = accept != null && accept.contains("application/json");
+
+	    String templateIdParam = request.getParameter("templateId");
+	    if (templateIdParam == null || templateIdParam.isBlank()) {
+	        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "templateId가 필요합니다.");
+	        return;
+	    }
+	    Long templateId = Long.parseLong(templateIdParam.trim());
 	    LoginUser loginUser = LoginSession.current(request);
 	    if (loginUser == null) {
 	        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
@@ -70,7 +91,12 @@ public class QuestServlet extends BaseServlet {
 	    Long tripId = (tripIdParam == null || tripIdParam.isBlank())
 	            ? null
 	            : Long.parseLong(tripIdParam);
-	    LocalDate scheduledDate = LocalDate.parse(request.getParameter("scheduledDate"));
+
+	    String scheduledDateParam = request.getParameter("scheduledDate");
+	    LocalDate scheduledDate = (scheduledDateParam != null && !scheduledDateParam.isBlank())
+	            ? LocalDate.parse(scheduledDateParam.trim())
+	            : LocalDate.now();
+
 	    String targetTimeParam = request.getParameter("targetTime");
 	    LocalTime targetTime = null;
 	    if (targetTimeParam != null && !targetTimeParam.isBlank())
@@ -91,6 +117,11 @@ public class QuestServlet extends BaseServlet {
 	        response.sendError(HttpServletResponse.SC_NOT_FOUND);
 	        return;
 	    }
-	    response.sendRedirect(request.getContextPath() + "/quests?id=" + templateId);
+	    if (wantsJson) {
+	        response.setContentType("application/json;charset=UTF-8");
+	        response.getWriter().write(com.dteam0928.sangsae.common.util.JsonUtil.toJson(com.dteam0928.sangsae.common.web.ApiResponse.ok(userQuest)));
+	        return;
+	    }
+	    response.sendRedirect(request.getContextPath() + "/quest?id=" + templateId);
 	}
 }

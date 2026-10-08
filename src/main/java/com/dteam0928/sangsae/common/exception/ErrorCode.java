@@ -15,6 +15,7 @@ public enum ErrorCode {
     INVALID_INPUT(400, null, "입력값을 확인해 주세요."),
     UNAUTHORIZED(401, null, "로그인이 필요합니다."),
     INTERNAL_ERROR(500, null, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."),
+    NOT_FOUND(404, null, "요청한 정보를 찾을 수 없습니다."),
 
     // 이메일
     EMAIL_REQUIRED(400, "email", "이메일을 입력해 주세요."),
@@ -48,7 +49,13 @@ public enum ErrorCode {
     INTEREST_REQUIRED(400, "interests", "최소 1개 이상 선택해주세요."),
     INTEREST_LIMIT(400, "interests", "관심사는 최대 {0}개까지 선택할 수 있습니다."),
     INTEREST_INVALID(400, "interests", "선택할 수 없는 관심사가 포함되어 있습니다."),
-    LOCATION_INVALID(400, "location", "위치 정보가 올바르지 않습니다.");
+    LOCATION_INVALID(400, "location", "위치 정보가 올바르지 않습니다."),
+
+    // 루틴 탐색
+    ROUTINE_NOT_FOUND(404, null, "루틴을 찾을 수 없습니다."),
+    PLACE_NOT_FOUND(404, "place", "장소를 찾을 수 없습니다."),
+    PLACE_INVALID(400, "place", "장소 정보가 올바르지 않습니다."),
+    PLACE_LIMIT(400, "place", "자주 가는 장소는 최대 {0}개까지 등록할 수 있습니다.");
 
     private final int status;
     private final String field;
