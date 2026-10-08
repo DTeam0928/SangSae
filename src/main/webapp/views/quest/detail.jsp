@@ -30,7 +30,7 @@
 			<div id="quest-mini-map" style="width: 100%; height: 220px; margin-top: 10px; border-radius: 6px; border: 1px solid #cbd5e1;"></div>
 		</div>
 
-		<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=<%= com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() != null ? com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() : "" %>&libraries=services,clusterer"></script>
+		<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=<%= com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() != null ? com.dteam0928.sangsae.common.util.ConfigUtil.getKakaoJsApiKey() : "" %>&libraries=services,clusterer"></script>
 		<script src="${pageContext.request.contextPath}/assets/js/mapUtil.js"></script>
 		<script>
 			window.addEventListener('DOMContentLoaded', function() {

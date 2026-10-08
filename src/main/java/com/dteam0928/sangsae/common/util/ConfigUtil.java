@@ -2,13 +2,12 @@ package com.dteam0928.sangsae.common.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -32,8 +31,13 @@ public final class ConfigUtil {
     private ConfigUtil() {}
 
     public static synchronized void initFromRealPath(String realPath) {
+        if (envLoaded && !ENV_CACHE.isEmpty()) {
+            return;
+        }
         if (realPath != null && !realPath.isBlank()) {
-            findAndParseDotEnv(new File(realPath));
+            if (searchUpwardForDotEnv(new File(realPath), 10)) {
+                envLoaded = true;
+            }
         }
     }
 
@@ -42,51 +46,104 @@ public final class ConfigUtil {
             return;
         }
 
-        List<File> candidates = new ArrayList<>();
-        candidates.add(new File("C:/Dev/Sangsae/.env"));
-        candidates.add(new File("C:\\Dev\\Sangsae\\.env"));
-
-        // Tomcat 배포 구동 시 user.dir이 프로젝트 루트가 아닌 CATALINA_BASE/bin을 가리키므로,
-        // 로컬 실행 및 다양한 배포 환경에서 프로젝트 루트 .env를 정상 감지하기 위해 상위 디렉터리 역추적 탐색 수행.
-        String userDir = System.getProperty("user.dir");
-        if (userDir != null) {
-            File current = new File(userDir);
-            for (int i = 0; i < 5 && current != null; i++) {
-                candidates.add(new File(current, ".env"));
-                current = current.getParentFile();
+        // 1. 현재 작업 경로 및 상위 디렉터리 상대경로 직접 탐색
+        String[] relativePaths = {
+            ".env",
+            "../.env",
+            "../../.env",
+            "../../../.env",
+            "../../../../.env"
+        };
+        for (String relPath : relativePaths) {
+            File file = new File(relPath);
+            if (parseFile(file)) {
+                envLoaded = true;
+                return;
             }
         }
 
+        // 2. 시스템 프로퍼티 또는 환경변수로 명시적 경로가 지정된 경우 우선 탐색
+        String explicitPath = System.getProperty("env.file");
+        if (explicitPath == null || explicitPath.isBlank()) {
+            explicitPath = System.getenv("ENV_PATH");
+        }
+        if (explicitPath == null || explicitPath.isBlank()) {
+            explicitPath = System.getenv("DOTENV_PATH");
+        }
+        if (explicitPath != null && !explicitPath.isBlank()) {
+            if (parseFile(new File(explicitPath.trim()))) {
+                envLoaded = true;
+                return;
+            }
+        }
+
+        // 3. user.dir 기준 상위 디렉터리 역추적 탐색
+        String userDir = System.getProperty("user.dir");
+        if (userDir != null && searchUpwardForDotEnv(new File(userDir), 10)) {
+            envLoaded = true;
+            return;
+        }
+
+        // 4. CodeSource 위치(classes/JAR 디렉터리) 기준 상위 디렉터리 역추적 탐색
         try {
             URL location = ConfigUtil.class.getProtectionDomain().getCodeSource().getLocation();
             if (location != null) {
                 File current = new File(location.toURI());
-                for (int i = 0; i < 7 && current != null; i++) {
-                    candidates.add(new File(current, ".env"));
-                    current = current.getParentFile();
+                if (searchUpwardForDotEnv(current, 10)) {
+                    envLoaded = true;
+                    return;
                 }
             }
         } catch (Exception ignored) {
         }
 
-        for (File file : candidates) {
-            if (parseFile(file)) {
-                envLoaded = true;
-                break;
+        // 5. 클래스패스 루트 URL 기준 상위 디렉터리 역추적 탐색
+        try {
+            URL resourceUrl = ConfigUtil.class.getResource("/");
+            if (resourceUrl != null) {
+                File current = new File(resourceUrl.toURI());
+                if (searchUpwardForDotEnv(current, 10)) {
+                    envLoaded = true;
+                    return;
+                }
             }
+        } catch (Exception ignored) {
+        }
+
+        // 6. 클래스패스 리소스 스트림 폴백 (빌드 시 클래스패스에 .env가 복사되었거나 패키징된 경우 대응)
+        InputStream is = ConfigUtil.class.getClassLoader().getResourceAsStream(".env");
+        if (is == null) {
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(".env");
+        }
+        if (is != null && parseStream(is, "classpath:/.env")) {
+            envLoaded = true;
         }
     }
 
-    private static void findAndParseDotEnv(File startDir) {
-        File current = startDir;
-        for (int i = 0; i < 7 && current != null; i++) {
+    private static boolean searchUpwardForDotEnv(File start, int maxLevels) {
+        if (start == null || !start.exists()) {
+            return false;
+        }
+
+        File current = start.isDirectory() ? start : start.getParentFile();
+        for (int i = 0; i < maxLevels && current != null; i++) {
             File envFile = new File(current, ".env");
             if (parseFile(envFile)) {
-                envLoaded = true;
-                break;
+                return true;
             }
+
+            // Eclipse WTP 배포 환경(.metadata/.../wtpwebapps) 감지 시 워크스페이스 루트 내 프로젝트 디렉터리 탐색
+            if (".metadata".equalsIgnoreCase(current.getName()) && current.getParentFile() != null) {
+                File workspaceRoot = current.getParentFile();
+                if (parseFile(new File(workspaceRoot, "Sangsae/.env"))
+                        || parseFile(new File(workspaceRoot, "sangsae/.env"))) {
+                    return true;
+                }
+            }
+
             current = current.getParentFile();
         }
+        return false;
     }
 
     private static boolean parseFile(File file) {
@@ -94,12 +151,25 @@ public final class ConfigUtil {
             return false;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+        try (InputStream is = new FileInputStream(file)) {
+            return parseStream(is, file.getAbsolutePath());
+        } catch (Exception e) {
+            System.err.println("[SangSae ConfigUtil] Failed to parse .env (" + file.getAbsolutePath() + "): " + e.getMessage());
+            return false;
+        }
+    }
+
+    private static boolean parseStream(InputStream is, String sourceDesc) {
+        if (is == null) {
+            return false;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 
-                // Windows 텍스트 에디터(메모장 등)가 파일 선두에 UTF-8 BOM(\uFEFF)을 삽입하여 첫 번째 키 매칭이 실패하는 현상 방지.
+                // Windows 텍스트 에디터(메모장 등) 편집 시 선두에 삽입되는 UTF-8 BOM(\uFEFF) 제거
                 if (line.startsWith("\uFEFF")) {
                     line = line.substring(1).trim();
                 }
@@ -122,10 +192,10 @@ public final class ConfigUtil {
                     ENV_CACHE.putIfAbsent(key, val);
                 }
             }
-            System.out.println("[SangSae ConfigUtil] .env loaded from: " + file.getAbsolutePath());
+            System.out.println("[SangSae ConfigUtil] .env loaded from: " + sourceDesc);
             return true;
         } catch (Exception e) {
-            System.err.println("[SangSae ConfigUtil] Failed to parse .env (" + file.getAbsolutePath() + "): " + e.getMessage());
+            System.err.println("[SangSae ConfigUtil] Failed to parse .env (" + sourceDesc + "): " + e.getMessage());
             return false;
         }
     }
