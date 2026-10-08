@@ -522,4 +522,74 @@ public class QuestService {
             )
         );
     }
+    
+ // 새로운 퀘스트 생성
+    public QuestTemplate createQuest(
+            Long creatorId,
+            Long placeId,
+            String title,
+            String description,
+            String category,
+            int estimatedMinutes,
+            int rewardXp,
+            String authType,
+            String visibility) {
+
+        if (creatorId == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+
+        if (title == null || title.isBlank() || title.length() > 150) {
+            throw new IllegalArgumentException("퀘스트 제목은 1~150자로 입력해야 합니다.");
+        }
+
+        if (category == null || category.isBlank() || category.length() > 50) {
+            throw new IllegalArgumentException("카테고리를 올바르게 입력해야 합니다.");
+        }
+
+        if (estimatedMinutes <= 0 || rewardXp < 0) {
+            throw new IllegalArgumentException("소요 시간 또는 보상 XP가 올바르지 않습니다.");
+        }
+
+        if (!"NONE".equals(authType)
+                && !"LOCATION".equals(authType)
+                && !"PHOTO".equals(authType)
+        		&& !"TEXT".equals(authType)) {
+            throw new IllegalArgumentException("지원하지 않는 인증 방식입니다.");
+        }
+
+        if ("LOCATION".equals(authType) && placeId == null) {
+            throw new IllegalArgumentException("위치 인증에는 장소가 필요합니다.");
+        }
+
+        if (!"PUBLIC".equals(visibility)
+                && !"PRIVATE".equals(visibility)) {
+            throw new IllegalArgumentException("공개 범위가 올바르지 않습니다.");
+        }
+
+        QuestTemplate quest = new QuestTemplate(
+                null,
+                creatorId,
+                placeId,
+                title.trim(),
+                description,
+                category.trim(),
+                estimatedMinutes,
+                rewardXp,
+                authType,
+                visibility,
+                null,
+                0,
+                0,
+                LocalDateTime.now()
+        );
+
+        return tx.inTransaction(em -> {
+            if (placeId != null && placeService.getPlaceById(placeId) == null) {
+                throw new IllegalArgumentException("존재하지 않는 장소입니다.");
+            }
+
+            return questRepository.save(em, quest);
+        });
+    }
 }

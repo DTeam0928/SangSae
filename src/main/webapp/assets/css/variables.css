@@ -1,4 +1,7 @@
-/* ---------- 0. 외부 구글 폰트 로드 ---------- */
+/* variables.css — 디자인 시스템 토큰과 폰트 등록만 관리합니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap');
 
 /* ---------- 1. 폰트 정의 (fonts) ---------- */
@@ -7,12 +10,7 @@
     src: url('nelnalizzychae2020.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-}
-
-@font-face {
-    font-family: 'IBM Plex Sans KR';
-    font-weight: normal;
-    font-style: normal;
+    font-display: swap;
 }
 
 /* ---------- 2. 디자인 정의 (style guide) ---------- */
@@ -49,9 +47,11 @@
     --font-logo: 'NalnaRiji', sans-serif;
     --font-body: 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-    /* 타이포그래피 스케일 */
+    /* 온보딩 대형 로고 크기 (--fs-a) */
     --fs-a: 128px;
+    /* 대형 강조 글자 크기 (--fs-b) */
     --fs-b: 36px;
+
     --fs-h1: 25px;  --fw-h1: 850;
     --fs-h2: 19px;  --fw-h2: 800;
     --fs-h3: 16px; --fw-h3: 730;
@@ -59,11 +59,51 @@
     --fs-small: 12px; --fw-small: 600;
 
     /* 라운드/그림자 */
+    /* 카드, 모달 곡률 (--radius-lg) */
     --radius-lg: 16px;
+    /* 내부 패널 곡률 (--radius-md) */
     --radius-md: 12px;
+    /* 버튼과 입력란 곡률 (--radius-sm) */
     --radius-sm: 8px;
+    /* 카드 그림자 (--shadow-card) */
     --shadow-card: 0 4px 20px rgba(30, 70, 90, 0.04);
-}
+
+    /* 기본 모달 배경 덮개 (--color-overlay) */
+    --color-overlay: rgba(20,30,40,.45);
+    /* 모달 그림자 (--shadow-modal) */
+    --shadow-modal: 0 20px 60px rgba(0,0,0,.18);
+    /* 기존 보조 글자색 변수의 호환 별칭 (--color-text-secondary) */
+    --color-text-secondary: var(--color-muted);
+    /* --color-overlay-strong 디자인 기준값 */
+    --color-overlay-strong: rgba(18,38,48,.6);
+    /* --radius-pill 디자인 기준값 */
+    --radius-pill: 999px;
+    /* --radius-xs 디자인 기준값 */
+    --radius-xs: 6px;
+    /* --fs-label 디자인 기준값 */
+    --fs-label: 13px;
+    /* --fs-stat 디자인 기준값 */
+    --fs-stat: 20px;
+    /* --shadow-pin 디자인 기준값 */
+    --shadow-pin: 0 4px 14px rgba(15,23,42,.22);
+    /* --color-pulse 디자인 기준값 */
+    --color-pulse: rgba(14,165,233,.4);
+    /* --color-pulse-clear 디자인 기준값 */
+    --color-pulse-clear: var(--color-pulse-clear);
+    /* --z-header 디자인 기준값 */
+    --z-header: 30;
+    /* --z-modal 디자인 기준값 */
+    --z-modal: 100;
+    /* --z-menu 디자인 기준값 */
+    --z-menu: 150;
+    /* --z-modal-large 디자인 기준값 */
+    --z-modal-large: 200;
+    /* --z-toast 디자인 기준값 */
+    --z-toast: 300;
+    /* 공통 콘텐츠 최대 너비 (--container-max) */
+    --container-max: 1200px;
+    /* 12칼럼 기본 간격 (--grid-gap) */
+    --grid-gap: 24px;}
 
 /* ---------- 3. 바디 기본 세팅 (body) ---------- */
 * { box-sizing: border-box; }
@@ -74,54 +114,54 @@ a { color: inherit; }
 img { max-width: 100%; display: block; }
 
 /* ---------- 4. 헤더 스타일 (header) ---------- */
-        .header {
-            height: 74px;
-            background: var(--color-white);
-            border-bottom: 1px solid var(--color-border2);
-            display: flex;
-            align-items: center;
-            padding: 0 32px;
-            position: sticky;
-            top: 0;
-            z-index: 30;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            font-family: var(--font-logo), sans-serif;
-            font-size: 30px;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-            color: var(--color-dark);
-            margin-right: 90px;
-            text-decoration: none;
-        }
+.header {
+    height: 74px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border2);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-logo), sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: var(--color-dark);
+    margin-right: 90px;
+    text-decoration: none;
+}
 
-        .logo img {
-            height: 32px;
-            width: auto;
-            margin-right: 10px;
-            object-fit: contain;
-        }
-        .nav { display: flex; gap: 38px; height: 100%; align-items: center;
-            font-family: var(--font-body), sans-serif;}
-        .nav a {
-            color: var(--color-text);
-            text-decoration: none;
-            font-size: var(--fs-body);
-            font-weight: var(--fw-body);
-        }
-        .nav a.active { color: var(--color-dark); font-weight: var(--fw-h2); }
+.logo img {
+    height: 32px;
+    width: auto;
+    margin-right: 10px;
+    object-fit: contain;
+}
+.nav { display: flex; gap: 38px; height: 100%; align-items: center;
+    font-family: var(--font-body), sans-serif;}
+.nav a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-body);
+}
+.nav a.active { color: var(--color-dark); font-weight: var(--fw-h2); }
 
 /* --------- 4. 공통 폼 요소 (form) ---------- */
 .form-input, .form-select {
-  width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  outline: none;
-  font-size: var(--fs-body);
-  background: var(--color-white);
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    outline: none;
+    font-size: var(--fs-body);
+    background: var(--color-white);
 }
 .form-input:focus, .form-select:focus { border-color: var(--color-dark); }
 .form-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-text); }
@@ -129,18 +169,18 @@ img { max-width: 100%; display: block; }
 /*-- 임시 --*/
 
 .container {
-  width: min(1080px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 38px 0 80px;
+    width: min(1080px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 38px 0 80px;
 }
 
 .section-title {
-  font-size: var(--fs-h2);
-  font-weight: var(--fw-h2);
-  margin-bottom: 17px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-h2);
+    margin-bottom: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /*--정렬됨--*/
