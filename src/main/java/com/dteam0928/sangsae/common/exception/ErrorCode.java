@@ -55,7 +55,22 @@ public enum ErrorCode {
     ROUTINE_NOT_FOUND(404, null, "루틴을 찾을 수 없습니다."),
     PLACE_NOT_FOUND(404, "place", "장소를 찾을 수 없습니다."),
     PLACE_INVALID(400, "place", "장소 정보가 올바르지 않습니다."),
-    PLACE_LIMIT(400, "place", "자주 가는 장소는 최대 {0}개까지 등록할 수 있습니다.");
+    PLACE_LIMIT(400, "place", "자주 가는 장소는 최대 {0}개까지 등록할 수 있습니다."),
+
+     // 루틴 관리
+    ROUTINE_TITLE_INVALID(400, "title", "루틴 이름을 {0}자 이내로 입력해 주세요."),
+    ROUTINE_PERIOD_INVALID(400, "endDate", "운영 기간을 확인해 주세요. 종료일은 시작일 이후여야 합니다."),
+    ROUTINE_CATEGORY_INVALID(400, "categories", "공개 루틴은 카테고리를 1~{0}개 선택해 주세요."),
+    ROUTINE_TAG_INVALID(400, "tags", "태그는 {0}개까지, 각 {1}자 이내로 입력해 주세요."),
+    ROUTINE_DESCRIPTION_INVALID(400, "description", "설명은 {0}자 이내로 입력해 주세요."),
+    ROUTINE_VISIBILITY_LOCKED(400, "visibility", "탐색 탭에서 추가한 루틴은 공개할 수 없습니다."),
+    TASK_NOT_FOUND(404, null, "Task를 찾을 수 없습니다."),
+    TASK_CONTENT_INVALID(400, "content", "루틴 내용을 {0}자 이내로 입력해 주세요."),
+    TASK_TIME_INVALID(400, "time", "시간을 입력해 주세요."),
+    TASK_CATEGORY_INVALID(400, "category", "카테고리를 선택해 주세요."),
+    TASK_REPEAT_INVALID(400, "repeatType", "반복 설정을 확인해 주세요. 요일 반복은 요일을, 1회성은 운영 기간 안의 날짜를 선택해 주세요."),
+    TASK_ALERT_INVALID(400, "alertTime", "알림 시간을 확인해 주세요."),
+    TASK_MEMO_INVALID(400, "memo", "메모는 {0}자 이내로 입력해 주세요.");
 
     private final int status;
     private final String field;
