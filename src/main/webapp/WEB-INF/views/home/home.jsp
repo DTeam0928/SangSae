@@ -60,7 +60,7 @@
         <section class="dash-card xp-card">
             <div class="dash-card-header">
                 <div class="dash-title">
-                    <c:out value="${ui.xpTitle}" default="나의 칭호" />
+                    <c:out value="${homeModel.ui.xpTitle}" default="나의 칭호" />
                 </div>
 
                 <span class="badge xp-badge" id="user-title-badge">

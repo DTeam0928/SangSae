@@ -66,6 +66,10 @@ public class HomeDashboardService {
                 ? experienceService.getUserLevelInfo(userId)
                 : new LevelInfo(1, "새싹 탐험가", totalXp, totalXp, 1000 - totalXp, 0.0, false);
 
+        model.getUi().setXpTitle(
+                "Lv." + levelInfo.level() + " " + levelInfo.title()
+        );
+
         // 2. 오늘의 퀘스트 현황 수집
         int questDoneCount = 0;
         int questRemainingCount = 0;
