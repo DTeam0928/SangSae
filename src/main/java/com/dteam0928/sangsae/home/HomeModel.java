@@ -159,11 +159,9 @@ public class HomeModel {
             ));
 
             // 2. 통계 카드 설정
-            statsCards.add(new StatsCardConfig("퀘스트 달성 현황", List.of(
+            statsCards.add(new StatsCardConfig("오늘의 달성 현황", List.of(
                     new StatItemConfig("완료한 퀘스트", "questDone", "개", true),
-                    new StatItemConfig("남은 퀘스트", "questRemaining", "개", false)
-            )));
-            statsCards.add(new StatsCardConfig("루틴 달성 현황", List.of(
+                    new StatItemConfig("남은 퀘스트", "questRemaining", "개", false),
                     new StatItemConfig("완료한 루틴", "routineDone", "개", true),
                     new StatItemConfig("남은 루틴", "routineRemaining", "개", false)
             )));
