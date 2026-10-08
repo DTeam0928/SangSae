@@ -1,7 +1,7 @@
 <div class="modal-bg" id="collectionModal" onclick="App.quest.closeModalOutside(event, 'collectionModal')">
     <div class="modal">
         <div class="modal-head">
-            <h2 class="title">♡ 내 컬렉션</h2>
+            <h2 class="title">♡ 내 북마크</h2>
             <button class="close" onclick="App.quest.closeModal('collectionModal')">×</button>
         </div>
         <div id="collectionBody"></div>
