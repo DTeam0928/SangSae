@@ -1,16 +1,13 @@
+/* routine.css — 루틴 지도·달력·시간표의 고유 스타일입니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
 
-/* ===== 루틴 메인 페이지 고유 스타일 ===== */
-body {
-    background-color: var(--color-bg);
+/* .routine-container: 너비 min(1220px,calc(100% - 28px))를 적용합니다. */
+.routine-container {
+    width: min(1220px,calc(100% - 28px));
 }
 
-.logo-font {
-    font-family: var(--font-logo);
-    letter-spacing: 0.5px;
-}
-
-button, input, select, textarea { font: inherit; }
-
+/* 탭 전환 클래스 */
 .main-tabs {
     display: flex;
     gap: 8px;
@@ -33,22 +30,7 @@ button, input, select, textarea { font: inherit; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-.modal-bg { display: none; }
-.modal-bg.show { display: flex; }
-
-.toast {
-    opacity: 0;
-    transform: translateY(12px);
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-}
-.toast.show {
-    opacity: 1;
-    transform: none;
-}
-
-
-/* ===== 루틴 탐색 탭 고유 스타일 ===== */
+/* 루틴 지도 영역: 높이 430px, 모서리 곡률 var(--radius-lg), 넘친 내용 처리 hidden, 배치 기준 relative, 배경 linear-gradient(135deg, var(--color-sub-bg) 0%, var(--color-sub-bg) 100%)를 적용합니다. */
 .map-wrap {
     height: 430px;
     border-radius: var(--radius-lg);
@@ -58,6 +40,7 @@ button, input, select, textarea { font: inherit; }
     border: 1px solid var(--color-border);
 }
 
+/* .map-grid-bg: 배치 기준 absolute, inset 0, background-image radial-gradient(var(--color-dark) 1px, transparent 1px), background-size 24px 24px, 불투명도 0.15를 적용합니다. */
 .map-grid-bg {
     position: absolute;
     inset: 0;
@@ -66,82 +49,62 @@ button, input, select, textarea { font: inherit; }
     opacity: 0.15;
 }
 
+/* .map-pin: 배치 기준 absolute, 너비 36px, 높이 36px, 모서리 곡률 50% 50% 50% 0, 위치·크기 변환 rotate(-45deg) translate(-50%, -50%)를 적용합니다. */
 .map-pin {
     position: absolute;
-    width: 36px; height: 36px;
+    width: 36px;
+    height: 36px;
     border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg) translate(-50%, -50%);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px rgba(15,23,42,.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-pin);
     border: 3px solid var(--color-white);
     cursor: pointer;
     transition: transform 0.2s;
 }
-.map-pin:hover { transform: rotate(-45deg) translate(-50%, -50%) scale(1.15); }
-.map-pin span { transform: rotate(45deg); font-size: 15px; }
 
+/* .map-pin 마우스 호버 상태: 위치·크기 변환 rotate(-45deg) translate(-50%, -50%) scale(1.15)를 적용합니다. */
+.map-pin:hover {
+    transform: rotate(-45deg) translate(-50%, -50%) scale(1.15);
+}
+
+/* .map-pin: 위치·크기 변환 rotate(45deg), 글자 크기 15px를 적용합니다. */
+.map-pin span {
+    transform: rotate(45deg);
+    font-size: 15px;
+}
+
+/* .user-dot: 배치 기준 absolute, 너비 18px, 높이 18px, 모서리 곡률 50%, 배경 var(--color-dark)를 적용합니다. */
 .user-dot {
-    position: absolute; width: 18px; height: 18px;
-    border-radius: 50%; background: var(--color-dark);
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-dark);
     border: 4px solid var(--color-white);
     box-shadow: 0 2px 10px var(--color-muted);
     transform: translate(-50%, -50%);
     animation: pulse-ring 2s infinite;
 }
 
+/* 화면 전환 애니메이션: @keyframes pulse-ring */
 @keyframes pulse-ring {
-    0% { box-shadow: 0 0 0 0 rgba(14,165,233,0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(14,165,233,0); }
-    100% { box-shadow: 0 0 0 0 rgba(14,165,233,0); }
-}
+    /* 0%: 그림자 0 0 0 0 var(--color-pulse)를 적용합니다. */
+    0% {
+        box-shadow: 0 0 0 0 var(--color-pulse);
+    }
 
-.day-chip {
-    border: 1px solid var(--color-border);
-    border-radius: 11px;
-    background: var(--color-white);
-    padding: 7px 11px;
-    font-size: var(--fs-small);
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-}
-.day-chip.active {
-    border-color: var(--color-dark);
-    background: var(--color-main);
-    color: var(--color-text);
-}
+    /* 70%: 그림자 0 0 0 10px var(--color-pulse-clear)를 적용합니다. */
+    70% {
+        box-shadow: 0 0 0 10px var(--color-pulse-clear);
+    }
 
-.place-card {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-white);
-    padding: 15px;
-    cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.place-card.active {
-    border-color: var(--color-dark);
-    box-shadow: 0 0 0 2px var(--color-sub-bg);
-}
-
-.pill {
-    font-size: 10px;
-    font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: var(--color-main);
-    color: var(--color-text);
-    display: inline-block;
-    line-height: normal;
-}
-
-.card {
-    transition: transform 0.18s, box-shadow 0.18s;
-}
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card);
-}
+    /* 100%: 그림자 0 0 0 0 var(--color-pulse-clear)를 적용합니다. */
+    100% {
+        box-shadow: 0 0 0 0 var(--color-pulse-clear);
+    }
 
 .empty {
     padding: 35px;
@@ -151,45 +114,65 @@ button, input, select, textarea { font: inherit; }
     border: 1px dashed var(--color-border);
     border-radius: var(--radius-md);
 }
-
+/* 반응형 또는 사용자 동작 설정: @media(max-width:700px) */
 @media(max-width:700px) {
-    .map-wrap { height: 350px; }
+    /* 루틴 지도 영역: 높이 350px를 적용합니다. */
+    .map-wrap {
+        height: 350px;
+    }
+
 }
-
-
-/* ===== 루틴 관리 탭 고유 스타일 ===== */
+/* 루틴 시간표 헤더 / 루틴 시간표 행: 표시 방식 grid, 그리드 열 구성 48px 105px minmax(0,1fr) 68px, 교차축 정렬 stretch를 적용합니다. */
 .tt-head, .tt-row {
     display: grid;
     grid-template-columns: 48px 105px minmax(0,1fr) 68px;
     align-items: stretch;
 }
+
+/* 루틴 시간표 헤더: 배경 var(--color-bg), 글자색 var(--color-muted), 글자 크기 var(--fs-small), 글자 두께 800를 적용합니다. */
 .tt-head {
     background: var(--color-bg);
     color: var(--color-muted);
     font-size: var(--fs-small);
     font-weight: 800;
 }
+
+/* 루틴 시간표 헤더 / 루틴 시간표 행: 안쪽 여백 10px 12px, border-right 1px solid var(--color-border)를 적용합니다. */
 .tt-head > div, .tt-row > div {
     padding: 10px 12px;
     border-right: 1px solid var(--color-border);
 }
-.tt-head > div:last-child, .tt-row > div:last-child { border-right: 0; }
 
+/* 루틴 시간표 헤더 / 루틴 시간표 행: border-right 0를 적용합니다. */
+.tt-head > div:last-child, .tt-row > div:last-child {
+    border-right: 0;
+}
+
+/* 루틴 시간표 행: 최소 높이 76px, border-top 1px solid var(--color-border), cursor pointer를 적용합니다. */
 .tt-row {
     min-height: 76px;
     border-top: 1px solid var(--color-border);
     cursor: pointer;
 }
-.tt-row:hover { background: var(--color-bg); }
+
+/* 루틴 시간표 행 마우스 호버 상태: 배경 var(--color-bg)를 적용합니다. */
+.tt-row:hover {
+    background: var(--color-bg);
+}
+
+/* 루틴 시간표 행 / .selected 활성 상태: 배경 var(--color-main), 그림자 inset 3px 0 var(--color-dark)를 적용합니다. */
 .tt-row.selected {
     background: var(--color-main);
     box-shadow: inset 3px 0 var(--color-dark);
 }
+
+/* 루틴 시간표 행 / .done / .task-title: text-decoration line-through, 글자색 var(--color-muted)를 적용합니다. */
 .tt-row.done .task-title {
     text-decoration: line-through;
     color: var(--color-muted);
 }
 
+/* .timeline-table: 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-md), 넘친 내용 처리 hidden, 배경 var(--color-white)를 적용합니다. */
 .timeline-table {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -197,11 +180,14 @@ button, input, select, textarea { font: inherit; }
     background: var(--color-white);
 }
 
+/* .cal-grid: 표시 방식 grid, 그리드 열 구성 repeat(7, minmax(0,1fr)), 요소 간 간격 6px를 적용합니다. */
 .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0,1fr));
     gap: 6px;
 }
+
+/* 루틴 달력 날짜 셀: 최소 높이 84px, 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-md), 배경 var(--color-white), 안쪽 여백 9px를 적용합니다. */
 .cal-day-box {
     min-height: 84px;
     border: 1px solid var(--color-border);
@@ -211,29 +197,74 @@ button, input, select, textarea { font: inherit; }
     cursor: pointer;
     position: relative;
 }
-.cal-day-box:hover { border-color: var(--color-dark); }
+
+/* 루틴 달력 날짜 셀 마우스 호버 상태: border-color var(--color-dark)를 적용합니다. */
+.cal-day-box:hover {
+    border-color: var(--color-dark);
+}
+
+/* 루틴 달력 날짜 셀 / .selected 활성 상태: 테두리 2px solid var(--color-dark), 배경 var(--color-main)를 적용합니다. */
 .cal-day-box.selected {
     border: 2px solid var(--color-dark);
     background: var(--color-main);
 }
-.cal-day-box.muted { opacity: .42; }
 
-.cal-day-name { font-size: 10px; font-weight: 800; color: var(--color-muted); }
-.cal-date-num { font-size: 18px; font-weight: 900; margin-top: 3px; }
-.cal-dots { display: flex; gap: 3px; margin-top: 8px; flex-wrap: wrap; }
-
-.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border); }
-.dot.active { background: var(--color-dark); }
-.dot.done { background: var(--color-success); }
-
-@media(max-width:700px) {
-    .tt-head, .tt-row { grid-template-columns: 34px 70px minmax(0,1fr) 50px; }
-    .tt-row { min-height: 82px; }
-    .tt-row > div, .tt-head > div { padding: 8px 6px; }
-    .cal-day-box { min-height: 70px; padding: 7px; }
-    .cal-date-num { font-size: 15px; }
+/* 루틴 달력 날짜 셀 / .muted: 불투명도 .42를 적용합니다. */
+.cal-day-box.muted {
+    opacity: .42;
 }
 
+/* .cal-day-name: 글자 크기 10px, 글자 두께 800, 글자색 var(--color-muted)를 적용합니다. */
+.cal-day-name {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--color-muted);
+}
+
+/* .cal-date-num: 글자 크기 18px, 글자 두께 900, 바깥 여백 top 3px를 적용합니다. */
+.cal-date-num {
+    font-size: 18px;
+    font-weight: 900;
+    margin-top: 3px;
+}
+
+/* .cal-dots: 표시 방식 flex, 요소 간 간격 3px, 바깥 여백 top 8px, flex-wrap wrap를 적용합니다. */
+.cal-dots {
+    display: flex;
+    gap: 3px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(max-width:700px) */
+@media(max-width:700px) {
+    /* 루틴 시간표 헤더 / 루틴 시간표 행: 그리드 열 구성 34px 70px minmax(0,1fr) 50px를 적용합니다. */
+    .tt-head, .tt-row {
+        grid-template-columns: 34px 70px minmax(0,1fr) 50px;
+    }
+
+    /* 루틴 시간표 행: 최소 높이 82px를 적용합니다. */
+    .tt-row {
+        min-height: 82px;
+    }
+
+    /* 루틴 시간표 행 / 루틴 시간표 헤더: 안쪽 여백 8px 6px를 적용합니다. */
+    .tt-row > div, .tt-head > div {
+        padding: 8px 6px;
+    }
+
+    /* 루틴 달력 날짜 셀: 최소 높이 70px, 안쪽 여백 7px를 적용합니다. */
+    .cal-day-box {
+        min-height: 70px;
+        padding: 7px;
+    }
+
+    /* .cal-date-num: 글자 크기 15px를 적용합니다. */
+    .cal-date-num {
+        font-size: 15px;
+    }
+
+}
 
 
 /* ==========================================================================

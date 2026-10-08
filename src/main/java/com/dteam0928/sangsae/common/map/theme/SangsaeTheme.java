@@ -91,4 +91,38 @@ public enum SangsaeTheme {
 
         return WALK;
     }
+
+    // DB places.category 또는 레거시 업종 코드 문자열을 상새 표준 테마로 변환
+    public static SangsaeTheme fromCodeOrName(String val) {
+        if (val == null || val.isBlank()) {
+            return WALK;
+        }
+        String clean = val.trim().toUpperCase();
+
+        try {
+            return SangsaeTheme.valueOf(clean);
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        if (clean.contains("GYM") || clean.contains("헬스") || clean.contains("피트니스") || clean.contains("ACTIVITY")) {
+            return ACTIVITY;
+        }
+        if (clean.contains("PARK") || clean.contains("공원") || clean.contains("산책") || clean.contains("WALK")) {
+            return WALK;
+        }
+        if (clean.contains("LIBRARY") || clean.contains("도서관") || clean.contains("스터디") || clean.contains("STUDY")) {
+            return STUDY;
+        }
+        if (clean.contains("CAFE") || clean.contains("카페")) {
+            return CAFE;
+        }
+        if (clean.contains("FOOD") || clean.contains("식당") || clean.contains("음식점")) {
+            return FOOD;
+        }
+        if (clean.contains("관광") || clean.contains("PHOTO")) {
+            return PHOTO;
+        }
+
+        return WALK;
+    }
 }

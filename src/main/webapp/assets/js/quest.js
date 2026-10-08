@@ -24,6 +24,7 @@
     let calendarMode = 'week';
     let questCalendarCursor = new Date();
     let questCategory = '전체';
+	let pendingScheduleQuestId = null;
 
     /* 탭 전환 */
     function switchTab(id, btn) {
@@ -51,7 +52,215 @@
         clearTimeout(window.toastTimer);
         window.toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
     }
+	
+	function openCreateModal() {
+	    document.getElementById('createModal')?.classList.add('show');
+	}
 
+	function toggleCreatePlaceSearch() {
+	    const authType = document.getElementById('newAuthType')?.value;
+	    const placeSection = document.getElementById('createPlaceSection');
+
+	    if (!placeSection) return;
+
+	    if (authType === 'LOCATION') {
+	        placeSection.style.display = 'block';
+	    } else {
+	        placeSection.style.display = 'none';
+			window.selectedCreatePlace = null;
+
+	        // 다른 인증 방식으로 변경하면 기존 장소 선택 초기화
+	        const query = document.getElementById('createPlaceQuery');
+	        const results = document.getElementById('createPlaceResults');
+	        const selected = document.getElementById('createSelectedPlace');
+
+	        if (query) query.value = '';
+	        if (results) results.innerHTML = '';
+	        if (selected) selected.innerHTML = '';
+	    }
+	}
+	
+	async function searchCreatePlaces() {
+	    const query = document.getElementById('createPlaceQuery')?.value.trim();
+	    const results = document.getElementById('createPlaceResults');
+	    if (!results) return;
+	    if (!query) {
+	        showToast('검색할 장소 이름을 입력해 주세요.');
+	        return;
+	    }
+		window.selectedCreatePlace = null;
+		document.getElementById('createSelectedPlace')?.replaceChildren();
+	    results.textContent = '장소를 검색하고 있습니다...';
+	    try {
+	        const response = await fetch(
+	            contextPath + '/api/map/search?query=' + encodeURIComponent(query),
+	            { headers: { 'Accept': 'application/json' } }
+	        );
+	        const json = await response.json();
+	        if (!response.ok || !json.success) {
+	            throw new Error(json.message || '장소 검색에 실패했습니다.');
+	        }
+	        results.replaceChildren();
+	        if (!json.data || json.data.length === 0) {
+	            results.textContent = '검색 결과가 없습니다.';
+	            return;
+	        }
+	        json.data.forEach(place => {
+	            const button = document.createElement('button');
+	            button.type = 'button';
+	            button.className = 'btn';
+	            button.style.display = 'block';
+	            button.style.width = '100%';
+	            button.style.marginTop = '8px';
+	            button.style.textAlign = 'left';
+	            const name = document.createElement('strong');
+	            name.textContent = place.name;
+	            const address = document.createElement('div');
+	            address.textContent = place.roadAddress || place.address || '';
+	            address.style.fontSize = '12px';
+	            button.append(name, address);
+	            button.addEventListener('click', () => {
+	                window.selectedCreatePlace = place;
+	                document.getElementById('createSelectedPlace').textContent =
+	                    '📍 선택한 장소: ' + place.name;
+	                results.replaceChildren();
+	            });
+	            results.appendChild(button);
+	        });
+	    } catch (error) {
+	        console.error('장소 검색 오류:', error);
+	        results.textContent = '장소 검색 중 오류가 발생했습니다.';
+	        showToast(error.message);
+	    }
+	}
+	
+	async function createQuest() {
+	    const title = document.getElementById('newTitle')?.value.trim();
+	    const description = document.getElementById('newDescription')?.value.trim();
+	    const category = document.getElementById('newCategory')?.value;
+	    const estimatedMinutes = document.getElementById('newEstimatedMinutes')?.value;
+	    const rewardXp = document.getElementById('newRewardXp')?.value;
+	    const authType = document.getElementById('newAuthType')?.value;
+	    const visibility = document.getElementById('newVisibility')?.value;
+
+	    if (!title) {
+	        showToast('퀘스트 제목을 입력해 주세요.', '⚠️');
+	        return;
+	    }
+
+	    if (!estimatedMinutes || Number(estimatedMinutes) <= 0) {
+	        showToast('예상 소요 시간을 확인해 주세요.', '⚠️');
+	        return;
+	    }
+
+	    if (rewardXp === '' || Number(rewardXp) < 0) {
+	        showToast('보상 XP를 확인해 주세요.', '⚠️');
+	        return;
+	    }
+
+	    if (authType === 'LOCATION' && !window.selectedCreatePlace) {
+	        showToast('위치 인증에 사용할 장소를 선택해 주세요.', '⚠️');
+	        return;
+	    }
+
+	    const publishButton = document.querySelector('#createModal .quest-detail-4');
+
+	    if (publishButton) {
+	        publishButton.disabled = true;
+	        publishButton.textContent = '발행 중...';
+	    }
+
+	    try {
+	        let placeId = null;
+
+	        // LOCATION 인증이면 장소를 먼저 DB에 등록
+	        if (authType === 'LOCATION') {
+	            const selectedPlace = window.selectedCreatePlace;
+	            const query = document.getElementById('createPlaceQuery')?.value.trim();
+
+	            const placeResponse = await fetch(contextPath + '/quests/place', {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/x-www-form-urlencoded',
+	                    'Accept': 'application/json'
+	                },
+	                body: new URLSearchParams({
+	                    kakaoPlaceId: selectedPlace.kakaoPlaceId,
+	                    query: query
+	                })
+	            });
+
+	            const placeJson = await placeResponse.json();
+
+	            if (!placeResponse.ok || !placeJson.success) {
+	                throw new Error(placeJson.message || '장소 등록에 실패했습니다.');
+	            }
+
+	            placeId = placeJson.data;
+	        }
+
+	        // 퀘스트 생성 요청
+	        const params = new URLSearchParams({
+	            title,
+	            description: description || '',
+	            category,
+	            estimatedMinutes,
+	            rewardXp,
+	            authType,
+	            visibility
+	        });
+
+	        if (placeId !== null) {
+	            params.append('placeId', String(placeId));
+	        }
+
+	        const questResponse = await fetch(contextPath + '/quests/create', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded',
+	                'Accept': 'application/json'
+	            },
+	            body: params
+	        });
+
+	        const questJson = await questResponse.json();
+
+	        if (!questResponse.ok || !questJson.success) {
+	            throw new Error(questJson.message || '퀘스트 생성에 실패했습니다.');
+	        }
+
+	        showToast('퀘스트가 성공적으로 발행되었습니다!', '🎉');
+	        closeModal('createModal');
+
+	        // 생성 폼 초기화
+	        [
+	            'newTitle',
+	            'newDescription',
+	            'createPlaceQuery'
+	        ].forEach(id => {
+	            const element = document.getElementById(id);
+	            if (element) element.value = '';
+	        });
+
+	        document.getElementById('createPlaceResults')?.replaceChildren();
+	        document.getElementById('createSelectedPlace')?.replaceChildren();
+	        window.selectedCreatePlace = null;
+
+	        // 공개 퀘스트 목록 갱신
+	        fetchQuestsFromServer();
+
+	    } catch (error) {
+	        console.error('퀘스트 생성 오류:', error);
+	        showToast(error.message || '퀘스트 생성 중 오류가 발생했습니다.', '⚠️');
+
+	    } finally {
+	        if (publishButton) {
+	            publishButton.disabled = false;
+	            publishButton.textContent = '퀘스트 발행하기';
+	        }
+	    }
+	}
+	
     function closeModal(id) {
         const target = document.getElementById(id);
         if (target) target.classList.remove('show');
@@ -71,6 +280,7 @@
                         return {
                             id: item.id,
                             title: item.title,
+							authType: item.authType,
                             cat: item.category || '일반',
                             place: placeObj ? (placeObj.roadAddress || placeObj.name) : '추천 장소',
                             placeName: placeObj ? placeObj.name : '',
@@ -217,27 +427,62 @@
     }
 
     /* 일정 추가 (오직 백엔드 DB 통신만 수행) */
-    function addSchedule(id) {
-        const dateStr = App.dateKey(questCalendarCursor);
-        fetch(contextPath + '/quest', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
-            body: new URLSearchParams({ templateId: String(id), scheduledDate: dateStr })
-        })
-        .then(res => res.json())
-        .then(json => {
-            if (json && json.success) {
-                showToast('📅 DB 일정에 추가되었습니다!');
-                fetchUserQuestsFromServer();
-            } else {
-                showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
-            }
-        })
-        .catch(() => {
-            showToast('일정 추가 중 통신 오류가 발생했습니다.', '⚠️');
-        });
-    }
+	function addSchedule(id, authRadiusM = null) {
+	    const quest = quests.find(q => q.id === id);
 
+	    // LOCATION 퀘스트이며 아직 반경을 선택하지 않았다면 모달 표시
+	    if (quest && quest.authType === 'LOCATION' && authRadiusM === null) {
+	        pendingScheduleQuestId = id;
+	        document.getElementById('authRadiusModal')?.classList.add('show');
+	        return;
+	    }
+	    const dateStr = App.dateKey(questCalendarCursor);
+	    const params = new URLSearchParams({
+	        templateId: String(id),
+	        scheduledDate: dateStr
+	    });
+
+	    // 인증 반경을 선택한 경우에만 전송
+	    if (authRadiusM !== null) {
+	        params.append('authRadiusM', String(authRadiusM));
+	    }
+
+	    fetch(contextPath + '/quest', {
+	        method: 'POST',
+	        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+	        body: params
+	    })
+	    .then(res => res.json())
+	    .then(json => {
+	        if (json && json.success) {
+	            showToast('📅 DB 일정에 추가되었습니다!');
+	            fetchUserQuestsFromServer();
+	        } else {
+	            showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
+	        }
+	    })
+	    .catch(() => {
+	        showToast('일정 추가 중 통신 오류가 발생했습니다.', '⚠️');
+	    });
+	}
+
+	function confirmAuthRadius() {
+	    if (pendingScheduleQuestId === null) return;
+
+	    const radius = Number(document.getElementById('authRadiusM')?.value);
+
+	    if (!Number.isInteger(radius) || radius < 100 || radius > 1000) {
+	        showToast('인증 반경은 100~1000m 사이여야 합니다.', '⚠️');
+	        return;
+	    }
+
+	    const questId = pendingScheduleQuestId;
+	    pendingScheduleQuestId = null;
+
+	    closeModal('authRadiusModal');
+	    addSchedule(questId, radius);
+	}
+	
     /* 관리 탭 렌더링 (순수 DB 데이터만 출력) */
     function renderManagement() {
         const list = document.getElementById('todayList');
@@ -573,6 +818,7 @@
         openRegionModal, applyRegions, openCollectionModal, openTripPickerModal,
         openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
         addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
-        initQuestMap, renderQuestMapMarkers, focusUserLocation
+        initQuestMap, renderQuestMapMarkers, focusUserLocation, openCreateModal, 
+		toggleCreatePlaceSearch, searchCreatePlaces, createQuest, confirmAuthRadius
     };
 })();
