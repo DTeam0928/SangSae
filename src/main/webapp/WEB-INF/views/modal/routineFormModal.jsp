@@ -15,6 +15,12 @@
                 </div>
             </div>
             <div>
+                <label class="type-xs weight-bold" for="rfRepeat">공개 설정</label>
+                <select id="rfRepeat" class="width-full ds-mt-1 border-default radius-md ds-px-3 ds-py-3">
+                    <option>공개</option><option>비공개</option>
+                </select>
+            </div>
+            <div>
                 <label class="type-xs weight-bold" for="rfRepeat">기본 반복</label>
                 <select id="rfRepeat" class="width-full ds-mt-1 border-default radius-md ds-px-3 ds-py-3">
                     <option>매일</option><option>평일</option><option>주말</option><option>사용자 지정</option>
