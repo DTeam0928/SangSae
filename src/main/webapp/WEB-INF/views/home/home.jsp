@@ -60,7 +60,7 @@
         <section class="dash-card xp-card">
             <div class="dash-card-header">
                 <div class="dash-title">
-                    <c:out value="${ui.xpTitle}" default="오늘의 달성도" />
+                    <c:out value="${ui.xpTitle}" default="나의 칭호" />
                 </div>
 
                 <span class="badge xp-badge" id="user-title-badge">
@@ -107,6 +107,31 @@
                 </div>
             </div>
         </section>
+
+        <c:forEach var="card" items="${ui.statsCards}">
+            <section class="dash-card">
+                <div class="dash-title">
+                    <c:out value="${card.title}" />
+                </div>
+
+                <div class="stats-row">
+                    <c:forEach var="stat" items="${card.items}">
+                        <div>
+                            <div class="stat-label">
+                                <c:out value="${stat.label}" />
+                            </div>
+
+                            <div class="stat-num${stat.accent ? ' stat-num-accent' : ''}">
+                                <fmt:formatNumber
+                                        value="${home.stats[stat.key]}"
+                                        type="number"
+                                        maxFractionDigits="0" /><c:out value="${stat.unit}" />
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </section>
+        </c:forEach>
 
         <!-- 3. 관리 카드 렌더링 (이후 영역은 기존과 동일) -->
         <c:forEach var="card" items="${ui.managementCards}">
@@ -193,31 +218,6 @@
                 <a href="<c:out value='${addUrl}' />" class="detail-btn">
                     <c:out value="${card.addLabel}" />
                 </a>
-            </section>
-        </c:forEach>
-
-        <c:forEach var="card" items="${ui.statsCards}">
-            <section class="dash-card">
-                <div class="dash-title">
-                    <c:out value="${card.title}" />
-                </div>
-
-                <div class="stats-row">
-                    <c:forEach var="stat" items="${card.items}">
-                        <div>
-                            <div class="stat-label">
-                                <c:out value="${stat.label}" />
-                            </div>
-
-                            <div class="stat-num${stat.accent ? ' stat-num-accent' : ''}">
-                                <fmt:formatNumber
-                                        value="${home.stats[stat.key]}"
-                                        type="number"
-                                        maxFractionDigits="0" /><c:out value="${stat.unit}" />
-                            </div>
-                        </div>
-                    </c:forEach>
-                </div>
             </section>
         </c:forEach>
     </div>
