@@ -71,6 +71,32 @@ public class QuestService {
                 .filter(quest -> category.equalsIgnoreCase(quest.getCategory()))
                 .toList();
     }
+
+    // 공개된 퀘스트 전체 상세(장소 정보 결합) 목록 조회
+    public List<QuestDetailResponseDto> getPublicQuestDetails(Long currentUserId) {
+        List<QuestTemplate> list = getPublicQuests();
+        if (list == null) return List.of();
+        return list.stream().map(quest -> {
+            PlaceResponseDto place = null;
+            if (this.placeService != null && quest.getPlaceId() != null) {
+                place = placeService.getPlaceById(quest.getPlaceId());
+            }
+            boolean bookmarked = false;
+            if (currentUserId != null && this.tx != null) {
+                final Long qId = quest.getId();
+                bookmarked = Boolean.TRUE.equals(tx.read(em -> bookmarkRepository.findByUserIdAndQuestTemplateId(em, currentUserId, qId) != null));
+            }
+            return QuestDetailResponseDto.of(quest, place, bookmarked);
+        }).toList();
+    }
+
+    // 카테고리별 공개 퀘스트 상세(장소 정보 결합) 목록 조회
+    public List<QuestDetailResponseDto> getPublicQuestDetailsByCategory(String category, Long currentUserId) {
+        return getPublicQuestDetails(currentUserId)
+                .stream()
+                .filter(quest -> category.equalsIgnoreCase(quest.category()))
+                .toList();
+    }
     
     // 퀘스트 상세 조회
     public QuestTemplate getQuestById(Long id) {

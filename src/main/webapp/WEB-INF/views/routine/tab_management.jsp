@@ -8,11 +8,11 @@
   </div>
   <div class="surface-white border-default border-color-border radius-lg ds-p-5">
     <div class="type-sm color-muted">연속 실천일</div>
-    <div class="type-3xl weight-heading ds-mt-1">12<span class="type-base color-muted ds-ml-1">일</span></div>
+    <div class="type-3xl weight-heading ds-mt-1"><span id="userStreak">0</span><span class="type-base color-muted ds-ml-1">일</span></div>
   </div>
   <div class="surface-white border-default border-color-border radius-lg ds-p-5">
     <div class="type-sm color-muted">누적 XP</div>
-    <div id="totalXp" class="type-3xl weight-heading color-dark ds-mt-1">1,240 XP</div>
+    <div id="totalXp" class="type-3xl weight-heading color-dark ds-mt-1">0 XP</div>
   </div>
 </div>
 
@@ -93,8 +93,18 @@
         </div>
       </div>
       <div>
-        <label class="type-xs weight-bold" for="taskLocation">장소</label>
+        <div class="layout-row justify-between align-center">
+          <label class="type-xs weight-bold" for="taskLocation">장소</label>
+          <label class="type-xs"><input type="checkbox" id="taskLocationReq" onchange="App.routine.toggleLocationRadius(this.checked)"> 위치 인증 필수</label>
+        </div>
         <input id="taskLocation" class="width-full ds-mt-1 surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3 type-sm" placeholder="예: 집 / 헬스장 / 광안리">
+        <div id="radiusControl" class="ds-mt-2 is-hidden">
+          <div class="layout-row justify-between type-xs color-muted">
+            <span>허용 인증 반경</span>
+            <span id="radiusValueLabel">100m</span>
+          </div>
+          <input type="range" id="taskRadius" min="50" max="1000" step="50" value="100" class="width-full ds-mt-1" oninput="document.getElementById('radiusValueLabel').textContent = this.value + 'm'">
+        </div>
       </div>
       <div>
         <label class="type-xs weight-bold" for="taskRepeat">반복</label>

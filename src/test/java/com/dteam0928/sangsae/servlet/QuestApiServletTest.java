@@ -130,6 +130,42 @@ class QuestApiServletTest {
         assertEquals(401, ctx.status);
     }
 
+    @Test
+    @DisplayName("GET /user-quests: 비로그인 상태 접근 시 401 Unauthorized 차단")
+    void testUserQuestServlet_unauthorized() throws Exception {
+        UserQuestServlet servlet = new UserQuestServlet();
+        MockContext ctx = new MockContext();
+        ctx.method = "GET";
+        HttpServletRequest req = ServletTestHelper.createRequest(ctx);
+        HttpServletResponse res = ServletTestHelper.createResponse(ctx);
+
+        servlet.service(req, res);
+
+        assertEquals(401, ctx.status);
+    }
+
+    @Test
+    @DisplayName("GET /quest: Accept가 application/json일 때 200 OK 및 퀘스트 목록 JSON 반환")
+    void testQuestServlet_jsonSuccess() throws Exception {
+        QuestServlet servlet = new QuestServlet();
+        MockContext ctx = new MockContext();
+        ctx.method = "GET";
+        ctx.headers.put("Accept", "application/json");
+
+        com.dteam0928.sangsae.AppContext mockApp = createMockAppContextWithQuestService(true);
+        ctx.contextAttributes.put(com.dteam0928.sangsae.AppContext.ATTRIBUTE, mockApp);
+
+        ServletTestHelper.initServlet(servlet, ctx);
+        HttpServletRequest req = ServletTestHelper.createRequest(ctx);
+        HttpServletResponse res = ServletTestHelper.createResponse(ctx);
+
+        servlet.service(req, res);
+
+        assertEquals(200, ctx.status);
+        String body = ctx.responseBody.toString();
+        assertTrue(body.contains("\"success\":true"));
+    }
+
     private com.dteam0928.sangsae.AppContext createMockAppContextWithQuestService(boolean success) throws Exception {
         java.lang.reflect.Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
         unsafeField.setAccessible(true);
@@ -139,6 +175,11 @@ class QuestApiServletTest {
         com.dteam0928.sangsae.quest.service.QuestService mockQuestService = new com.dteam0928.sangsae.quest.service.QuestService(
                 new com.dteam0928.sangsae.common.db.TransactionTemplate(null), null, null
         ) {
+            @Override
+            public java.util.List<com.dteam0928.sangsae.quest.dto.QuestTemplate> getPublicQuests() {
+                return java.util.List.of();
+            }
+
             @Override
             public com.dteam0928.sangsae.quest.dto.QuestCompleteResult completeQuestWithReward(
                     Long userQuestId, Long userId, String proofImageUrl, String proofText, Double userLat, Double userLng) {
