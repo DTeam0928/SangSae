@@ -356,26 +356,31 @@ function focusUser() {
     locateUser();
 }
 
-// 내 위치 찾기 옆 필터 버튼
+// 내 위치 찾기 옆 필터 버튼 (모달: routineFilterModal)
+/* 주변 루틴 스팟 필터: 키워드에 맞는 장소만 지도·목록에 표시. 비우고 적용하면 해제.
+   키워드는 placeKeyword 에 남겨서 내 위치 이동·카테고리 변경 뒤에도 유지된다 */
+let placeKeyword = '';
 
 function openPlaceFilters() {
+    if (!routineMap || typeof MapUtil === 'undefined') {
+        toast('지도를 불러오지 못해 필터를 적용할 수 없습니다.', '⚠️');
+        return;
+    }
+    const input = document.getElementById('placeKeywordInput');
+    if (input) input.value = placeKeyword;   // 지금 적용 중인 키워드 표시
     ModalManager.open('routineFilterModal');
 }
 
 function submitPlaceFilter() {
     const input = document.getElementById('placeKeywordInput');
-    const cur = input ? input.value.trim() : '';
-
-    if (cur) {
-        // 1. 모달을 먼저 닫아줍니다.
-        ModalManager.close('routineFilterModal');
-
-        // 2. 그 다음 검색을 실행합니다.
-        searchNearbyRoutinePlaces(cur);
-        toast(`'${cur}' 스팟을 지도에 표시합니다.`, '🔍');
-    } else {
-        ModalManager.close('routineFilterModal');
-    }
+    placeKeyword = input ? input.value.trim() : '';
+    ModalManager.close('routineFilterModal');
+    searchNearbyRoutinePlaces().then(applied => {
+        if (!applied) return;
+        if (!placeKeyword) toast('필터를 해제했습니다.', '📍');
+        else if (nearbyRoutinePlaces.length) toast(`'${placeKeyword}' 스팟 ${Math.min(nearbyRoutinePlaces.length, 6)}곳을 표시합니다.`, '🔍');
+        else toast(`'${placeKeyword}'에 맞는 주변 스팟이 없습니다.`, '🔍');
+    });
 }
 
 
@@ -869,8 +874,20 @@ function deleteRoutine() {
         return NOISE_BLACKLIST.some(kw => targetText.includes(kw));
     }
 
-    async function searchNearbyRoutinePlaces(keyword) {
-        if (!routineMap || typeof MapUtil === 'undefined') return;
+    let placeSearchSeq = 0;   // 늦게 끝난 이전 검색이 필터 결과를 덮어쓰지 않게
+
+    /* 필터 키워드가 장소 이름·카테고리·테마에 들어 있는지 (키워드 없으면 모두 통과) */
+    function matchesPlaceKeyword(place, kw) {
+        if (!kw) return true;
+        const text = [place.name, place.categoryName, place.originalCategoryName, place.themeName]
+            .filter(Boolean).join(' ').toLowerCase();
+        return text.includes(kw.toLowerCase());
+    }
+
+    async function searchNearbyRoutinePlaces(keyword = placeKeyword) {
+        if (!routineMap || typeof MapUtil === 'undefined') return false;
+        const seq = ++placeSearchSeq;
+        keyword = (keyword || '').trim();
 
         const lat = userLocation.lat;
         const lng = userLocation.lng;
@@ -887,6 +904,7 @@ function deleteRoutine() {
                 if (dbJson && dbJson.success && Array.isArray(dbJson.data)) {
                     combinedPlaces = dbJson.data
                         .filter(p => !isNoisePlace(p))
+                        .filter(p => matchesPlaceKeyword(p, keyword))
                         .map(p => ({
                             ...p,
                             isDbSpot: true,
@@ -932,8 +950,10 @@ function deleteRoutine() {
             }
         }
 
+        if (seq !== placeSearchSeq) return false;   // 그 사이 새 검색(필터 변경 등)이 시작됨
         nearbyRoutinePlaces = combinedPlaces;
         renderNearbyPlaces();
+        return true;
     }
 
     function renderNearbyPlaces() {
