@@ -168,21 +168,20 @@ function routineCard(r) {
     const place = r.place
         ? '📍 ' + App.escape(r.place.name) + (r.place.distanceMeters != null ? ' · ' + formatDistance(r.place.distanceMeters) : '')
         : '📍 장소 자유';
+
     return '<article class="card surface-white border-default border-color-border radius-lg clip-overflow cursor-pointer" onclick="App.routine.openRoutine(' + r.id + ')">' +
-           '<div class="ds-h-28 surface-gradient ds-p-4 layout-row justify-between">' +
-           '<div class="layout-row ds-gap-1 layout-wrap align-start">' + cats + '</div>' +
-           '</div>' +
-           '<div class="ds-p-5">' +
-           '<h3 class="weight-heading type-lg">' + App.escape(r.title) + '</h3>' +
-           '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.description || '') + '</p>' +
-           '<p class="type-xs color-muted ds-mt-2">' + place + '</p>' +
-           (tags ? '<p class="type-xs color-muted ds-mt-1">' + tags + '</p>' : '') +
-           '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
-           '<span>🔥 ' + (r.adoptedCount || 0).toLocaleString() + '명 · Task ' + r.taskCount + '개</span>' +
-           '<b class="color-text">적합도 ' + r.fitScore + '%</b>' +
-           '</div>' +
-           '</div>' +
-           '</article>';
+        '<div class="ds-p-5">' +
+        '<h3 class="weight-heading type-lg">' + App.escape(r.title) + '</h3>' +
+        (cats ? '<div class="layout-row ds-gap-1 layout-wrap align-start ds-mt-2">' + cats + '</div>' : '') +
+        '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.description || '') + '</p>' +
+        '<p class="type-xs color-muted ds-mt-2">' + place + '</p>' +
+        (tags ? '<p class="type-xs color-muted ds-mt-1">' + tags + '</p>' : '') +
+        '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
+        '<span>🔥 ' + (r.adoptedCount || 0).toLocaleString() + '명 · Task ' + (r.taskCount || 0) + '개</span>' +
+        '<b class="color-text">적합도 ' + (r.fitScore || 100) + '%</b>' +
+        '</div>' +
+        '</div>' +
+        '</article>';
 }
 
 /* 검색창 입력·정렬 변경 (tab_explorer.jsp 의 oninput / onchange) */
