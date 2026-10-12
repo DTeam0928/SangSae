@@ -61,7 +61,7 @@
 
         <div class="quest-detail-15">
             <strong class="quest-detail-16 subtitle">위치 인증 팁</strong>
-            <span class="desc">해당 장소 반경 내에서 체크박스를 누르면 즉시 500 XP가 적립됩니다.</span>
+            <span class="desc">해당 장소 반경 내에서 체크박스를 누르면 즉시 XP가 적립됩니다.</span>
         </div>
     </div>
 </div>
