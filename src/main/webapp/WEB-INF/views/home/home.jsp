@@ -167,8 +167,10 @@
                                            begin="0"
                                            end="4">
                                     <c:url var="editUrl" value="${card.editPath}">
-                                        <c:param name="id" value="${item.id}" />
-                                    </c:url>
+									    <c:if test="${card.key ne 'trip'}">
+									        <c:param name="id" value="${item.id}" />
+									    </c:if>
+									</c:url>
 
                                     <div class="item-row"
                                          data-item-row
