@@ -22,7 +22,7 @@
             <div id="rmTasks" class="space-y-2"></div>
         </div>
         <div class="ds-p-5 border-top layout-row ds-gap-2">
-            <button type="button" id="rmAdoptBtn" onclick="App.routine.addAllRoutineTasks()" class="layout-grow ds-py-3 surface-dark color-white radius-md weight-bold">내 루틴에 담기</button>
+            <button type="button" id="rmAdoptBtn" onclick="App.routine.addAllRoutineTasks()" class="layout-grow ds-py-3 surface-dark color-white radius-md weight-bold border-none">내 루틴에 담기</button>
         </div>
     </div>
 </div>

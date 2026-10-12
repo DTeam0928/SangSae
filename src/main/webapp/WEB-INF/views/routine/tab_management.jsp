@@ -26,11 +26,11 @@
         <div class="text-xs text-secondary surface-sub-bg rounded-md px-16 py-8 mt-8">운영 기간 <b
             id="routinePeriodLabel"></b></div>
       </div>
-      <div class="flex items-center" style="width: 400px;">
+      <div class="flex items-center gap-8 justify-end" style="width: 400px;">
         <button type="button" onclick="App.routine.openRoutineInfo()"
           class="btn btn-secondary text-sm font-bold rounded-md px-16 py-8">⚙ 기본 정보</button>
         <button type="button" onclick="App.routine.openRoutineCreateModal()"
-          class="btn btn-primary text-sm font-bold rounded-md px-16 py-8">＋ 새 루틴</button>
+          class="btn surface-dark color-white text-sm font-bold rounded-md px-16 py-8">＋ 새 루틴</button>
       </div>
     </div>
   </section>
@@ -50,7 +50,7 @@
             class="btn btn-secondary rounded-md p-8 font-bold">›</button>
         </div>
         <button type="button" id="calendarViewBtn" onclick="App.routine.toggleCalendarView()"
-          class="btn btn-primary text-xs font-bold rounded-md px-16 py-8">주</button>
+          class="btn btn surface-dark color-white rounded-md p-8 font-bold">주</button>
       </div>
     </div>
     <div class="flex items-center justify-between mb-16">
