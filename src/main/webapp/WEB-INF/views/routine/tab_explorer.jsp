@@ -16,27 +16,19 @@
     <button type="button" onclick="App.routine.locateUser()" class="ds-px-5 ds-py-3 radius-md surface-soft border-default border-color-white weight-bold text-nowrap">📍 내 위치 찾기</button>
   </div>
   <div class="ds-mt-3 layout-row align-center ds-gap-2 type-xs color-main">
-    <span id="locationStatus">기본 위치: 서울 시청 인근 · GPS를 사용하면 주변 추천이 정교해집니다.</span>
+    <span id="locationStatus">위치를 확인하는 중…</span>
   </div>
 </section>
 
 <!-- 카테고리 필터 및 정렬 -->
 <section class="surface-white border-default border-color-border radius-lg ds-p-4 medium-ds-p-5 shadow-card">
   <div class="layout-row layout-column large-layout-horizontal ds-gap-3 large-align-center">
-    <div class="layout-row ds-gap-2 scroll-x scrollbar ds-pb-1 layout-grow">
-      <button type="button" class="day-chip active" data-cat="전체" onclick="App.routine.setCategory('전체',this)">🔥 전체</button>
-      <button type="button" class="day-chip" data-cat="운동" onclick="App.routine.setCategory('운동',this)">💪 운동</button>
-      <button type="button" class="day-chip" data-cat="미라클 모닝" onclick="App.routine.setCategory('미라클 모닝',this)">🌅 미라클 모닝</button>
-      <button type="button" class="day-chip" data-cat="공부" onclick="App.routine.setCategory('공부',this)">📚 공부</button>
-      <button type="button" class="day-chip" data-cat="건강" onclick="App.routine.setCategory('건강',this)">🥗 건강</button>
-      <button type="button" class="day-chip" data-cat="숙면" onclick="App.routine.setCategory('숙면',this)">😴 숙면</button>
-      <button type="button" class="day-chip" data-cat="직장인" onclick="App.routine.setCategory('직장인',this)">💼 직장인</button>
-    </div>
+    <div id="exploreChips" class="layout-row ds-gap-2 scroll-x scrollbar ds-pb-1 layout-grow"></div>
     <select id="routineSort" onchange="App.routine.renderExplore()" class="surface-sub-bg border-default border-color-border radius-md ds-px-3 ds-py-3 type-sm">
-      <option value="near">내 위치 가까운 순</option>
+      <option value="distance">내 위치 가까운 순</option>
       <option value="popular">인기순</option>
-      <option value="new">최신순</option>
-      <option value="easy">부담 적은 순</option>
+      <option value="latest">최신순</option>
+      <option value="recommend">나에게 맞는 순</option>
     </select>
   </div>
 </section>
@@ -51,6 +43,9 @@
     <button type="button" onclick="App.routine.clearSearch()" class="type-sm color-dark weight-bold">탐색 홈으로</button>
   </div>
   <div id="searchGrid" class="layout-grid columns-1 medium-columns-2 large-columns-3 ds-gap-5"></div>
+  <div id="searchMore" class="is-hidden" style="text-align: center; margin-top: 16px;">
+    <button type="button" onclick="App.routine.loadMoreSearch()" class="ds-px-5 ds-py-2 radius-md surface-sub-bg weight-bold type-sm">더 보기</button>
+  </div>
 </section>
 
 <!-- 탐색 홈 컨텐츠 -->
