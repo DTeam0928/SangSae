@@ -74,6 +74,11 @@ public class OnboardingService {
         return nickname;
     }
 
+    /** 마이페이지: 위치 권한 허용 여부 (O-03 또는 마이페이지에서 허용하고 좌표를 저장했는지) */
+    public boolean isLocationPermitted(long userId) {
+        return tx.read(em -> profileDao.findByUserId(em, userId).map(UserProfile::isLocationPermitted).orElse(false));
+    }
+
     /** O-03 [위치 허용하기] 결과 저장 → 온보딩 완료 */
     public LoginUser saveLocation(long userId, LocationSetupRequest req) {
         GeoPoint point = null;
