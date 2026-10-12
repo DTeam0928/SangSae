@@ -18,7 +18,7 @@
     </c:otherwise>
 </c:choose>
 
-<!-- 1. 루틴 성공 비율로 퍼센트 계산 (0으로 나누기 방지 및 Null 처리) -->
+<!-- 1. 루틴 성공 비율로 퍼센트 계산 -->
 <c:choose>
     <c:when test="${empty home.dailyAggregate or empty home.dailyAggregate.routineTotalCount or home.dailyAggregate.routineTotalCount eq 0}">
         <c:set var="xpPercent" value="0" />
