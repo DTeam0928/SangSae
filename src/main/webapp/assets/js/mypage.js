@@ -54,6 +54,15 @@
         return card && card.querySelector('.badge');
     }
 
+    function showToast(msg, icon = '✨') {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = icon + ' ' + msg;
+        t.classList.add('show');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
     window.App = window.App || {};
 
     window.App.user = Object.assign(window.App.user || {}, {
@@ -103,7 +112,7 @@
             const newNickname = nicknameInput ? nicknameInput.value.trim() : '';
 
             if (!newNickname) {
-                alert("변경할 닉네임을 입력해주세요.");
+                showToast("변경할 닉네임을 입력해주세요.");
                 return;
             }
 
@@ -111,13 +120,13 @@
                 const response = await request('/api/me/nickname', { nickname: newNickname });
 
                 if (response.success) {
-                    alert(response.message || "닉네임이 성공적으로 변경되었습니다.");
+                    showToast(response.message || "닉네임이 성공적으로 변경되었습니다.");
                 } else {
-                    alert(response.message || "닉네임 변경 실패");
+                    showToast(response.message || "닉네임 변경 실패");
                 }
             } catch (error) {
                 console.error("닉네임 변경 오류:", error);
-                alert(error.message || "서버 통신 중 오류가 발생했습니다.");
+                showToast(error.message || "서버 통신 중 오류가 발생했습니다.");
             }
         },
 
@@ -130,20 +139,20 @@
                 const response = await request('/api/me/interests', { interestIds });
 
                 if (response.success) {
-                    alert(response.message || "관심사가 저장되었습니다.");
+                    showToast(response.message || "관심사가 저장되었습니다.");
                 } else {
-                    alert(response.message || "관심사 저장 실패");
+                    showToast(response.message || "관심사 저장 실패");
                 }
             } catch (error) {
                 console.error("관심사 저장 오류:", error);
-                alert(error.message || "서버 통신 중 오류가 발생했습니다.");
+                showToast(error.message || "서버 통신 중 오류가 발생했습니다.");
             }
         },
 
         // 3. 위치 권한 저장 (POST /api/me/location)
         requestLocation: function() {
             if (!navigator.geolocation) {
-                alert("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
+                showToast("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
                 return;
             }
 
@@ -155,23 +164,23 @@
                         const response = await request('/api/me/location', { latitude: lat, longitude: lon });
 
                         if (response.success) {
-                            alert(response.message || "위치 정보가 저장되었습니다.");
+                            showToast(response.message || "위치 정보가 저장되었습니다.");
                             const badge = locationBadge();
                             if (badge) {
                                 badge.textContent = "허용됨";
                                 badge.className = "badge green";
                             }
                         } else {
-                            alert(response.message || "위치 정보 저장 실패");
+                            showToast(response.message || "위치 정보 저장 실패");
                         }
                     } catch (error) {
                         console.error("위치 저장 오류:", error);
-                        alert(error.message || "서버 통신 중 오류가 발생했습니다.");
+                        showToast(error.message || "서버 통신 중 오류가 발생했습니다.");
                     }
                 },
                 (error) => {
                     console.error("위치 권한 거부/오류:", error);
-                    alert("위치 권한이 거부되었거나 위치를 가져올 수 없습니다.");
+                    showToast("위치 권한이 거부되었거나 위치를 가져올 수 없습니다.");
                 }
             );
         },
@@ -190,7 +199,7 @@
                 localStorage.setItem('theme', 'light');
             }
 
-            alert("테마 설정이 저장되었습니다.");
+            showToast("테마 설정이 저장되었습니다.");
         },
 
         // 초기 테마 적용
