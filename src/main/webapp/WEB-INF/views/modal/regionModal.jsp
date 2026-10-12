@@ -5,7 +5,7 @@
             <button class="close" onclick="App.quest.closeModal('regionModal')">×</button>
         </div>
         <div class="quest-detail-1">
-            <p class="desc">부산 지역 필터가 기본 적용되어 있습니다</p>
+            <p class="desc">부산 지역 필터가 기본 적용되어 있습니다.</p>
             <button class="btn btn-primary" onclick="App.quest.applyRegions()">부산 전체 적용</button>
         </div>
     </div>
