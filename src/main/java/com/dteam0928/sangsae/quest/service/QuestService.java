@@ -382,6 +382,8 @@ public class QuestService {
                     proofText,
                     earnedXp
             );
+            //완료한 퀘스트의 제목 기록
+            questLog.setTitle(userQuest.getTitle());
             // 10. QuestLog 저장
             QuestLog savedLog = questLogRepository.save(em, questLog);
 
