@@ -16,11 +16,13 @@ import com.dteam0928.sangsae.common.config.AppConfig;
  * @param usageDays          장소 이용 통계 기간(일). 최근 N일과 그 전 N일을 비교한다
  * @param surgeRatio         "이용 급증" 기준: 최근 N일 ≥ 그 전 N일 × 이 배수
  * @param surgeMinCount      "이용 급증" 최소 건수 (기록이 너무 적을 때 급증으로 보지 않음)
+ * @param taskRewardXp       루틴 관리 탭에서 직접 만든 Task 의 완료 보상 XP (팀원 코드의 직접 추가 Task 와 같은 100)
  */
 public record RoutineSettings(double defaultLatitude, double defaultLongitude, String defaultLocationName,
                               int nearbyRadiusMeters,
                               int trendingDays, int sectionSize, int mapPlaceLimit, int pageSize,
-                              int myPlaceLimit, int usageDays, double surgeRatio, int surgeMinCount) {
+                              int myPlaceLimit, int usageDays, double surgeRatio, int surgeMinCount,
+                              int taskRewardXp) {
 
     public static RoutineSettings from(AppConfig config) {
         return new RoutineSettings(
@@ -35,6 +37,7 @@ public record RoutineSettings(double defaultLatitude, double defaultLongitude, S
                 config.getInt("routine.my-place-limit", 10),
                 config.getInt("routine.usage-days", 7),
                 Double.parseDouble(config.get("routine.surge-ratio", "1.5")),
-                config.getInt("routine.surge-min-count", 3));
+                config.getInt("routine.surge-min-count", 3),
+                config.getInt("routine.task-reward-xp", 100));
     }
 }

@@ -8,6 +8,7 @@ import com.dteam0928.sangsae.quest.repository.UserQuestRepository;
 import com.dteam0928.sangsae.routine.dto.UserRoutineTaskResponseDto;
 import com.dteam0928.sangsae.routine.service.RoutineService;
 import com.dteam0928.sangsae.user.dao.UserProfileDao;
+import com.dteam0928.sangsae.user.exp.ExpPolicy;
 import com.dteam0928.sangsae.user.exp.ExperienceService;
 import com.dteam0928.sangsae.user.exp.LevelInfo;
 import com.dteam0928.sangsae.user.model.UserProfile;
@@ -62,9 +63,16 @@ public class HomeDashboardService {
         }
         model.setNickname(nickname);
 
+        ExpPolicy policy = (experienceService != null)
+                ? experienceService.getExpPolicy()
+                : new ExpPolicy();
+
         LevelInfo levelInfo = (experienceService != null && userId != null)
                 ? experienceService.getUserLevelInfo(userId)
-                : new LevelInfo(1, "새싹 탐험가", totalXp, totalXp, 1000 - totalXp, 0.0, false);
+                : policy.calculateLevelInfo(totalXp);
+
+        model.setLevelInfo(levelInfo);
+        model.getUi().setXpTitle("Lv." + levelInfo.level() + " " + levelInfo.title());
 
         // 2. 오늘의 퀘스트 현황 수집
         int questDoneCount = 0;
@@ -115,7 +123,7 @@ public class HomeDashboardService {
         aggregate.setRoutineSuccessCount(routineSuccess);
         aggregate.setQuestSuccessCount(questDoneCount);
         aggregate.setEarnedXp(totalXp);
-        aggregate.setCurrentStreak(Math.max(1, (routineSuccess + questDoneCount)));
+                aggregate.setCurrentStreak(userId == null ? 0 : calculateStreak(userId, today));
 
         // 5. 통계 맵 바인딩 (statsCards)
         model.getStats().put("questDone", questDoneCount);
@@ -141,5 +149,50 @@ public class HomeDashboardService {
         }
 
         return model;
+    }
+
+    
+    /**
+     * 연속 실천일: 루틴 Task 또는 퀘스트를 하루 1개 이상 완료한 날이
+     * 오늘(오늘 기록이 아직 없으면 어제)부터 끊기지 않고 이어진 일수.
+     * 같은 날 여러 개를 완료해도 하루로 센다.
+     */
+    private int calculateStreak(Long userId, LocalDate today) {
+        List<?> dates = tx.read(em -> em.createNativeQuery(
+                        "SELECT d FROM ("
+                                + " SELECT l.log_date AS d FROM routine_task_logs l"
+                                + " WHERE l.user_id = ?1 AND l.is_success = 1 AND l.log_date <= ?2"
+                                + " UNION"   // UNION 이 같은 날짜를 하나로 합친다
+                                + " SELECT DATE(q.completed_at) FROM quest_logs q"
+                                + " WHERE q.user_id = ?3 AND DATE(q.completed_at) <= ?4"
+                                + ") x ORDER BY d DESC")
+                .setParameter(1, userId)
+                .setParameter(2, today)
+                .setParameter(3, userId)
+                .setParameter(4, today)
+                .setMaxResults(400)
+                .getResultList());
+
+        LocalDate expected = null;
+        int count = 0;
+        for (Object row : dates) {
+            LocalDate d = toLocalDate(row);
+            if (expected == null) {
+                if (d.equals(today)) expected = today;
+                else if (d.equals(today.minusDays(1))) expected = today.minusDays(1);
+                else return 0;   // 어제도 기록이 없으면 연속 끊김
+            }
+            if (!d.equals(expected)) break;
+            count++;
+            expected = expected.minusDays(1);
+        }
+        return count;
+    }
+
+    /** DATE 컬럼 값이 드라이버에 따라 java.sql.Date 또는 LocalDate 로 온다 */
+    private static LocalDate toLocalDate(Object value) {
+        if (value instanceof LocalDate d) return d;
+        if (value instanceof java.sql.Date d) return d.toLocalDate();
+        return LocalDate.parse(value.toString().substring(0, 10));
     }
 }

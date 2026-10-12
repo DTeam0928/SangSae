@@ -775,6 +775,12 @@
         );
     }
 
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') document.querySelectorAll('.modal-bg.show').forEach(el => {
+            if (['regionModal','collectionModal','tripModal','detailModal','createModal'].includes(el.id)) closeModal(el.id);
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         fetchQuestsFromServer();
         fetchUserQuestsFromServer();
@@ -786,12 +792,12 @@
     });
 
     App.quest = {
-        switchTab, showToast, closeModal, closeModalOutside, cardTemplate, renderQuestCards,
+        createQuest, switchTab, showToast, closeModal, closeModalOutside, cardTemplate, renderQuestCards,
         toggleSave, addSchedule, completeQuestAction, deleteScheduleItem,
         openRegionModal, applyRegions, openCollectionModal, openTripPickerModal,
         openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
         addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
         initQuestMap, renderQuestMapMarkers, focusUserLocation, openCreateModal, 
-		toggleCreatePlaceSearch, searchCreatePlaces, createQuest, confirmAuthRadius
+		toggleCreatePlaceSearch, searchCreatePlaces, confirmAuthRadius
     };
 })();
