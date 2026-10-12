@@ -277,13 +277,29 @@ function focusUser() {
     locateUser();
 }
 
+// 내 위치 찾기 옆 필터 버튼
+
 function openPlaceFilters() {
-    const cur = prompt('검색할 주변 루틴 스팟 키워드를 입력하세요:\n(예: 운동, 러닝, 공원, 카페, 도서관, 헬스장)', '운동');
-    if (cur && cur.trim()) {
-        searchNearbyRoutinePlaces(cur.trim());
-        toast(`'${cur.trim()}' 스팟을 지도에 표시합니다.`, '🔍');
+    ModalManager.open('routineFilterModal');
+}
+
+function submitPlaceFilter() {
+    const input = document.getElementById('placeKeywordInput');
+    const cur = input ? input.value.trim() : '';
+
+    if (cur) {
+        // 1. 모달을 먼저 닫아줍니다.
+        ModalManager.close('routineFilterModal');
+
+        // 2. 그 다음 검색을 실행합니다.
+        searchNearbyRoutinePlaces(cur);
+        toast(`'${cur}' 스팟을 지도에 표시합니다.`, '🔍');
+    } else {
+        ModalManager.close('routineFilterModal');
     }
 }
+
+
 
 /* ============================================================
    루틴 관리 탭 (백엔드: /api/my-routines, 문서 docs/ROUTINE_MANAGE_API.md)
@@ -945,7 +961,7 @@ function showPlaceDetail(place) {
         App.routine = {
         setRadius, applyPlaceFilters, showPlaceDetail, toast, hide, closeModal, switchTab, filteredRoutines, routineCard, renderExplore,
         clearSearch, setCategory, openRoutine, toggleModalTasks, adoptRoutineToServer,
-        addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters,
+        addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters, submitPlaceFilter,
         loadManage, changeActiveRoutine, renderManage, renderCalendar, selectCalendarDate, moveCalendar,
         toggleCalendarView, calendarToday, toggleServerDone, selectServerTask, openTaskForm, onRepeatChange,
         saveTask, deleteActiveTask, searchTaskPlace, pickTaskPlace, clearTaskPlace,
