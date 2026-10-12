@@ -182,14 +182,43 @@ function setCategory(c, b) {
 function openRoutine(id) {
     selectedRoutine = routines.find(r => r.id === id);
     if (!selectedRoutine) return;
+
     document.getElementById('rmTitle').textContent = selectedRoutine.name;
     document.getElementById('rmDesc').textContent = selectedRoutine.desc;
     document.getElementById('rmBadges').innerHTML = (selectedRoutine.cat || []).map(function(c) { return '<span class="pill">' + App.escape(c) + '</span>'; }).join('');
     document.getElementById('rmPlace').textContent = '추천 장소';
     document.getElementById('rmFit').textContent = '100%';
     document.getElementById('rmUsers').textContent = (selectedRoutine.popular || 0) + '명';
-    document.getElementById('rmTasks').innerHTML = '<div class="desc" style="padding:15px; text-align:center;">이 루틴을 담아 나만의 일상을 시작해보세요!</div>';
+
+    document.getElementById('rmTasks').innerHTML = '<div class="desc" style="padding:15px; text-align:center;">Task를 불러오는 중...</div>';
     document.getElementById('routineModal').classList.add('show');
+
+    fetch(contextPath + '/routines?id=' + selectedRoutine.serverId)
+        .then(res => res.json())
+        .then(json => {
+            const routineData = json && json.success ? json.data : null;
+            const tasks = routineData ? (Array.isArray(routineData) ? (routineData[0]?.tasks || []) : (routineData.tasks || [])) : [];
+
+            if (tasks.length === 0) {
+                document.getElementById('rmTasks').innerHTML = '<div class="desc" style="padding:15px; text-align:center;">등록된 Task가 없습니다.</div>';
+                return;
+            }
+
+            const tasksHtml = tasks.map((task, index) => {
+                return '<div class="surface-white radius-md ds-p-4 border-default layout-row justify-between align-center">' +
+                    '<div class="layout-row ds-gap-3 align-center">' +
+                    '<span class="color-muted weight-bold">' + (index + 1) + '</span>' +
+                    '<span>' + App.escape(task.content || '') + '</span>' +
+                    '</div>' +
+                    '<input type="checkbox" class="rm-check" value="' + task.id + '" checked>' +
+                    '</div>';
+            }).join('');
+
+            document.getElementById('rmTasks').innerHTML = tasksHtml;
+        })
+        .catch(() => {
+            document.getElementById('rmTasks').innerHTML = '<div class="desc" style="padding:15px; text-align:center; color: var(--color-danger);">Task를 불러오지 못했습니다.</div>';
+        });
 }
 
 function toggleModalTasks(c) { document.querySelectorAll('.rm-check').forEach(x => x.checked = c.checked); }
