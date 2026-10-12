@@ -50,7 +50,7 @@
             class="btn btn-secondary rounded-md p-8 font-bold">›</button>
         </div>
         <button type="button" id="calendarViewBtn" onclick="App.routine.toggleCalendarView()"
-          class="btn btn surface-dark color-white rounded-md p-8 font-bold">주</button>
+          class="btn surface-dark color-white rounded-md p-8 font-bold">주</button>
       </div>
     </div>
     <div class="flex items-center justify-between mb-16">
