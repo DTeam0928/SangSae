@@ -28,6 +28,9 @@ public final class Routes {
     public static final String API_MY_PLACES = "/api/routines/my-places";    // R-00 장소 관리 API
     public static final String API_MY_ROUTINES = "/api/my-routines";          // R-00 루틴 관리 API
 
+    public static final String MYPAGE = "/mypage";                            // 마이페이지 (닉네임·관심사·위치 변경)
+    public static final String API_ME = "/api/me";                            // 마이페이지 API (/api/me/*)
+
     /** 로그인 직후 이동할 곳: 온보딩을 안 끝냈으면 O-02 */
     public static String afterLogin(LoginUser user) {
         return user.isOnboardingCompleted() ? HOME : ONBOARDING_PROFILE;
