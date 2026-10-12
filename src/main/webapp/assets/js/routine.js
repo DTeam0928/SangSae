@@ -97,137 +97,241 @@ function toggleLocationRadius(checked) {
     if (el) el.classList.toggle('is-hidden', !checked);
 }
 
-/* 1. 서버 루틴 카탈로그 동기화 (DB 조회만 허용) */
-function fetchRoutinesFromServer() {
-    fetch(contextPath + '/routines')
-        .then(res => res.ok ? res.json() : null)
+/* ============================================================
+   루틴 탐색 탭 (백엔드: /api/routines, 문서 docs/ROUTINE_EXPLORE_API.md)
+   ============================================================ */
+const EXPLORE_API = contextPath + '/api/routines';
+let exploreCategoryCode = 'ALL';   // 선택한 카테고리 칩 code (ALL = 전체)
+let exploreCategories = [];        // 칩 목록 (서버 routine_categories)
+let gpsUsed = false;               // [내 위치 찾기]를 눌렀으면 그 좌표로 조회
+let searchPage = 1;
+let searchTimer = null;
+let selectedRoutineId = null;      // 상세 모달에서 보고 있는 루틴
+
+/* GPS 를 썼을 때만 좌표를 보낸다. 없으면 서버가 온보딩 위치 → 기본 위치(동의대) 순으로 정함 */
+function locationQuery() {
+    return gpsUsed ? 'lat=' + userLocation.lat + '&lng=' + userLocation.lng : '';
+}
+
+/* 탐색 홈: 섹션 4개 + 칩 + 위치 문구 */
+function loadExplore() {
+    api('GET', EXPLORE_API + '/explore?' + locationQuery())
         .then(json => {
-            if (json && json.success && Array.isArray(json.data)) {
-                routines = json.data.map(item => ({
-                    id: String(item.id),
-                    serverId: item.id,
-                    name: item.title,
-                    desc: item.description || '',
-                    cat: [formatCategoryName(item.category || '일상')],
-                    popular: item.adoptedCount || 0,
-                    difficulty: 2,
-                    tasks: []
-                }));
-            } else {
-                routines = [];
-            }
-            renderExplore();
+            if (!json.success) return fail(json, '루틴 탐색 정보를 불러오지 못했습니다.');
+            const d = json.data;
+            renderLocation(d.location);
+            renderCategoryChips(d.categories);
+            fillGrid('nearbyRoutineGrid', d.trendingNearby, '반경 3km 안 장소에서 진행 중인 루틴이 아직 없습니다.');
+            fillGrid('recommendedGrid', d.recommended, '추천할 루틴이 없습니다. 관심사에 맞는 루틴을 이미 모두 담았어요!');
+            fillGrid('popularGrid', d.popular, '등록된 루틴이 없습니다.');
+            fillGrid('newGrid', d.latest, '등록된 루틴이 없습니다.');
         })
-        .catch(() => {
-            routines = [];
-            renderExplore();
+        .catch(() => toast('루틴 탐색 정보를 불러오는 중 오류가 발생했습니다.', '⚠️'));
+}
+
+function renderLocation(loc) {
+    const el = document.getElementById('locationStatus');
+    if (!el || !loc) return;
+    if (loc.source === 'GPS') el.textContent = 'GPS 위치 사용 중 · 반경 3km 기준으로 추천합니다.';
+    else if (loc.source === 'PROFILE') el.textContent = '저장한 내 위치 기준 · [내 위치 찾기]로 GPS를 쓰면 더 정확해집니다.';
+    else el.textContent = '기본 위치: ' + (loc.label || '동의대학교') + ' 인근 · GPS를 사용하면 주변 추천이 정교해집니다.';
+}
+
+function renderCategoryChips(categories) {
+    const box = document.getElementById('exploreChips');
+    if (!box || !categories) return;
+    exploreCategories = categories;
+    const chip = (code, label) =>
+        '<button type="button" class="day-chip' + (code === exploreCategoryCode ? ' active' : '') + '" data-cat="' + code + '"'
+        + ' onclick="App.routine.setCategory(\'' + code + '\', this)">' + label + '</button>';
+    box.innerHTML = chip('ALL', '🔥 전체')
+        + categories.map(c => chip(c.code, (c.emoji || '') + ' ' + App.escape(c.name))).join('');
+}
+
+function fillGrid(id, cards, emptyMsg) {
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    grid.innerHTML = cards && cards.length
+        ? cards.map(routineCard).join('')
+        : '<div class="empty span-full" style="padding: 40px; text-align: center; color: var(--color-muted);">' + emptyMsg + '</div>';
+}
+
+function formatDistance(m) {
+    if (m == null) return '';
+    return m < 1000 ? m + 'm' : (m / 1000).toFixed(1) + 'km';
+}
+
+/* 루틴 카드: 카테고리 여러 개, 장소·거리, 태그, 담은 인원, 적합도 (담기는 상세 모달) */
+function routineCard(r) {
+    const cats = (r.categories || []).map(c => '<span class="pill">' + (c.emoji || '') + ' ' + App.escape(c.name) + '</span>').join('');
+    const tags = (r.tags || []).slice(0, 3).map(t => '#' + App.escape(t)).join(' ');
+    const place = r.place
+        ? '📍 ' + App.escape(r.place.name) + (r.place.distanceMeters != null ? ' · ' + formatDistance(r.place.distanceMeters) : '')
+        : '📍 장소 자유';
+
+    return '<article class="card surface-white border-default border-color-border radius-lg clip-overflow cursor-pointer" onclick="App.routine.openRoutine(' + r.id + ')">' +
+        '<div class="ds-p-5">' +
+        '<h3 class="weight-heading type-lg">' + App.escape(r.title) + '</h3>' +
+        (cats ? '<div class="layout-row ds-gap-1 layout-wrap align-start ds-mt-2">' + cats + '</div>' : '') +
+        '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.description || '') + '</p>' +
+        '<p class="type-xs color-muted ds-mt-2">' + place + '</p>' +
+        (tags ? '<p class="type-xs color-muted ds-mt-1">' + tags + '</p>' : '') +
+        '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
+        '<span>🔥 ' + (r.adoptedCount || 0).toLocaleString() + '명 · Task ' + (r.taskCount || 0) + '개</span>' +
+        '<b class="color-text">적합도 ' + (r.fitScore || 100) + '%</b>' +
+        '</div>' +
+        '</div>' +
+        '</article>';
+}
+
+/* 검색창 입력·정렬 변경 (tab_explorer.jsp 의 oninput / onchange) */
+function renderExplore() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { searchPage = 1; runSearch(false); }, 250);
+}
+
+/* 검색어·칩·정렬 중 하나라도 있으면 검색 결과, 없으면 탐색 홈 */
+function runSearch(append) {
+    const q = document.getElementById('routineSearch').value.trim();
+    const sort = document.getElementById('routineSort').value;
+    const searching = q || exploreCategoryCode !== 'ALL' || sort !== 'distance';
+    document.getElementById('searchState').classList.toggle('is-hidden', !searching);
+    document.getElementById('exploreHome').classList.toggle('is-hidden', !!searching);
+    if (!searching) return;
+
+    const params = new URLSearchParams({ q: q, category: exploreCategoryCode, sort: sort, page: String(searchPage) });
+    const loc = locationQuery();
+    api('GET', EXPLORE_API + '?' + params.toString() + (loc ? '&' + loc : ''))
+        .then(json => {
+            if (!json.success) return fail(json, '루틴을 검색하지 못했습니다.');
+            const result = json.data;
+            const chip = exploreCategories.find(c => c.code === exploreCategoryCode);
+            const label = [q ? '"' + q + '"' : '', chip ? chip.name : ''].filter(Boolean).join(' · ') || '전체 루틴';
+            document.getElementById('searchCount').textContent = label + ' 결과';
+            const grid = document.getElementById('searchGrid');
+            const html = result.items.map(routineCard).join('');
+            if (append) grid.insertAdjacentHTML('beforeend', html);
+            else grid.innerHTML = html || '<div class="empty span-full" style="padding: 40px; text-align: center; color: var(--color-muted);">조건에 맞는 루틴이 없습니다.</div>';
+            document.getElementById('searchMore').classList.toggle('is-hidden', !result.hasNext);
+        })
+        .catch(() => toast('루틴 검색 중 오류가 발생했습니다.', '⚠️'));
+}
+
+function loadMoreSearch() { searchPage++; runSearch(true); }
+
+/* "더보기 →": 가까운 순 전체 목록 */
+function showSection() {
+    document.getElementById('routineSort').value = 'distance';
+    exploreCategoryCode = 'ALL';
+    searchPage = 1;
+    document.getElementById('searchState').classList.remove('is-hidden');
+    document.getElementById('exploreHome').classList.add('is-hidden');
+    const params = new URLSearchParams({ sort: 'distance', page: '1' });
+    const loc = locationQuery();
+    api('GET', EXPLORE_API + '?' + params.toString() + (loc ? '&' + loc : ''))
+        .then(json => {
+            if (!json.success) return fail(json, '루틴을 불러오지 못했습니다.');
+            document.getElementById('searchCount').textContent = '가까운 순 전체 루틴';
+            document.getElementById('searchGrid').innerHTML = json.data.items.map(routineCard).join('');
+            document.getElementById('searchMore').classList.toggle('is-hidden', !json.data.hasNext);
         });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    fetchRoutinesFromServer();
-    loadManage();
-});
-
-function filteredRoutines() {
-    const q = document.getElementById('routineSearch').value.trim().toLowerCase();
-    return routines.filter(r => (routineCategory === '전체' || (r.cat && r.cat.includes(routineCategory))) && (!q || (r.name + ' ' + r.desc).toLowerCase().includes(q)));
+function clearSearch() {
+    document.getElementById('routineSearch').value = '';
+    document.getElementById('routineSort').value = 'distance';
+    exploreCategoryCode = 'ALL';
+    routineCategory = '전체';
+    renderCategoryChips(exploreCategories);
+    runSearch(false);
 }
 
-function routineCard(r) {
-  const catHtml = (r.cat || []).map(function(c) { return '<span class="pill">' + App.escape(c) + '</span>'; }).join('');
-
-  return '<article class="card surface-white border-default border-color-border radius-lg clip-overflow cursor-pointer" onclick="App.routine.openRoutine(\'' + r.id + '\')">' +
-         '<div class="ds-h-28 surface-gradient ds-p-4 layout-row justify-between">' +
-         '<div class="layout-row ds-gap-1 layout-wrap align-start">' + catHtml + '</div>' +
-         '</div>' +
-         '<div class="ds-p-5">' +
-         '<h3 class="weight-heading type-lg">' + App.escape(r.name) + '</h3>' +
-         '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.desc) + '</p>' +
-         '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
-         '<span>담은 인원: ' + (r.popular || 0) + '명</span>' +
-         '<button type="button" class="btn btn-secondary ds-px-3 ds-py-1" onclick="event.stopPropagation();App.routine.adoptRoutineToServer(' + r.serverId + ')">내 루틴에 담기</button>' +
-         '</div>' +
-         '</div>' +
-         '</article>';
-}
-
-function renderExplore() {
-    const a = filteredRoutines(), q = document.getElementById('routineSearch').value.trim();
-    document.getElementById('searchState').classList.toggle('is-hidden', !q);
-    document.getElementById('exploreHome').classList.toggle('is-hidden', !!q);
-
-    const emptyMsg = '<div class="empty span-full" style="padding: 40px; text-align: center; color: var(--color-muted);">DB에 등록된 루틴 템플릿이 없습니다.</div>';
-
-    if (q) {
-        document.getElementById('searchCount').textContent = '"' + q + '" 검색 결과 ' + a.length + '개';
-        document.getElementById('searchGrid').innerHTML = a.length ? a.map(routineCard).join('') : emptyMsg;
-        return;
-    }
-
-    const cardsHtml = a.length ? a.map(routineCard).join('') : emptyMsg;
-    document.getElementById('nearbyRoutineGrid').innerHTML = cardsHtml;
-    document.getElementById('recommendedGrid').innerHTML = cardsHtml;
-    document.getElementById('popularGrid').innerHTML = cardsHtml;
-    document.getElementById('newGrid').innerHTML = cardsHtml;
-}
-
-function clearSearch() { document.getElementById('routineSearch').value = ''; renderExplore(); }
-function setCategory(c, b) {
-    routineCategory = c;
-    document.querySelectorAll('[data-cat]').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    renderExplore();
+/* 카테고리 칩: 목록은 서버 검색, 지도 주변 장소는 기존 검색(이름 기준) 그대로 */
+function setCategory(code, btn) {
+    exploreCategoryCode = code;
+    const chip = exploreCategories.find(c => c.code === code);
+    routineCategory = chip ? chip.name : '전체';
+    document.querySelectorAll('#exploreChips [data-cat]').forEach(x => x.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    searchPage = 1;
+    runSearch(false);
     searchNearbyRoutinePlaces();
 }
 
+/* 루틴 상세 모달: 대표 장소, 적합도, 실천 중인 인원, Task 목록 */
 function openRoutine(id) {
-    selectedRoutine = routines.find(r => r.id === id);
-    if (!selectedRoutine) return;
-    document.getElementById('rmTitle').textContent = selectedRoutine.name;
-    document.getElementById('rmDesc').textContent = selectedRoutine.desc;
-    document.getElementById('rmBadges').innerHTML = (selectedRoutine.cat || []).map(function(c) { return '<span class="pill">' + App.escape(c) + '</span>'; }).join('');
-    document.getElementById('rmPlace').textContent = '추천 장소';
-    document.getElementById('rmFit').textContent = '100%';
-    document.getElementById('rmUsers').textContent = (selectedRoutine.popular || 0) + '명';
-    document.getElementById('rmTasks').innerHTML = '<div class="desc" style="padding:15px; text-align:center;">이 루틴을 담아 나만의 일상을 시작해보세요!</div>';
-    document.getElementById('routineModal').classList.add('show');
+    const loc = locationQuery();
+    api('GET', EXPLORE_API + '/' + id + (loc ? '?' + loc : ''))
+        .then(json => {
+            if (!json.success) return fail(json, '루틴 정보를 불러오지 못했습니다.');
+            const d = json.data, r = d.routine;
+            selectedRoutineId = r.id;
+            document.getElementById('rmTitle').textContent = r.title;
+            document.getElementById('rmDesc').textContent = r.description || '';
+            document.getElementById('rmBadges').innerHTML = (r.categories || [])
+                .map(c => '<span class="pill">' + (c.emoji || '') + ' ' + App.escape(c.name) + '</span>').join('');
+            document.getElementById('rmPlace').textContent = r.place
+                ? r.place.name + (r.place.distanceMeters != null ? ' (' + formatDistance(r.place.distanceMeters) + ')' : '')
+                : '장소 자유';
+            document.getElementById('rmFit').textContent = r.fitScore + '%';
+            document.getElementById('rmUsers').textContent = d.performerCount.toLocaleString() + '명 실천 중';
+            document.getElementById('rmTasks').innerHTML = d.tasks.length
+                ? d.tasks.map(t =>
+                    '<div class="surface-white radius-md ds-p-3 border-default layout-row ds-gap-3 align-center">' +
+                    '<b class="type-sm">' + App.escape(t.time) + '</b>' +
+                    '<div class="min-width-zero"><div class="type-sm weight-bold">' + App.escape(t.content) + '</div>' +
+                    '<div class="type-xs color-muted">' + App.escape(t.category || '') + (t.placeName ? ' · 📍 ' + App.escape(t.placeName) : '') + '</div></div>' +
+                    '</div>').join('')
+                : '<div class="type-sm color-muted" style="padding: 15px; text-align: center;">등록된 Task가 없습니다.</div>';
+            const btn = document.getElementById('rmAdoptBtn');
+            btn.disabled = d.alreadyAdopted;
+            btn.textContent = d.alreadyAdopted ? '이미 내 루틴에 있어요' : '내 루틴에 담기';
+            btn.style.opacity = d.alreadyAdopted ? '0.5' : '1';
+            document.getElementById('routineModal').classList.add('show');
+        })
+        .catch(() => toast('루틴 정보를 불러오는 중 오류가 발생했습니다.', '⚠️'));
 }
 
 function toggleModalTasks(c) { document.querySelectorAll('.rm-check').forEach(x => x.checked = c.checked); }
 
-/* 템플릿 Fork (내 루틴으로 담기: POST /user-routines/adopt) */
+document.addEventListener('DOMContentLoaded', function() {
+    loadExplore();
+    loadManage();
+});
+
+/* 내 루틴에 담기: 팀원 API (POST /user-routines/adopt). 상세 모달에서 이미 담은 루틴이면 버튼이 비활성화된다 */
+let adopting = false;
 function adoptRoutineToServer(templateId) {
-    if (!templateId) return;
+    if (!templateId || adopting) return;          // 두 번 눌러도 한 번만 담기
+    adopting = true;
+    const btn = document.getElementById('rmAdoptBtn');
+    if (btn) btn.disabled = true;
     const body = new URLSearchParams({
         routineTemplateId: String(templateId),
         startDate: App.dateKey()
     });
-    fetch(contextPath + '/user-routines/adopt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body
-    })
-    .then(res => res.json())
-    .then(json => {
-        if (json && json.success) {
-            toast('루틴을 내 일상에 추가했습니다!', '✨');
-            hide('routineModal');
-            switchTab('manage');
-            loadManage(json.data && json.data.id);
-        } else {
-            toast(json.message || '루틴 담기에 실패했습니다.', '⚠️');
-        }
-    })
-    .catch(() => {
-        toast('루틴 담기 중 통신 오류가 발생했습니다.', '⚠️');
-    });
+    api('POST', contextPath + '/user-routines/adopt', body)
+        .then(json => {
+            if (json && json.success) {
+                toast('루틴을 내 일상에 추가했습니다!', '✨');
+                hide('routineModal');
+                switchTab('manage');
+                loadManage(json.data && json.data.id);
+                loadExplore();   // 담은 루틴은 추천에서 빠지고 상세 버튼이 비활성화되도록
+            } else {
+                if (btn) btn.disabled = false;
+                fail(json, '루틴 담기에 실패했습니다.');
+            }
+        })
+        .catch(() => {
+            if (btn) btn.disabled = false;
+            toast('루틴 담기 중 통신 오류가 발생했습니다.', '⚠️');
+        })
+        .finally(() => { adopting = false; });
 }
 
 function addAllRoutineTasks() {
-    if (selectedRoutine && selectedRoutine.serverId) {
-        adoptRoutineToServer(selectedRoutine.serverId);
-    }
+    if (selectedRoutineId) adoptRoutineToServer(selectedRoutineId);
 }
 function addSelectedRoutineTasks() { addAllRoutineTasks(); }
 
@@ -241,6 +345,8 @@ function locateUser() {
         if (routineMap && typeof MapUtil !== 'undefined') {
             MapUtil.moveTo(routineMap, userLocation.lat, userLocation.lng);
         }
+        gpsUsed = true;
+        loadExplore();
         searchNearbyRoutinePlaces();
         toast('현재 위치를 반영했습니다.', '📍');
     }, () => toast('위치 권한을 확인하지 못했습니다.', '⚠️'), { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 });
@@ -250,13 +356,34 @@ function focusUser() {
     locateUser();
 }
 
+// 내 위치 찾기 옆 필터 버튼 (모달: routineFilterModal)
+/* 주변 루틴 스팟 필터: 키워드에 맞는 장소만 지도·목록에 표시. 비우고 적용하면 해제.
+   키워드는 placeKeyword 에 남겨서 내 위치 이동·카테고리 변경 뒤에도 유지된다 */
+let placeKeyword = '';
+
 function openPlaceFilters() {
-    const cur = prompt('검색할 주변 루틴 스팟 키워드를 입력하세요:\n(예: 운동, 러닝, 공원, 카페, 도서관, 헬스장)', '운동');
-    if (cur && cur.trim()) {
-        searchNearbyRoutinePlaces(cur.trim());
-        toast(`'${cur.trim()}' 스팟을 지도에 표시합니다.`, '🔍');
+    if (!routineMap || typeof MapUtil === 'undefined') {
+        toast('지도를 불러오지 못해 필터를 적용할 수 없습니다.', '⚠️');
+        return;
     }
+    const input = document.getElementById('placeKeywordInput');
+    if (input) input.value = placeKeyword;   // 지금 적용 중인 키워드 표시
+    ModalManager.open('routineFilterModal');
 }
+
+function submitPlaceFilter() {
+    const input = document.getElementById('placeKeywordInput');
+    placeKeyword = input ? input.value.trim() : '';
+    ModalManager.close('routineFilterModal');
+    searchNearbyRoutinePlaces().then(applied => {
+        if (!applied) return;
+        if (!placeKeyword) toast('필터를 해제했습니다.', '📍');
+        else if (nearbyRoutinePlaces.length) toast(`'${placeKeyword}' 스팟 ${Math.min(nearbyRoutinePlaces.length, 6)}곳을 표시합니다.`, '🔍');
+        else toast(`'${placeKeyword}'에 맞는 주변 스팟이 없습니다.`, '🔍');
+    });
+}
+
+
 
 /* ============================================================
    루틴 관리 탭 (백엔드: /api/my-routines, 문서 docs/ROUTINE_MANAGE_API.md)
@@ -747,8 +874,20 @@ function deleteRoutine() {
         return NOISE_BLACKLIST.some(kw => targetText.includes(kw));
     }
 
-    async function searchNearbyRoutinePlaces(keyword) {
-        if (!routineMap || typeof MapUtil === 'undefined') return;
+    let placeSearchSeq = 0;   // 늦게 끝난 이전 검색이 필터 결과를 덮어쓰지 않게
+
+    /* 필터 키워드가 장소 이름·카테고리·테마에 들어 있는지 (키워드 없으면 모두 통과) */
+    function matchesPlaceKeyword(place, kw) {
+        if (!kw) return true;
+        const text = [place.name, place.categoryName, place.originalCategoryName, place.themeName]
+            .filter(Boolean).join(' ').toLowerCase();
+        return text.includes(kw.toLowerCase());
+    }
+
+    async function searchNearbyRoutinePlaces(keyword = placeKeyword) {
+        if (!routineMap || typeof MapUtil === 'undefined') return false;
+        const seq = ++placeSearchSeq;
+        keyword = (keyword || '').trim();
 
         const lat = userLocation.lat;
         const lng = userLocation.lng;
@@ -765,6 +904,7 @@ function deleteRoutine() {
                 if (dbJson && dbJson.success && Array.isArray(dbJson.data)) {
                     combinedPlaces = dbJson.data
                         .filter(p => !isNoisePlace(p))
+                        .filter(p => matchesPlaceKeyword(p, keyword))
                         .map(p => ({
                             ...p,
                             isDbSpot: true,
@@ -810,8 +950,10 @@ function deleteRoutine() {
             }
         }
 
+        if (seq !== placeSearchSeq) return false;   // 그 사이 새 검색(필터 변경 등)이 시작됨
         nearbyRoutinePlaces = combinedPlaces;
         renderNearbyPlaces();
+        return true;
     }
 
     function renderNearbyPlaces() {
@@ -915,10 +1057,11 @@ function showPlaceDetail(place) {
         if (location.hash === '#manage') switchTab('manage');
     });
 
-        App.routine = {
-        setRadius, applyPlaceFilters, showPlaceDetail, toast, hide, closeModal, switchTab, filteredRoutines, routineCard, renderExplore,
+    App.routine = {
+        setRadius, applyPlaceFilters, showPlaceDetail, toast, hide, closeModal, switchTab, routineCard, renderExplore,
+        loadExplore, loadMoreSearch, showSection,
         clearSearch, setCategory, openRoutine, toggleModalTasks, adoptRoutineToServer,
-        addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters,
+        addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters, submitPlaceFilter,
         loadManage, changeActiveRoutine, renderManage, renderCalendar, selectCalendarDate, moveCalendar,
         toggleCalendarView, calendarToday, toggleServerDone, selectServerTask, openTaskForm, onRepeatChange,
         saveTask, deleteActiveTask, searchTaskPlace, pickTaskPlace, clearTaskPlace,

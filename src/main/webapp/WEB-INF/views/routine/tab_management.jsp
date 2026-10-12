@@ -26,7 +26,7 @@
         <div class="text-xs text-secondary surface-sub-bg rounded-md px-16 py-8 mt-8">운영 기간 <b
             id="routinePeriodLabel"></b></div>
       </div>
-      <div class="flex items-center">
+      <div class="flex items-center" style="width: 400px;">
         <button type="button" onclick="App.routine.openRoutineInfo()"
           class="btn btn-secondary text-sm font-bold rounded-md px-16 py-8">⚙ 기본 정보</button>
         <button type="button" onclick="App.routine.openRoutineCreateModal()"
@@ -55,7 +55,7 @@
     </div>
     <div class="flex items-center justify-between mb-16">
       <div id="calendarTitle" class="text-lg font-bold"></div>
-      <button type="button" onclick="App.routine.calendarToday()" class="text-xs font-bold text-primary">오늘</button>
+      <button type="button" onclick="App.routine.calendarToday()" class="badge border-none">오늘</button>
     </div>
     <div id="calendarGrid" class="cal-grid"></div>
   </section>

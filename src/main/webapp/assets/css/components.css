@@ -15,6 +15,13 @@
     z-index: 30;
 }
 
+.header-logout {
+    border: none;
+    background: none;
+    color: red;
+    cursor: pointer;
+}
+
 /* 브랜드 로고: 표시 방식 flex, 교차축 정렬 center, 글꼴 var(--font-logo), sans-serif, 글자 크기 30px, 글자 두께 400를 적용합니다. */
 .logo {
     display: flex;
@@ -88,7 +95,7 @@
 .section-title {
     font-size: var(--fs-h2);
     font-weight: var(--fw-h2);
-    margin-bottom: 17px;
+    margin: 17px 0 17px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -273,8 +280,8 @@
 /* .btn-secondary: 배경 var(--color-white), 테두리 1px solid var(--color-border), 글자색 var(--color-muted)를 적용합니다. */
 .btn-secondary {
     background: var(--color-white);
-    border: 1px solid var(--color-border);
     color: var(--color-muted);
+    border: 1px solid var(--color-border);
 }
 
 /* .btn-secondary 마우스 호버 상태: 배경 var(--color-sub-bg)를 적용합니다. */

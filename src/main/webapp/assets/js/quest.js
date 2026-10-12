@@ -375,7 +375,6 @@
         const isPlanned = serverUserQuests.some(uq => uq.originTemplateId === q.id);
         return `
             <div class="dash-card card" onclick="App.quest.openDetailModal(${q.id})">
-                <div class="thumb">${App.escape(q.icon)}</div>
                 <div class="badges">
                     <span class="badge">${App.escape(getCategoryName(q.cat))}</span>
                     <span class="badge orange">+${q.xp} XP</span>
