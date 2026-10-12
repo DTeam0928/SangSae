@@ -161,7 +161,7 @@ function formatDistance(m) {
     return m < 1000 ? m + 'm' : (m / 1000).toFixed(1) + 'km';
 }
 
-/* 루틴 카드: 카테고리 여러 개, 장소·거리, 태그, 담은 인원, 적합도 (담기는 상세 모달에서) */
+/* 루틴 카드: 카테고리 여러 개, 장소·거리, 태그, 담은 인원, 적합도 (담기는 상세 모달) */
 function routineCard(r) {
     const cats = (r.categories || []).map(c => '<span class="pill">' + (c.emoji || '') + ' ' + App.escape(c.name) + '</span>').join('');
     const tags = (r.tags || []).slice(0, 3).map(t => '#' + App.escape(t)).join(' ');
