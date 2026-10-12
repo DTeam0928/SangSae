@@ -10,6 +10,23 @@
         return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
+    function restoreTheme() {
+        try {
+            const theme = localStorage.getItem('theme');
+
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        } catch (error) {
+            console.warn('저장된 테마를 불러올 수 없습니다.', error);
+        }
+    }
+
+    restoreTheme();
+    window.addEventListener('pageshow', restoreTheme);
+
     window.App = Object.assign(window.App || {}, {
         dateKey,
         escape,
