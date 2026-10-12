@@ -14,6 +14,5 @@ public final class Views {
     public static final String ONBOARDING_LOCATION = PREFIX + "onboarding/location.jsp"; // O-03
     public static final String HOME = PREFIX + "home/home.jsp";
     public static final String QUEST = PREFIX + "quest/quest.jsp";
-    public static final String ROUTINE = PREFIX + "routine/routine.jsp";
-    public static final String MYPAGE = PREFIX + "mypage/mypage.jsp";
+    public static final String MYPAGE = PREFIX + "mypage/mypage.jsp";                // 마이페이지
 }
