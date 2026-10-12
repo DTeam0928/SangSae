@@ -138,12 +138,11 @@ public class HomeDashboardService {
                 String title = row[1] != null
                         ? row[1].toString()
                         : "완료한 퀘스트";
-                String completedAt = row[2].toString();
 
                 model.getTrips().add(new HomeModel.ManagementItem(
                     logId,
                     title,
-                    completedAt,
+                    today.toString(),
                     today.toString(),
                     "completed"
                 ));
