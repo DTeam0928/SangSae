@@ -95,7 +95,7 @@
 .section-title {
     font-size: var(--fs-h2);
     font-weight: var(--fw-h2);
-    margin-bottom: 17px;
+    margin: 17px 0 17px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;

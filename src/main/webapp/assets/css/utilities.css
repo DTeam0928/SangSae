@@ -501,6 +501,10 @@ button:disabled {
     background: var(--color-sub-bg);
 }
 
+.surface-none {
+    background: none;
+}
+
 /* .ds-py-7: 안쪽 여백 top 1.75rem, 안쪽 여백 bottom 1.75rem를 적용합니다. */
 .ds-py-7 {
     padding-top: 1.75rem;
