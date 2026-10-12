@@ -15,6 +15,13 @@
     z-index: 30;
 }
 
+.header-logout {
+    border: none;
+    background: none;
+    color: red;
+    cursor: pointer;
+}
+
 /* 브랜드 로고: 표시 방식 flex, 교차축 정렬 center, 글꼴 var(--font-logo), sans-serif, 글자 크기 30px, 글자 두께 400를 적용합니다. */
 .logo {
     display: flex;
