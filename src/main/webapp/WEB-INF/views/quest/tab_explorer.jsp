@@ -28,7 +28,7 @@
             <p class="desc">여행지에서 할 수 있는 작은 도전을 발견하고 나만의 일정으로 만들어보세요.</p>
         </div>
         <div class="hero-actions">
-            <button class="btn btn-secondary" onclick="App.quest.openCollectionModal()">♡ 내 컬렉션</button>
+            <button class="btn btn-secondary" onclick="App.quest.openCollectionModal()">♡ 내 북마크</button>
             <button class="quest-detail-6 btn btn-primary" onclick="App.quest.openCreateModal()">＋ 퀘스트 만들기</button>
         </div>
     </div>

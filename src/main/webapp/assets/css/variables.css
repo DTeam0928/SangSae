@@ -3,7 +3,8 @@
  */
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap');
-/* 로컬 로고 글꼴을 등록합니다. CSS와 같은 위치의 TTF 파일을 사용합니다. */
+
+/* ---------- 1. 폰트 정의 (fonts) ---------- */
 @font-face {
     font-family: 'NalnaRiji';
     src: url('nelnalizzychae2020.ttf') format('truetype');
@@ -12,67 +13,53 @@
     font-display: swap;
 }
 
-/* 공통 디자인 토큰: 색상, 글꼴, 크기, 곡률, 그림자와 레이아웃 기준값을 정의합니다. */
+/* ---------- 2. 디자인 정의 (style guide) ---------- */
 :root {
-    /* 브랜드 기본 민트 (--color-primary) */
-    --color-primary: #BDDEDD;
-    /* 브랜드 진한 민트와 호버 색상 (--color-dark) */
-    --color-dark: #87BBBE;
-    /* 기본 화면 배경 (--color-bg) */
-    --color-bg: #EFFAFA;
-    /* 강조 영역 배경 (--color-main) */
-    --color-main: #E2F5F5;
-    /* 보조 영역 배경 (--color-sub-bg) */
-    --color-sub-bg: #E8F4F4;
-    /* 흰색 표면과 반전 글자 (--color-white) */
-    --color-white: #ffffff;
-    /* 기본 본문 글자색 (--color-text) */
-    --color-text: #2C3E42;
-    /* 보조 글자색 (--color-muted) */
-    --color-muted: #6C8287;
-    /* 기본 테두리 (--color-border) */
-    --color-border: #D1E5E5;
-    /* 보조 구분선 (--color-border2) */
-    --color-border2: #D8ECEC;
-    /* 경험치와 강조 색상 (--color-accent) */
-    --color-accent: #E59B21;
-    /* 오류와 삭제 색상 (--color-danger) */
-    --color-danger: #E56B6F;
-    /* 오류와 삭제 배경 (--color-danger-bg) */
-    --color-danger-bg: #FDE8E8;
-    /* 완료와 성공 색상 (--color-success) */
-    --color-success: #2A9D8F;
-    /* 로고 전용 글꼴 (--font-logo) */
+    /* 컬러 팔레트 */
+    /* 1. 핵심 포인트 컬러 (요청하신 톤 유지) */
+    --color-primary: #BDDEDD;     /* 메인 포인트 / 연한 민트 */
+    --color-dark: #87BBBE;        /* 프라이머리 다크 버전 / 버튼 호버용 */
+    --color-bg: #EFFAFA;          /* 기본 배경색 / 매우 연한 민트빛 화이트 */
+
+    --color-dark-hover: #75a7a9;    /* --color-dark보다 살짝 짙은 호버용 민트 */
+    --color-danger-border: #f7a3a6; /* --color-danger와 어울리는 연한 에러 테두리 선 */
+
+    /* 2. 조화로운 서브 및 배경 컬러 */
+    --color-main: #E2F5F5;        /* 기존 메인 컬러를 배경 톤에 맞게 은은하게 조율 */
+    --color-sub-bg: #E8F4F4;      /* 배경 박스 및 연한 서브 배경 */
+    --color-white: #ffffff;       /* 카드 및 컴포넌트 흰색 배경 */
+
+    /* 3. 텍스트 및 보조 컬러 (민트 톤과 어울리는 차분한 차콜/그레이) */
+    --color-text: #2C3E42;        /* 기본 텍스트 (너무 진한 블랙 대신 푸른빛이 감도는 다크 톤) */
+    --color-muted: #6C8287;       /* 보조 텍스트 (톤 다운된 그레이민트) */
+    --color-surface: var(--color-white);
+
+    /* 4. 테두리 및 경계선 */
+    --color-border: #D1E5E5;      /* 기본 테두리 (민트빛이 살짝 감도는 부드러운 선) */
+    --color-border2: #D8ECEC;     /* 헤더 등 보조 테두리 */
+
+    /* 5. 강조, 뱃지 및 상태 컬러 */
+    --color-accent: #E59B21;      /* 경고/뱃지/보조 포인트 (따뜻한 오렌지/골드 톤으로 포인트) */
+    --color-danger: #E56B6F;      /* 삭제/에러 (채도를 살짝 낮춘 세련된 레드) */
+    --color-danger-bg: #FDE8E8;   /* 에러 배경 연한 톤 */
+    --color-success: #2A9D8F;     /* 성공/완료 (민트 계열과 찰떡궁합인 딥 그린) */
+
     --font-logo: 'NalnaRiji', sans-serif;
-    /* 한국어 본문 글꼴 (--font-body) */
     --font-body: 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
     /* 온보딩 대형 로고 크기 (--fs-a) */
     --fs-a: 128px;
     /* 대형 강조 글자 크기 (--fs-b) */
     --fs-b: 36px;
-    /* 큰 제목 크기 (--fs-h1) */
-    --fs-h1: 25px;
-    /* 큰 제목 두께 (--fw-h1) */
-    --fw-h1: 850;
-    /* 중간 제목 크기 (--fs-h2) */
-    --fs-h2: 19px;
-    /* 중간 제목 두께 (--fw-h2) */
-    --fw-h2: 800;
-    /* 작은 제목 크기 (--fs-h3) */
-    --fs-h3: 16px;
-    /* 작은 제목 두께 (--fw-h3) */
-    --fw-h3: 730;
-    /* 본문 크기 (--fs-body) */
-    --fs-body: 14px;
-    /* 본문 두께 (--fw-body) */
-    --fw-body: 450;
-    /* 본문 줄 간격 (--lh-body) */
-    --lh-body: 1.5;
-    /* 보조 설명 크기 (--fs-small) */
-    --fs-small: 12px;
-    /* 보조 설명 두께 (--fw-small) */
-    --fw-small: 600;
-    /* 카드와 모달 곡률 (--radius-lg) */
+
+    --fs-h1: 25px;  --fw-h1: 850;
+    --fs-h2: 19px;  --fw-h2: 800;
+    --fs-h3: 16px; --fw-h3: 730;
+    --fs-body: 14px; --fw-body: 450; --lh-body: 1.5;
+    --fs-small: 12px; --fw-small: 600;
+
+    /* 라운드/그림자 */
+    /* 카드, 모달 곡률 (--radius-lg) */
     --radius-lg: 16px;
     /* 내부 패널 곡률 (--radius-md) */
     --radius-md: 12px;
@@ -80,6 +67,7 @@
     --radius-sm: 8px;
     /* 카드 그림자 (--shadow-card) */
     --shadow-card: 0 4px 20px rgba(30, 70, 90, 0.04);
+
     /* 기본 모달 배경 덮개 (--color-overlay) */
     --color-overlay: rgba(20,30,40,.45);
     /* 모달 그림자 (--shadow-modal) */
@@ -115,6 +103,8 @@
     /* 공통 콘텐츠 최대 너비 (--container-max) */
     --container-max: 1200px;
     /* 12칼럼 기본 간격 (--grid-gap) */
-    --grid-gap: 24px;
-}
+    --grid-gap: 24px;}
 
+:root { --color-overlay: rgba(20,30,40,.45); --shadow-modal: 0 20px 60px rgba(0,0,0,.18); }
+
+.routine-container {width:min(1220px,calc(100% - 28px))}

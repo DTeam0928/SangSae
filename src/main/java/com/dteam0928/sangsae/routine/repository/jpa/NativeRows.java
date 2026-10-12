@@ -35,6 +35,26 @@ final class NativeRows {
         return ((Number) o).intValue() != 0;
     }
 
+    /** DATE 컬럼 값. 드라이버·Hibernate 버전에 따라 java.sql.Date 또는 LocalDate 로 온다 */
+    static java.time.LocalDate date(Object o) {
+        if (o == null) return null;
+        if (o instanceof java.time.LocalDate d) return d;
+        if (o instanceof java.sql.Date d) return d.toLocalDate();
+        if (o instanceof java.util.Date d) return new java.sql.Date(d.getTime()).toLocalDate();
+        return java.time.LocalDate.parse(o.toString().substring(0, 10));
+    }
+
+    /** TIME 컬럼 값 → "HH:mm". (SQL 에서 TIME_FORMAT(..., '%H:%i') 을 쓰면 ':i' 가 Hibernate 이름 파라미터로 읽힐 수 있어 여기서 변환) */
+    static String hhmm(Object o) {
+        if (o == null) return null;
+        java.time.LocalTime t;
+        if (o instanceof java.time.LocalTime lt) t = lt;
+        else if (o instanceof java.sql.Time st) t = st.toLocalTime();
+        else if (o instanceof java.time.Duration d) t = java.time.LocalTime.MIDNIGHT.plus(d);
+        else t = java.time.LocalTime.parse(o.toString());
+        return String.format("%02d:%02d", t.getHour(), t.getMinute());
+    }
+
     static List<String> csv(Object o) {
         return split(o, ",");
     }
@@ -74,6 +94,11 @@ final class NativeRows {
         String add(Object value) {
             values.add(value);
             return "?" + values.size();
+        }
+
+        /** null 이면 SQL 리터럴 NULL (native 쿼리에 null 을 바인딩하면 타입 추론이 안 될 수 있어서) */
+        String nullable(Object value) {
+            return value == null ? "NULL" : add(value);
         }
 
         Query bind(Query q) {

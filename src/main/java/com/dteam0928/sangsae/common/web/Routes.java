@@ -26,6 +26,7 @@ public final class Routes {
     public static final String QUEST = "/quest";
     public static final String API_ROUTINES = "/api/routines";               // R-00 탐색 API
     public static final String API_MY_PLACES = "/api/routines/my-places";    // R-00 장소 관리 API
+    public static final String API_MY_ROUTINES = "/api/my-routines";          // R-00 루틴 관리 API
 
     /** 로그인 직후 이동할 곳: 온보딩을 안 끝냈으면 O-02 */
     public static String afterLogin(LoginUser user) {
