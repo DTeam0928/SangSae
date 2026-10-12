@@ -137,19 +137,17 @@ function filteredRoutines() {
 function routineCard(r) {
   const catHtml = (r.cat || []).map(function(c) { return '<span class="pill">' + App.escape(c) + '</span>'; }).join('');
 
-  return '<article class="card surface-white border-default border-color-border radius-lg clip-overflow cursor-pointer" onclick="App.routine.openRoutine(\'' + r.id + '\')">' +
-         '<div class="ds-h-28 surface-gradient ds-p-4 layout-row justify-between">' +
-         '<div class="layout-row ds-gap-1 layout-wrap align-start">' + catHtml + '</div>' +
-         '</div>' +
-         '<div class="ds-p-5">' +
-         '<h3 class="weight-heading type-lg">' + App.escape(r.name) + '</h3>' +
-         '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.desc) + '</p>' +
-         '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
-         '<span>담은 인원: ' + (r.popular || 0) + '명</span>' +
-         '<button type="button" class="btn btn-secondary ds-px-3 ds-py-1" onclick="event.stopPropagation();App.routine.adoptRoutineToServer(' + r.serverId + ')">내 루틴에 담기</button>' +
-         '</div>' +
-         '</div>' +
-         '</article>';
+    return '<article class="card surface-white border-default border-color-border radius-lg clip-overflow cursor-pointer" onclick="App.routine.openRoutine(\'' + r.id + '\')">' +
+        '<div class="ds-p-5">' +
+        '<h3 class="weight-heading type-lg">' + App.escape(r.name) + '</h3>' +
+        '<div class="layout-row ds-gap-1 layout-wrap align-start ds-mt-2">' + catHtml + '</div>' +
+        '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.desc) + '</p>' +
+        '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
+        '<span>담은 인원: ' + (r.popular || 0) + '명</span>' +
+        '<button type="button" class="btn btn-secondary ds-px-3 ds-py-1" onclick="event.stopPropagation();App.routine.adoptRoutineToServer(' + r.serverId + ')">내 루틴에 담기</button>' +
+        '</div>' +
+        '</div>' +
+        '</article>';
 }
 
 function renderExplore() {
