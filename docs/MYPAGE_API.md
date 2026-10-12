@@ -20,6 +20,7 @@
 
 ## 1. 조회 — `GET /api/me/profile`
 
+//로그인 한 본인의 정보가 옴(예시)
 ```json
 {
   "email": "godlife@questrip.demo",
