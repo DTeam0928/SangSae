@@ -36,7 +36,7 @@
             <div class="layout-row ds-gap-2">
                 <button type="submit" class="layout-grow surface-dark color-white ds-py-3 radius-md weight-bold border-none">저장</button>
                 <button type="button" id="rfDeleteBtn" onclick="App.routine.deleteRoutine()" class="ds-px-4 border-default border-color-danger-bg color-danger radius-md border-none is-hidden">루틴 삭제</button>
-                <button type="button" onclick="App.routine.hide('routineFormModal')" class="ds-px-5 surface-sub-bg radius-md weight-bold">취소</button>
+                <button type="button" onclick="App.routine.hide('routineFormModal')" class="ds-px-5 surface-sub-bg radius-md weight-bold border-none">취소</button>
             </div>
         </form>
     </div></div>
