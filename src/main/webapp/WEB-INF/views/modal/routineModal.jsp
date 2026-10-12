@@ -6,7 +6,7 @@
                 <h3 id="rmTitle" class="type-2xl weight-heading"></h3>
                 <p id="rmDesc" class="type-sm color-muted ds-mt-1"></p>
             </div>
-            <button type="button" onclick="App.routine.hide('routineModal')" class="type-2xl color-muted">×</button>
+            <button type="button" onclick="App.routine.hide('routineModal')" class="type-2xl border-none surface-none">×</button>
         </div>
         <div class="ds-p-6 scroll-y ds-max-h-64vh surface-sub-bg">
             <div class="layout-grid columns-1 medium-columns-3 ds-gap-3 ds-mb-4">
@@ -17,11 +17,12 @@
             <div class="layout-row justify-between ds-mb-3">
                 <b>포함 Task</b>
             </div>
+
+            <!-- 개별 Task들이 동적으로 들어갈 컨테이너 -->
             <div id="rmTasks" class="space-y-2"></div>
         </div>
         <div class="ds-p-5 border-top layout-row ds-gap-2">
             <button type="button" id="rmAdoptBtn" onclick="App.routine.addAllRoutineTasks()" class="layout-grow ds-py-3 surface-dark color-white radius-md weight-bold">내 루틴에 담기</button>
         </div>
-    </div></div>
-
-<!-- Place Detail Modal -->
+    </div>
+</div>

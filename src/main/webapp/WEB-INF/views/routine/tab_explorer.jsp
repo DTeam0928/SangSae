@@ -11,9 +11,9 @@
     <div class="position-relative layout-grow">
       <span class="position-absolute ds-left-4 ds-top-3_5">🔍</span>
       <input id="routineSearch" oninput="App.routine.renderExplore()" class="width-full radius-md ds-pl-11 ds-pr-10 ds-py-3 color-text surface-white border-none focus:outline-none" placeholder="루틴, 장소, 헬스장, 카페, 테마 검색">
-      <button type="button" onclick="App.routine.clearSearch()" class="position-absolute ds-right-3 ds-top-3 color-muted">×</button>
+      <button type="button" onclick="App.routine.clearSearch()" class="position-absolute ds-right-3 surface-none color-text btn">×</button>
     </div>
-    <button type="button" onclick="App.routine.locateUser()" class="ds-px-5 ds-py-3 radius-md surface-soft border-default border-color-white weight-bold text-nowrap">📍 내 위치 찾기</button>
+    <button type="button" onclick="App.routine.locateUser()" class="btn surface-dark color-white">📍 내 위치 찾기</button>
   </div>
   <div class="ds-mt-3 layout-row align-center ds-gap-2 type-xs color-main">
     <span id="locationStatus">위치를 확인하는 중…</span>
@@ -57,8 +57,8 @@
         <p class="type-xs color-muted ds-mt-1">GPS 기준으로 가까운 장소와 그곳에서 많이 수행되는 루틴을 연결합니다.</p>
       </div>
       <div class="layout-row ds-gap-2">
-        <button type="button" onclick="App.routine.focusUser()" class="ds-px-3 ds-py-2 radius-md surface-main color-dark type-xs weight-bold">내 위치로 이동</button>
-        <button type="button" onclick="App.routine.openPlaceFilters()" class="ds-px-3 ds-py-2 radius-md surface-sub-bg color-muted type-xs weight-bold">필터</button>
+        <button type="button" onclick="App.routine.focusUser()" class="ds-px-3 ds-py-2 radius-md surface-main color-dark type-xs weight-bold border-default">내 위치로 이동</button>
+        <button type="button" onclick="App.routine.openPlaceFilters()" class="ds-px-3 ds-py-2 radius-md surface-sub-bg color-muted type-xs weight-bold border-default">필터</button>
       </div>
     </div>
     <div id="map" class="map-wrap" style="position: relative; overflow: hidden;">
@@ -76,12 +76,12 @@
         <h2 class="weight-heading type-xl">🔥 지금 이 근처에서 뜨는 루틴</h2>
         <p class="type-xs color-muted ds-mt-1">내 주변 장소에서 최근 많이 시작된 루틴</p>
       </div>
-      <button type="button" onclick="App.routine.showSection('nearby')" class="type-xs color-muted">더보기 →</button>
+      <button type="button" onclick="App.routine.showSection('nearby')" class="small-btn">더보기 →</button>
     </div>
     <div id="nearbyRoutineGrid" class="layout-grid columns-1 medium-columns-2 large-columns-3 ds-gap-5"></div>
   </section>
 
-  <section class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card">
+  <section class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card ds-mt-2 ds-mb-2">
     <h2 class="weight-heading type-xl">🎯 일상 루틴 가이드</h2>
     <p class="type-xs color-muted ds-mt-1">마음에 드는 루틴을 담아 내 일정으로 만들고, 지정된 장소나 시간에서 완료해 보세요.</p>
   </section>

@@ -9,3 +9,4 @@
 <%@ include file="filterModal.jsp" %>
 <%@ include file="routineFormModal.jsp" %>
 <%@ include file="authRadiusModal.jsp"%>
+<%@ include file="routineFilterModal.jsp"%>

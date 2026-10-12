@@ -40,7 +40,6 @@
 
     <link rel="stylesheet" href="<c:out value='${homeCssUrl}' />">
 
-    <script src="${pageContext.request.contextPath}/assets/js/api-client.js" defer></script>
     <script src="<c:out value='${homeJsUrl}' />" defer></script>
 </head>
 <body data-page="home" data-context-path="${pageContext.request.contextPath}">
