@@ -89,5 +89,7 @@
             </div>
         </main>
 
+        <div id="toast" class="toast"></div>
+
     </div>
 </div>

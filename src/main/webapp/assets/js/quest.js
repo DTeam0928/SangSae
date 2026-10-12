@@ -25,6 +25,29 @@
     let questCalendarCursor = new Date();
     let questCategory = '전체';
 	let pendingScheduleQuestId = null;
+	let selectedSido = '전국';
+	let selectedSigungu = new Set();
+	let appliedRegions = [];
+
+	const KOREA_REGIONS = {
+	    '서울특별시': ['종로구','중구','용산구','성동구','광진구','동대문구','중랑구','성북구','강북구','도봉구','노원구','은평구','서대문구','마포구','양천구','강서구','구로구','금천구','영등포구','동작구','관악구','서초구','강남구','송파구','강동구'],
+	    '부산광역시': ['중구','서구','동구','영도구','부산진구','동래구','남구','북구','해운대구','사하구','금정구','강서구','연제구','수영구','사상구','기장군'],
+	    '대구광역시': ['중구','동구','서구','남구','북구','수성구','달서구','달성군','군위군'],
+	    '인천광역시': ['중구','동구','미추홀구','연수구','남동구','부평구','계양구','서구','강화군','옹진군'],
+	    '광주광역시': ['동구','서구','남구','북구','광산구'],
+	    '대전광역시': ['동구','중구','서구','유성구','대덕구'],
+	    '울산광역시': ['중구','남구','동구','북구','울주군'],
+	    '세종특별자치시': ['세종시'],
+	    '경기도': ['수원시','용인시','고양시','화성시','성남시','부천시','남양주시','안산시','평택시','안양시','시흥시','파주시','김포시','의정부시','광주시','하남시','광명시','군포시','양주시','오산시','이천시','안성시','구리시','의왕시','포천시','양평군','여주시','동두천시','과천시','가평군','연천군'],
+	    '강원특별자치도': ['춘천시','원주시','강릉시','동해시','태백시','속초시','삼척시','홍천군','횡성군','영월군','평창군','정선군','철원군','화천군','양구군','인제군','고성군','양양군'],
+	    '충청북도': ['청주시','충주시','제천시','보은군','옥천군','영동군','증평군','진천군','괴산군','음성군','단양군'],
+	    '충청남도': ['천안시','공주시','보령시','아산시','서산시','논산시','계룡시','당진시','금산군','부여군','서천군','청양군','홍성군','예산군','태안군'],
+	    '전북특별자치도': ['전주시','군산시','익산시','정읍시','남원시','김제시','완주군','진안군','무주군','장수군','임실군','순창군','고창군','부안군'],
+	    '전라남도': ['목포시','여수시','순천시','나주시','광양시','담양군','곡성군','구례군','고흥군','보성군','화순군','장흥군','강진군','해남군','영암군','무안군','함평군','영광군','장성군','완도군','진도군','신안군'],
+	    '경상북도': ['포항시','경주시','김천시','안동시','구미시','영주시','영천시','상주시','문경시','경산시','의성군','청송군','영양군','영덕군','청도군','고령군','성주군','칠곡군','예천군','봉화군','울진군','울릉군'],
+	    '경상남도': ['창원시','진주시','통영시','사천시','김해시','밀양시','거제시','양산시','의령군','함안군','창녕군','고성군','남해군','하동군','산청군','함양군','거창군','합천군'],
+	    '제주특별자치도': ['제주시','서귀포시']
+	};
 
     /* 탭 전환 */
     function switchTab(id, btn) {
@@ -262,6 +285,7 @@
 	}
 	
     function closeModal(id) {
+        if (id === 'regionModal' && typeof ModalManager !== 'undefined') return ModalManager.close(id);
         const target = document.getElementById(id);
         if (target) target.classList.remove('show');
     }
@@ -409,8 +433,9 @@
             return;
         }
 
-        if (popularGrid) popularGrid.innerHTML = quests.map(cardTemplate).join('');
-        if (newGrid) newGrid.innerHTML = quests.map(cardTemplate).join('');
+        const regionQuests = filterQuestsByRegion(quests);
+        if (popularGrid) popularGrid.innerHTML = regionQuests.map(cardTemplate).join('');
+        if (newGrid) newGrid.innerHTML = regionQuests.map(cardTemplate).join('');
         renderExplorerExtras();
     }
 
@@ -454,14 +479,14 @@
 	    .then(res => res.json())
 	    .then(json => {
 	        if (json && json.success) {
-	            showToast('📅 퀘스트를 내 일상에 추가했어요');
+	            showToast('📅 DB 일정에 추가되었습니다!');
 	            fetchUserQuestsFromServer();
 	        } else {
-	            showToast(json.message || '일정 추가에 실패했습니다', '⚠️');
+	            showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
 	        }
 	    })
 	    .catch(() => {
-	        showToast('일정 추가 중 통신 오류가 발생했습니다', '⚠️');
+	        showToast('일정 추가 중 통신 오류가 발생했습니다.', '⚠️');
 	    });
 	}
 
@@ -596,8 +621,68 @@
         });
     }
 
-    function openRegionModal() { document.getElementById('regionModal')?.classList.add('show'); }
-    function applyRegions() { closeModal('regionModal'); showToast('지역 필터 적용됨', '📍'); }
+    function renderRegionPicker() {
+        const sidoList = document.getElementById('regionSidoList');
+        const sigunguList = document.getElementById('regionSigunguList');
+        if (!sidoList || !sigunguList) return;
+        const sidoNames = Object.keys(KOREA_REGIONS);
+        sidoList.innerHTML = ['전국', ...sidoNames].map(name => '<button type="button" role="option" aria-selected="' + (selectedSido === name) + '" class="small-btn" style="display:block;width:100%;margin:4px 0;' + (selectedSido === name ? 'font-weight:700;outline:2px solid var(--color-primary,#4f46e5);' : '') + '" onclick="App.quest.selectRegionSido(' + JSON.stringify(name) + ')">' + name + '</button>').join('');
+        if (selectedSido === '전국') {
+            sigunguList.innerHTML = '<p class="desc">전국을 선택하면 지역 제한 없이 탐색합니다.</p>';
+        } else {
+            const districts = KOREA_REGIONS[selectedSido] || [];
+            sigunguList.innerHTML = '<label style="display:block;margin:6px 0;"><input type="checkbox" ' + (selectedSigungu.size === districts.length ? 'checked' : '') + ' onchange="App.quest.toggleAllSigungu(this.checked)"> 전체 선택</label>' + districts.map(name => '<label style="display:inline-flex;align-items:center;gap:5px;min-width:110px;margin:5px 8px 5px 0;"><input type="checkbox" value="' + name + '" ' + (selectedSigungu.has(name) ? 'checked' : '') + ' onchange="App.quest.toggleSigungu(this.value,this.checked)">' + name + '</label>').join('');
+        }
+        const summary = document.getElementById('selectedRegionSummary');
+        if (summary) summary.textContent = selectedSido === '전국' ? '현재 선택: 전국' : '현재 선택: ' + selectedSido + (selectedSigungu.size ? ' · ' + [...selectedSigungu].join(', ') : ' · 시·군·구를 선택해 주세요');
+    }
+    function openRegionModal() {
+        selectedSido = appliedRegions.length ? appliedRegions[0].sido : '전국';
+        selectedSigungu = new Set(appliedRegions.flatMap(region => region.sigungu));
+        renderRegionPicker();
+        if (typeof ModalManager !== 'undefined') ModalManager.open('regionModal');
+        else document.getElementById('regionModal')?.classList.add('show');
+    }
+    function selectRegionSido(sido) {
+        selectedSido = sido;
+        selectedSigungu = new Set();
+        renderRegionPicker();
+    }
+    function toggleSigungu(name, checked) {
+        if (checked) selectedSigungu.add(name); else selectedSigungu.delete(name);
+        renderRegionPicker();
+    }
+    function toggleAllSigungu(checked) {
+        selectedSigungu = new Set(checked ? (KOREA_REGIONS[selectedSido] || []) : []);
+        renderRegionPicker();
+    }
+    function resetRegions() {
+        selectedSido = '전국';
+        selectedSigungu.clear();
+        renderRegionPicker();
+    }
+    function applyRegions() {
+        if (selectedSido !== '전국' && selectedSigungu.size === 0) {
+            showToast('적용할 시·군·구를 선택해 주세요.', '⚠️');
+            return;
+        }
+        appliedRegions = selectedSido === '전국' ? [] : [{ sido: selectedSido, sigungu: [...selectedSigungu] }];
+        if (typeof ModalManager !== 'undefined') ModalManager.close('regionModal'); else closeModal('regionModal');
+        const label = appliedRegions.length ? appliedRegions[0].sido + ' ' + appliedRegions[0].sigungu.join(', ') : '전국';
+        showToast(label + ' 지역 선택 적용됨', '📍');
+        renderQuestCards();
+        handleSearch(document.getElementById('searchInput')?.value || '');
+    }
+
+    function filterQuestsByRegion(items) {
+        if (!appliedRegions.length) return items;
+        return items.filter(q => appliedRegions.some(region => {
+            const placeText = String(q.place || '').replace(/\\s+/g, '');
+            const sidoPrefix = region.sido.replace(/특별자치도|특별시|광역시|자치시|도$/g, '');
+            return (placeText.includes(sidoPrefix) || placeText.includes(region.sido)) &&
+                region.sigungu.some(district => placeText.includes(district));
+        }));
+    }
 
     function openCollectionModal() {
         const container = document.getElementById('collectionBody');
@@ -651,7 +736,10 @@
         const searchTitle = document.getElementById('searchResultTitle');
         if (searchTitle) searchTitle.textContent = term ? '“' + value.trim() + '” 검색 결과' : getCategoryName(questCategory) + ' 퀘스트';
 
-        const filtered = quests.filter(q => (questCategory === '전체' || q.cat === questCategory) && [q.title, q.place, q.cat].join(' ').toLocaleLowerCase().includes(term));
+        const filtered = filterQuestsByRegion(quests).filter(q =>
+            (questCategory === '전체' || q.cat === questCategory) &&
+            [q.title, q.place, q.cat].join(' ').toLocaleLowerCase().includes(term)
+        );
         const searchGrid = document.getElementById('searchGrid');
         if (searchGrid) {
             searchGrid.innerHTML = filtered.length ? filtered.map(cardTemplate).join('') : '<p class="empty-state">검색 결과가 없습니다.</p>';
@@ -804,7 +892,7 @@
     App.quest = {
         createQuest, switchTab, showToast, closeModal, closeModalOutside, cardTemplate, renderQuestCards,
         toggleSave, addSchedule, completeQuestAction, deleteScheduleItem,
-        openRegionModal, applyRegions, openCollectionModal, openTripPickerModal,
+        openRegionModal, applyRegions, selectRegionSido, toggleSigungu, toggleAllSigungu, resetRegions, openCollectionModal, openTripPickerModal,
         openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
         addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
         initQuestMap, renderQuestMapMarkers, focusUserLocation, openCreateModal, 
