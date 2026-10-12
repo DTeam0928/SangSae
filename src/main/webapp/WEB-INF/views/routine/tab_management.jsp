@@ -35,7 +35,7 @@
     </div>
   </section>
 
-  <!-- 3. 루틴 캘린더 위젯 -->
+  <!-- 3. 루틴 캘린더 -->
   <section class="surface-white border-default rounded-lg p-24 mb-24">
     <div class="flex items-center justify-between flex-wrap mb-16">
       <div>
