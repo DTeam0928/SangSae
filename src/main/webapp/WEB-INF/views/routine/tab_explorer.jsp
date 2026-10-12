@@ -86,7 +86,7 @@
     <div id="nearbyRoutineGrid" class="layout-grid columns-1 medium-columns-2 large-columns-3 ds-gap-5"></div>
   </section>
 
-  <section class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card">
+  <section class="surface-white border-default border-color-border radius-lg ds-p-5 shadow-card ds-mt-2 ds-mb-2">
     <h2 class="weight-heading type-xl">🎯 일상 루틴 가이드</h2>
     <p class="type-xs color-muted ds-mt-1">마음에 드는 루틴을 담아 내 일정으로 만들고, 지정된 장소나 시간에서 완료해 보세요.</p>
   </section>
