@@ -161,28 +161,27 @@ function formatDistance(m) {
     return m < 1000 ? m + 'm' : (m / 1000).toFixed(1) + 'km';
 }
 
-/* 루틴 카드: 카테고리 여러 개, 장소·거리, 태그, 담은 인원, 적합도 (담기는 상세 모달에서) */
+/* 루틴 카드: 카테고리 여러 개, 장소·거리, 태그, 담은 인원, 적합도 (담기는 상세 모달) */
 function routineCard(r) {
     const cats = (r.categories || []).map(c => '<span class="pill">' + (c.emoji || '') + ' ' + App.escape(c.name) + '</span>').join('');
     const tags = (r.tags || []).slice(0, 3).map(t => '#' + App.escape(t)).join(' ');
     const place = r.place
         ? '📍 ' + App.escape(r.place.name) + (r.place.distanceMeters != null ? ' · ' + formatDistance(r.place.distanceMeters) : '')
         : '📍 장소 자유';
+
     return '<article class="card surface-white border-default border-color-border radius-lg clip-overflow cursor-pointer" onclick="App.routine.openRoutine(' + r.id + ')">' +
-           '<div class="ds-h-28 surface-gradient ds-p-4 layout-row justify-between">' +
-           '<div class="layout-row ds-gap-1 layout-wrap align-start">' + cats + '</div>' +
-           '</div>' +
-           '<div class="ds-p-5">' +
-           '<h3 class="weight-heading type-lg">' + App.escape(r.title) + '</h3>' +
-           '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.description || '') + '</p>' +
-           '<p class="type-xs color-muted ds-mt-2">' + place + '</p>' +
-           (tags ? '<p class="type-xs color-muted ds-mt-1">' + tags + '</p>' : '') +
-           '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
-           '<span>🔥 ' + (r.adoptedCount || 0).toLocaleString() + '명 · Task ' + r.taskCount + '개</span>' +
-           '<b class="color-text">적합도 ' + r.fitScore + '%</b>' +
-           '</div>' +
-           '</div>' +
-           '</article>';
+        '<div class="ds-p-5">' +
+        '<h3 class="weight-heading type-lg">' + App.escape(r.title) + '</h3>' +
+        (cats ? '<div class="layout-row ds-gap-1 layout-wrap align-start ds-mt-2">' + cats + '</div>' : '') +
+        '<p class="type-sm color-muted ds-mt-2 text-clamp-two">' + App.escape(r.description || '') + '</p>' +
+        '<p class="type-xs color-muted ds-mt-2">' + place + '</p>' +
+        (tags ? '<p class="type-xs color-muted ds-mt-1">' + tags + '</p>' : '') +
+        '<div class="layout-row justify-between align-center ds-mt-4 ds-pt-3 border-top border-color-sub-bg type-xs color-muted">' +
+        '<span>🔥 ' + (r.adoptedCount || 0).toLocaleString() + '명 · Task ' + (r.taskCount || 0) + '개</span>' +
+        '<b class="color-text">적합도 ' + (r.fitScore || 100) + '%</b>' +
+        '</div>' +
+        '</div>' +
+        '</article>';
 }
 
 /* 검색창 입력·정렬 변경 (tab_explorer.jsp 의 oninput / onchange) */
@@ -357,7 +356,8 @@ function focusUser() {
     locateUser();
 }
 
-/* 주변 루틴 스팟 필터: 키워드에 맞는 장소만 지도·목록에 표시. 비우고 확인하면 해제.
+// 내 위치 찾기 옆 필터 버튼 (모달: routineFilterModal)
+/* 주변 루틴 스팟 필터: 키워드에 맞는 장소만 지도·목록에 표시. 비우고 적용하면 해제.
    키워드는 placeKeyword 에 남겨서 내 위치 이동·카테고리 변경 뒤에도 유지된다 */
 let placeKeyword = '';
 
@@ -366,9 +366,15 @@ function openPlaceFilters() {
         toast('지도를 불러오지 못해 필터를 적용할 수 없습니다.', '⚠️');
         return;
     }
-    const input = prompt('검색할 주변 루틴 스팟 키워드를 입력하세요:\n(예: 운동, 러닝, 공원, 카페, 도서관, 헬스장)\n비우고 확인하면 필터가 해제됩니다.', placeKeyword || '운동');
-    if (input === null) return;   // 취소
-    placeKeyword = input.trim();
+    const input = document.getElementById('placeKeywordInput');
+    if (input) input.value = placeKeyword;   // 지금 적용 중인 키워드 표시
+    ModalManager.open('routineFilterModal');
+}
+
+function submitPlaceFilter() {
+    const input = document.getElementById('placeKeywordInput');
+    placeKeyword = input ? input.value.trim() : '';
+    ModalManager.close('routineFilterModal');
     searchNearbyRoutinePlaces().then(applied => {
         if (!applied) return;
         if (!placeKeyword) toast('필터를 해제했습니다.', '📍');
@@ -376,6 +382,8 @@ function openPlaceFilters() {
         else toast(`'${placeKeyword}'에 맞는 주변 스팟이 없습니다.`, '🔍');
     });
 }
+
+
 
 /* ============================================================
    루틴 관리 탭 (백엔드: /api/my-routines, 문서 docs/ROUTINE_MANAGE_API.md)
@@ -1053,7 +1061,7 @@ function showPlaceDetail(place) {
         setRadius, applyPlaceFilters, showPlaceDetail, toast, hide, closeModal, switchTab, routineCard, renderExplore,
         loadExplore, loadMoreSearch, showSection,
         clearSearch, setCategory, openRoutine, toggleModalTasks, adoptRoutineToServer,
-        addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters,
+        addAllRoutineTasks, addSelectedRoutineTasks, locateUser, focusUser, openPlaceFilters, submitPlaceFilter,
         loadManage, changeActiveRoutine, renderManage, renderCalendar, selectCalendarDate, moveCalendar,
         toggleCalendarView, calendarToday, toggleServerDone, selectServerTask, openTaskForm, onRepeatChange,
         saveTask, deleteActiveTask, searchTaskPlace, pickTaskPlace, clearTaskPlace,
