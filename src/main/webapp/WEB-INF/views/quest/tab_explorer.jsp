@@ -35,13 +35,35 @@
 
     <!-- 카테고리 칩 -->
     <div class="quick">
-        <button class="chip subtitle active" onclick="App.quest.setCategory(this, '전체')">✨ 전체</button>
-        <button class="chip subtitle" onclick="App.quest.setCategory(this, '맛집')">🍴 맛집</button>
-        <button class="chip subtitle" onclick="App.quest.setCategory(this, '카페')">☕ 카페</button>
-        <button class="chip subtitle" onclick="App.quest.setCategory(this, '사진')">📸 사진</button>
-        <button class="chip subtitle" onclick="App.quest.setCategory(this, '산책')">🚶 산책</button>
-        <button class="chip subtitle" onclick="App.quest.setCategory(this, '문화')">🎨 문화</button>
-        <button class="chip subtitle" onclick="App.quest.setCategory(this, '액티비티')">🎢 액티비티</button>
+		<button class="chip subtitle active"
+		    onclick="App.quest.setCategory(this, '전체')">
+		    🌟 전체
+		</button>
+		
+		<button class="chip subtitle"
+		    onclick="App.quest.setCategory(this, 'PARK')">
+		    🚶 산책
+		</button>
+		
+		<button class="chip subtitle"
+		    onclick="App.quest.setCategory(this, 'CAFE')">
+		    ☕ 카페
+		</button>
+		
+		<button class="chip subtitle"
+		    onclick="App.quest.setCategory(this, 'CULTURE')">
+		    🎨 문화
+		</button>
+		
+		<button class="chip subtitle"
+		    onclick="App.quest.setCategory(this, 'GYM')">
+		    🏋️ 운동
+		</button>
+		
+		<button class="chip subtitle"
+		    onclick="App.quest.setCategory(this, 'EXPLORE')">
+		    🧭 탐방
+		</button>
     </div>
 
     <!-- 오늘의 추천 -->
