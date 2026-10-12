@@ -18,7 +18,7 @@
     </c:otherwise>
 </c:choose>
 
-<!-- 1. [수정됨] 루틴 성공 비율로 퍼센트 계산 (0으로 나누기 방지 및 Null 처리) -->
+<!-- 1. 루틴 성공 비율로 퍼센트 계산 (0으로 나누기 방지 및 Null 처리) -->
 <c:choose>
     <c:when test="${empty home.dailyAggregate or empty home.dailyAggregate.routineTotalCount or home.dailyAggregate.routineTotalCount eq 0}">
         <c:set var="xpPercent" value="0" />
@@ -55,7 +55,7 @@
     </div>
 
     <div class="dashboard-grid">
-        <!-- 2. [수정됨] XP 카드 렌더링 (user_daily_aggregates 테이블 반영 및 Null 방어) -->
+        <!-- 2. XP 카드 렌더링 -->
         <section class="dash-card xp-card">
             <div class="dash-card-header">
                 <div class="dash-title">
@@ -132,7 +132,7 @@
             </section>
         </c:forEach>
 
-        <!-- 3. 관리 카드 렌더링 (이후 영역은 기존과 동일) -->
+        <!-- 3. 관리 카드 렌더링 -->
         <c:forEach var="card" items="${ui.managementCards}">
             <c:set var="items" value="${home[card.listKey]}" />
             <c:url var="addUrl" value="${card.addPath}" />
@@ -163,7 +163,9 @@
                             <c:when test="${not empty items}">
                                 <c:forEach var="item"
                                            items="${items}"
-                                           varStatus="status">
+                                           varStatus="status"
+                                           begin="0"
+                                           end="4">
                                     <c:url var="editUrl" value="${card.editPath}">
                                         <c:param name="id" value="${item.id}" />
                                     </c:url>
@@ -199,9 +201,6 @@
                                     </div>
                                 </c:forEach>
                             </c:when>
-                            <c:otherwise>
-                                <%-- 빈 상태 문구는 아래 공통 요소에서 출력합니다. --%>
-                            </c:otherwise>
                         </c:choose>
 
                         <div class="empty-state"
@@ -214,9 +213,19 @@
                     </div>
                 </div>
 
-                <a href="<c:out value='${addUrl}' />" class="detail-btn">
-                    <c:out value="${card.addLabel}" />
-                </a>
+                <!-- 5개 초과: 전체보기 / 5개 이하: 추가하기 -->
+                <c:choose>
+                    <c:when test="${not empty items and items.size() > 5}">
+                        <a href="<c:out value='${addUrl}' />#<c:out value='${card.editFragment}' />" class="detail-btn">
+                            전체보기 (${items.size()}개) →
+                        </a>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="<c:out value='${addUrl}' />" class="detail-btn">
+                            <c:out value="${card.addLabel}" />
+                        </a>
+                    </c:otherwise>
+                </c:choose>
             </section>
         </c:forEach>
     </div>
