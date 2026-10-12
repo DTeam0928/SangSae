@@ -376,7 +376,7 @@
         return `
             <div class="dash-card card" onclick="App.quest.openDetailModal(${q.id})">
                 <div class="badges">
-                    <span class="badge">${App.escape(q.cat)}</span>
+                    <span class="badge">${App.escape(getCategoryName(q.cat))}</span>
                     <span class="badge orange">+${q.xp} XP</span>
                 </div>
                 <h3 class="subtitle" style="margin: 8px 0;">${App.escape(q.title)}</h3>
@@ -649,7 +649,7 @@
         const exploreHome = document.getElementById('exploreHome');
         if (exploreHome) exploreHome.classList.toggle('is-hidden', !!term);
         const searchTitle = document.getElementById('searchResultTitle');
-        if (searchTitle) searchTitle.textContent = term ? '“' + value.trim() + '” 검색 결과' : questCategory + ' 퀘스트';
+        if (searchTitle) searchTitle.textContent = term ? '“' + value.trim() + '” 검색 결과' : getCategoryName(questCategory) + ' 퀘스트';
 
         const filtered = quests.filter(q => (questCategory === '전체' || q.cat === questCategory) && [q.title, q.place, q.cat].join(' ').toLocaleLowerCase().includes(term));
         const searchGrid = document.getElementById('searchGrid');
@@ -761,6 +761,17 @@
         }
     }
 
+	function getCategoryName(code) {
+	    const names = {
+	        PARK: '산책',
+	        CAFE: '카페',
+	        CULTURE: '문화',
+	        GYM: '운동',
+	        EXPLORE: '탐방'
+	    };
+	    return names[code] || code;
+	}
+	
     function focusUserLocation() {
         if (!questMap || typeof MapUtil === 'undefined') {
             showToast('지도가 아직 준비되지 않았습니다.', '⚠️');
