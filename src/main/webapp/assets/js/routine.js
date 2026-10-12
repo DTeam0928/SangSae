@@ -357,12 +357,24 @@ function focusUser() {
     locateUser();
 }
 
+/* 주변 루틴 스팟 필터: 키워드에 맞는 장소만 지도·목록에 표시. 비우고 확인하면 해제.
+   키워드는 placeKeyword 에 남겨서 내 위치 이동·카테고리 변경 뒤에도 유지된다 */
+let placeKeyword = '';
+
 function openPlaceFilters() {
-    const cur = prompt('검색할 주변 루틴 스팟 키워드를 입력하세요:\n(예: 운동, 러닝, 공원, 카페, 도서관, 헬스장)', '운동');
-    if (cur && cur.trim()) {
-        searchNearbyRoutinePlaces(cur.trim());
-        toast(`'${cur.trim()}' 스팟을 지도에 표시합니다.`, '🔍');
+    if (!routineMap || typeof MapUtil === 'undefined') {
+        toast('지도를 불러오지 못해 필터를 적용할 수 없습니다.', '⚠️');
+        return;
     }
+    const input = prompt('검색할 주변 루틴 스팟 키워드를 입력하세요:\n(예: 운동, 러닝, 공원, 카페, 도서관, 헬스장)\n비우고 확인하면 필터가 해제됩니다.', placeKeyword || '운동');
+    if (input === null) return;   // 취소
+    placeKeyword = input.trim();
+    searchNearbyRoutinePlaces().then(applied => {
+        if (!applied) return;
+        if (!placeKeyword) toast('필터를 해제했습니다.', '📍');
+        else if (nearbyRoutinePlaces.length) toast(`'${placeKeyword}' 스팟 ${Math.min(nearbyRoutinePlaces.length, 6)}곳을 표시합니다.`, '🔍');
+        else toast(`'${placeKeyword}'에 맞는 주변 스팟이 없습니다.`, '🔍');
+    });
 }
 
 /* ============================================================
@@ -854,8 +866,20 @@ function deleteRoutine() {
         return NOISE_BLACKLIST.some(kw => targetText.includes(kw));
     }
 
-    async function searchNearbyRoutinePlaces(keyword) {
-        if (!routineMap || typeof MapUtil === 'undefined') return;
+    let placeSearchSeq = 0;   // 늦게 끝난 이전 검색이 필터 결과를 덮어쓰지 않게
+
+    /* 필터 키워드가 장소 이름·카테고리·테마에 들어 있는지 (키워드 없으면 모두 통과) */
+    function matchesPlaceKeyword(place, kw) {
+        if (!kw) return true;
+        const text = [place.name, place.categoryName, place.originalCategoryName, place.themeName]
+            .filter(Boolean).join(' ').toLowerCase();
+        return text.includes(kw.toLowerCase());
+    }
+
+    async function searchNearbyRoutinePlaces(keyword = placeKeyword) {
+        if (!routineMap || typeof MapUtil === 'undefined') return false;
+        const seq = ++placeSearchSeq;
+        keyword = (keyword || '').trim();
 
         const lat = userLocation.lat;
         const lng = userLocation.lng;
@@ -872,6 +896,7 @@ function deleteRoutine() {
                 if (dbJson && dbJson.success && Array.isArray(dbJson.data)) {
                     combinedPlaces = dbJson.data
                         .filter(p => !isNoisePlace(p))
+                        .filter(p => matchesPlaceKeyword(p, keyword))
                         .map(p => ({
                             ...p,
                             isDbSpot: true,
@@ -917,8 +942,10 @@ function deleteRoutine() {
             }
         }
 
+        if (seq !== placeSearchSeq) return false;   // 그 사이 새 검색(필터 변경 등)이 시작됨
         nearbyRoutinePlaces = combinedPlaces;
         renderNearbyPlaces();
+        return true;
     }
 
     function renderNearbyPlaces() {
