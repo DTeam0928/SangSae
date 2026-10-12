@@ -7,5 +7,3 @@
         <div id="detailContent"></div>
     </div>
 </div>
-
-<!-- 5. 퀘스트 생성 모달 -->
