@@ -454,14 +454,14 @@
 	    .then(res => res.json())
 	    .then(json => {
 	        if (json && json.success) {
-	            showToast('📅 DB 일정에 추가되었습니다!');
+	            showToast('📅 퀘스트를 내 일상에 추가했어요');
 	            fetchUserQuestsFromServer();
 	        } else {
-	            showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
+	            showToast(json.message || '일정 추가에 실패했습니다', '⚠️');
 	        }
 	    })
 	    .catch(() => {
-	        showToast('일정 추가 중 통신 오류가 발생했습니다.', '⚠️');
+	        showToast('일정 추가 중 통신 오류가 발생했습니다', '⚠️');
 	    });
 	}
 
