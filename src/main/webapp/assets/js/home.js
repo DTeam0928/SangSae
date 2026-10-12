@@ -27,6 +27,10 @@
             return row.dataset.status || '';
         }
 
+		if (type === 'trip' && row.dataset.status === 'completed') {
+		    return 'completed';
+		}
+		
         const { startDate, endDate } = row.dataset;
 
         if (!startDate || !endDate) return '';
