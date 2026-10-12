@@ -9,6 +9,6 @@
         <a href="${pageContext.request.contextPath}/home" id="nav-home">홈</a>
         <a href="${pageContext.request.contextPath}/quest" id="nav-quest">퀘스트</a>
         <a href="${pageContext.request.contextPath}/routine" id="nav-routine">루틴</a>
-        <button onclick="handleLogout()">로그아웃</button>
+        <button class="header-logout" onclick="handleLogout()">로그아웃</button>
     </nav>
 </header>
