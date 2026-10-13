@@ -2,7 +2,7 @@
     <div class="surface-white radius-lg width-full max-width-lg ds-p-6" onclick="event.stopPropagation()">
         <div class="layout-row justify-between align-center ds-mb-5">
             <h3 id="rfTitle" class="type-xl weight-heading">새 루틴 만들기</h3>
-            <button type="button" onclick="App.routine.hide('routineFormModal')" class="type-2xl color-muted">×</button>
+            <button type="button" onclick="App.routine.hide('routineFormModal')" class="type-2xl color-muted border-none surface-none">×</button>
         </div>
         <form onsubmit="App.routine.saveRoutineInfo(event)" class="space-y-4">
             <input type="hidden" id="rfRoutineId">
