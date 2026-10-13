@@ -377,7 +377,7 @@
                 <div class="desc">📍 ${App.escape(topQ.place)} · ⏱ ${App.escape(topQ.time)}</div>
                 <div class="quest-detail-8">
                     <button class="quest-detail-6 btn btn-primary" onclick="App.quest.openDetailModal(${topQ.id})">퀘스트 보기</button>
-                    <button class="btn btn-secondary" onclick="App.quest.toggleSave(${topQ.id})">♡</button>
+					<button class="btn btn-secondary" onclick="App.quest.toggleSave(${topQ.id})">${savedQuestIds.includes(topQ.id) ? '♥' : '♡'}</button>
                 </div>
             </div>
             <div class="feature-side">
@@ -439,16 +439,59 @@
         renderExplorerExtras();
     }
 
-    function toggleSave(id) {
-        if (savedQuestIds.includes(id)) {
-            savedQuestIds = savedQuestIds.filter(x => x !== id);
-            showToast('컬렉션에서 제외했습니다.', '🤍');
-        } else {
-            savedQuestIds.push(id);
-            showToast('♡ 내 컬렉션에 저장했습니다.');
-        }
-        renderQuestCards();
-    }
+	async function fetchBookmarksFromServer() {
+	    try {
+	        const response = await fetch(contextPath + '/quest-bookmarks', {
+	            headers: { 'Accept': 'application/json' }
+	        });
+
+	        if (!response.ok) {
+	            throw new Error('북마크 조회 실패: ' + response.status);
+	        }
+
+	        const json = await response.json();
+
+	        if (!json.success || !Array.isArray(json.data)) {
+	            throw new Error('북마크 응답 형식 오류');
+	        }
+
+	        savedQuestIds = json.data.map(Number);
+	        renderQuestCards();
+
+	    } catch (error) {
+	        console.error('북마크 조회 오류:', error);
+	    }
+	}
+	
+	async function toggleSave(id) {
+	    const isSaved = savedQuestIds.includes(id);
+	    const action = isSaved ? 'remove' : 'add';
+	    try {
+	        const response = await fetch(contextPath + '/quest-bookmarks', {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	            body: new URLSearchParams({
+	                action: action,
+	                questTemplateId: String(id)
+	            })
+	        });
+	        if (!response.ok) {
+	            throw new Error('북마크 처리 실패: ' + response.status);
+	        }
+	        if (isSaved) {
+	            savedQuestIds = savedQuestIds.filter(x => x !== id);
+	            showToast('컬렉션에서 제외했습니다.', '🤍');
+	        } else {
+	            savedQuestIds.push(id);
+	            showToast('♡ 내 컬렉션에 저장했습니다.');
+	        }
+	        renderQuestCards();
+			renderRecommendedHero();
+	    } catch (error) {
+	        console.error('북마크 처리 오류:', error);
+	        showToast('북마크 저장에 실패했습니다.', '⚠️');
+	    }
+	}
 
     /* 일정 추가 (오직 백엔드 DB 통신만 수행) */
 	function addSchedule(id, authRadiusM = null) {
@@ -882,6 +925,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         fetchQuestsFromServer();
         fetchUserQuestsFromServer();
+		fetchBookmarksFromServer();
         switchCalendarMode('week');
         initQuestMap();
         if (location.hash === '#management') {

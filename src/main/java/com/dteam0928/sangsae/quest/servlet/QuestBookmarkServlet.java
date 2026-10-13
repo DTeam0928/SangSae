@@ -32,11 +32,15 @@ public class QuestBookmarkServlet extends BaseServlet {
     	}
     	QuestService questService = app().questService();
     	Long userId = loginUser.getId();
-    	List<QuestTemplate> bookmarkQuests = 
-    			questService.getBookmarkedQuests(userId);
-    	request.setAttribute("bookmarkedQuests", bookmarkQuests);
-    	//경로는 추후 만들어지고 나면 변경
-    	request.getRequestDispatcher("/views/quest/list.jsp").forward(request, response);
+    	List<QuestTemplate> bookmarkQuests =
+    	        questService.getBookmarkedQuests(userId);
+    	response.setContentType("application/json;charset=UTF-8");
+    	String ids = bookmarkQuests.stream()
+    	        .map(quest -> String.valueOf(quest.getId()))
+    	        .collect(java.util.stream.Collectors.joining(","));
+    	response.getWriter().write(
+    	        "{\"success\":true,\"data\":[" + ids + "]}"
+    	);
     }
     
     @Override
