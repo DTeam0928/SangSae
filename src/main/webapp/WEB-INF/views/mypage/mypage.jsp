@@ -25,7 +25,7 @@
                     <div>
                         <div class="dash-card-header">
                             <h3 class="dash-title">닉네임 변경</h3>
-                            <span class="badge">계정</span>
+                            <span class="badge orange">계정</span>
                         </div>
                         <p class="desc mb-16">새로운 닉네임을 설정합니다.</p>
                         <input id="nicknameInput" type="text" class="form-input mb-16" placeholder="변경할 닉네임 입력">
