@@ -23,20 +23,29 @@ public class QuestBookmarkServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-    		throws ServletException, IOException {
-    	LoginUser loginUser = LoginSession.current(request);
-    	if (loginUser == null) {
-    	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
-    	    return;
-    	}
-    	QuestService questService = app().questService();
-    	Long userId = loginUser.getId();
-    	List<QuestTemplate> bookmarkQuests = 
-    			questService.getBookmarkedQuests(userId);
-    	request.setAttribute("bookmarkedQuests", bookmarkQuests);
-    	//경로는 추후 만들어지고 나면 변경
-    	request.getRequestDispatcher("/views/quest/list.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        LoginUser loginUser = LoginSession.current(request);
+        if (loginUser == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
+            return;
+        }
+
+        List<QuestTemplate> bookmarks =
+                app().questService().getBookmarkedQuests(loginUser.getId());
+
+        response.setContentType("application/json;charset=UTF-8");
+
+        StringBuilder json = new StringBuilder("{\"success\":true,\"data\":[");
+        for (int i = 0; i < bookmarks.size(); i++) {
+            if (i > 0) json.append(',');
+            json.append("{\"id\":")
+                    .append(bookmarks.get(i).getId())
+                    .append('}');
+        }
+        json.append("]}");
+
+        response.getWriter().write(json.toString());
     }
     
     @Override

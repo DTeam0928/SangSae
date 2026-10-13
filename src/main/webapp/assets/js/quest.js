@@ -14,7 +14,6 @@
         return '✨';
     }
 
-    // 순수 DB 데이터 저장소 (더미 데이터 전면 삭제)
     let quests = [];
     let serverUserQuests = [];
     let savedQuestIds = [];
@@ -439,17 +438,6 @@
         renderExplorerExtras();
     }
 
-    function toggleSave(id) {
-        if (savedQuestIds.includes(id)) {
-            savedQuestIds = savedQuestIds.filter(x => x !== id);
-            showToast('컬렉션에서 제외했습니다.', '🤍');
-        } else {
-            savedQuestIds.push(id);
-            showToast('♡ 내 컬렉션에 저장했습니다.');
-        }
-        renderQuestCards();
-    }
-
     /* 일정 추가 (오직 백엔드 DB 통신만 수행) */
 	function addSchedule(id, authRadiusM = null) {
 	    const quest = quests.find(q => q.id === id);
@@ -479,7 +467,7 @@
 	    .then(res => res.json())
 	    .then(json => {
 	        if (json && json.success) {
-	            showToast('📅 DB 일정에 추가되었습니다!');
+	            showToast('📅 일정에 추가되었습니다!');
 	            fetchUserQuestsFromServer();
 	        } else {
 	            showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
@@ -684,6 +672,62 @@
         }));
     }
 
+    // 북마크
+
+    function fetchBookmarksFromServer() {
+        fetch(contextPath + '/quest-bookmarks', {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(res => {
+                if (!res.ok) return null;
+                return res.json().catch(() => null);
+            })
+            .then(json => {
+                if (json && Array.isArray(json.data)) {
+                    savedQuestIds = json.data.map(q => q.id);
+                }
+                renderQuestCards();
+            })
+            .catch(() => {
+            });
+    }
+
+    function toggleSave(id) {
+        const isCurrentlySaved = savedQuestIds.includes(id);
+        const action = isCurrentlySaved ? 'remove' : 'add';
+
+        const params = new URLSearchParams({
+            action: action,
+            questTemplateId: String(id)
+        });
+
+        fetch(contextPath + '/quest-bookmarks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: params
+        })
+            .then(res => {
+                if (res.ok || res.status === 204) {
+                    if (isCurrentlySaved) {
+                        savedQuestIds = savedQuestIds.filter(x => x !== id);
+                        showToast('북마크에서 제외했습니다.', '🤍');
+                    } else {
+                        savedQuestIds.push(id);
+                        showToast('♡ 내 북마크에 저장했습니다.');
+                    }
+                    renderQuestCards();
+                } else {
+                    showToast('북마크 처리에 실패했습니다.', '⚠️');
+                }
+            })
+            .catch(() => {
+                showToast('서버 통신 중 오류가 발생했습니다.', '⚠️');
+            });
+    }
+
     function openCollectionModal() {
         const container = document.getElementById('collectionBody');
         const savedList = quests.filter(q => savedQuestIds.includes(q.id));
@@ -692,12 +736,13 @@
             container.innerHTML = '<div class="desc" style="text-align:center; padding:20px;">저장된 컬렉션이 없습니다.</div>';
         } else {
             container.innerHTML = savedList.map(q => `
-                <div class="collection-row">
+                <div class="collection-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--color-border, #eee);">
                     <div style="font-size:24px;">${App.escape(q.icon)}</div>
                     <div style="flex:1;">
                         <div class="subtitle">${App.escape(q.title)}</div>
                         <div class="desc">📍 ${App.escape(q.place)}</div>
                     </div>
+                    <button class="small-btn" onclick="App.quest.toggleSave(${q.id}); App.quest.openCollectionModal();">삭제</button>
                     <button class="small-btn" onclick="App.quest.addSchedule(${q.id})">+ 일정</button>
                 </div>
             `).join('');
@@ -882,6 +927,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         fetchQuestsFromServer();
         fetchUserQuestsFromServer();
+        fetchBookmarksFromServer();
         switchCalendarMode('week');
         initQuestMap();
         if (location.hash === '#management') {
@@ -896,6 +942,6 @@
         openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
         addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
         initQuestMap, renderQuestMapMarkers, focusUserLocation, openCreateModal, 
-		toggleCreatePlaceSearch, searchCreatePlaces, confirmAuthRadius
+		toggleCreatePlaceSearch, searchCreatePlaces, confirmAuthRadius, fetchUserQuestsFromServer
     };
 })();
