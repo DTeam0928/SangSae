@@ -14,7 +14,6 @@
         return '✨';
     }
 
-    // 순수 DB 데이터 저장소 (더미 데이터 전면 삭제)
     let quests = [];
     let serverUserQuests = [];
     let savedQuestIds = [];
@@ -457,7 +456,7 @@
 
 	        savedQuestIds = json.data.map(Number);
 	        renderQuestCards();
-
+			renderRecommendedHero();
 	    } catch (error) {
 	        console.error('북마크 조회 오류:', error);
 	    }
@@ -522,7 +521,7 @@
 	    .then(res => res.json())
 	    .then(json => {
 	        if (json && json.success) {
-	            showToast('📅 DB 일정에 추가되었습니다!');
+	            showToast('📅 일정에 추가되었습니다!');
 	            fetchUserQuestsFromServer();
 	        } else {
 	            showToast(json.message || '일정 추가에 실패했습니다.', '⚠️');
@@ -735,12 +734,13 @@
             container.innerHTML = '<div class="desc" style="text-align:center; padding:20px;">저장된 컬렉션이 없습니다.</div>';
         } else {
             container.innerHTML = savedList.map(q => `
-                <div class="collection-row">
+                <div class="collection-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--color-border, #eee);">
                     <div style="font-size:24px;">${App.escape(q.icon)}</div>
                     <div style="flex:1;">
                         <div class="subtitle">${App.escape(q.title)}</div>
                         <div class="desc">📍 ${App.escape(q.place)}</div>
                     </div>
+                    <button class="small-btn" onclick="App.quest.toggleSave(${q.id}); App.quest.openCollectionModal();">삭제</button>
                     <button class="small-btn" onclick="App.quest.addSchedule(${q.id})">+ 일정</button>
                 </div>
             `).join('');
@@ -940,6 +940,6 @@
         openDetailModal, handleSearch, clearSearch, setCategory, renderExplorerExtras,
         addCourse, switchCalendarMode, moveQuestCalendar, selectDate,
         initQuestMap, renderQuestMapMarkers, focusUserLocation, openCreateModal, 
-		toggleCreatePlaceSearch, searchCreatePlaces, confirmAuthRadius
+		toggleCreatePlaceSearch, searchCreatePlaces, confirmAuthRadius, fetchUserQuestsFromServer
     };
 })();
