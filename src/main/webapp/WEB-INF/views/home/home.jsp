@@ -70,7 +70,7 @@
             <div class="xp-content-group">
                 <div class="xp-info-row">
                     <span class="stat-label">
-                        오늘 획득한 XP (퀘스트: <c:out value="${empty home.dailyAggregate.questSuccessCount ? 0 : home.dailyAggregate.questSuccessCount}"/>개)
+                        총 획득한 XP (퀘스트: <c:out value="${empty home.dailyAggregate.questSuccessCount ? 0 : home.dailyAggregate.questSuccessCount}"/>개)
                     </span>
 
                     <div class="stat-num stat-num-accent">
