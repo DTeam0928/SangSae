@@ -20,46 +20,61 @@
 
 ---
 
-## 2. 논리 ERD (Mermaid)
+## 2. 논리 ERD (Mermaid - 실제 DB v2.0 반영본)
 
 ```mermaid
 erDiagram
     %% ==========================================
-    %% 회원 및 온보딩
+    %% 1. 회원 · 온보딩 · 관심사
     %% ==========================================
-    users ||--|| user_profiles : "1:1 소유"
-    users ||--o{ user_interests : "1:N 관심사 등록"
-    interest_categories ||--o{ user_interests : "분류 매핑"
+    users ||--|| user_profiles : "1:1 프로필/누적XP"
+    users ||--o{ user_interests : "1:N 관심사 선택"
+    interest_categories ||--o{ user_interests : "관심사 매핑"
+    interest_categories ||--o{ interest_routine_category_map : "적합도 매핑"
+    routine_categories ||--o{ interest_routine_category_map : "루틴 카테고리 연결"
 
     %% ==========================================
-    %% 장소 및 여행
+    %% 2. 장소 마스터 · 내 장소 · 여행
     %% ==========================================
+    place_categories ||..o{ places : "장소 유형 코드 (논리 매핑)"
+    users ||--o{ user_places : "1:N 내가 다니는 장소"
+    places ||--o{ user_places : "장소 등록"
     users ||--o{ trips : "1:N 여행 일정"
 
     %% ==========================================
-    %% 퀘스트 도메인 
+    %% 3. 퀘스트 도메인 (템플릿 - Fork - 원장)
     %% ==========================================
-    users ||--o{ quest_templates : "개설/공유"
+    users ||--o{ quest_templates : "개설/공유 (0..1)"
     places ||--o{ quest_templates : "추천 장소 (0..1)"
-    
-    users ||--o{ user_quests : "담기/신청"
-    trips ||--o{ user_quests : "여행 일정 배정 (0..1)"
-    places ||--o{ user_quests : "수행 장소 (0..1)"
+
+    users ||--o{ user_quests : "1:N 내 퀘스트 일정"
+    trips ||--o{ user_quests : "여행 배정 (0..1)"
+    places ||--o{ user_quests : "실천 장소 (0..1)"
     quest_templates ||--o{ user_quests : "Fork 원본 (0..1)"
-    
-    users ||--o{ user_quest_bookmarks : "1:N 관심 저장(♡)"
-    quest_templates ||--o{ user_quest_bookmarks : "저장된 템플릿"
+
+    users ||--o{ user_quest_bookmarks : "1:N 퀘스트 찜(♡)"
+    quest_templates ||--o{ user_quest_bookmarks : "북마크 대상"
+
+    users ||--o{ quest_logs : "1:N 퀘스트 인증 기록"
+    user_quests ||--o{ quest_logs : "완료 원장 (ON DELETE SET NULL)"
 
     %% ==========================================
-    %% 루틴 도메인 
+    %% 4. 루틴 도메인 (2단계 계층 템플릿 - Fork - 원장)
     %% ==========================================
-    users ||--o{ routine_templates : "개설/공유"
+    users ||--o{ routine_templates : "개설/공개 사본 (0..1)"
     places ||--o{ routine_templates : "대표 장소 (0..1)"
     routine_templates ||--o{ routine_template_tasks : "1:N 세부 Task"
     places ||--o{ routine_template_tasks : "Task 추천 장소 (0..1)"
 
+    routine_templates ||--o{ routine_template_categories : "1:N 다중 카테고리"
+    routine_categories ||--o{ routine_template_categories : "카테고리 분류"
+    routine_templates ||--o{ routine_template_tags : "1:N 자유 태그"
+
+    users ||--o{ routine_template_bookmarks : "1:N 루틴 찜(♡)"
+    routine_templates ||--o{ routine_template_bookmarks : "찜 대상"
+
     users ||--o{ user_routines : "1:N 내 활성 루틴"
-    routine_templates ||--o{ user_routines : "Fork 원본 (0..1)"
+    routine_templates ||--o{ user_routines : "Fork 원본/공개 사본 (0..1)"
 
     user_routines ||--o{ user_routine_tasks : "1:N 내 루틴 Task"
     places ||--o{ user_routine_tasks : "Task 실천 장소 (0..1)"
@@ -67,33 +82,28 @@ erDiagram
 
     user_routine_tasks ||--o{ routine_task_schedules : "1:N 요일 반복 스케줄"
 
-    %% ==========================================
-    %% 수행 원장 로그 
-    %% ==========================================
-    users ||--o{ quest_logs : "수행/인증 기록"
-    user_quests ||--o{ quest_logs : "퀘스트 완료 원장"
-
-    users ||--o{ routine_task_logs : "실천 기록"
+    users ||--o{ routine_task_logs : "1:N 루틴 실천 기록"
     user_routine_tasks ||--o{ routine_task_logs : "Task 수행 원장"
 
     %% ==========================================
-    %% 집계 및 통계 
+    %% 5. 일일 요약 통계
     %% ==========================================
-    users ||--o{ user_daily_aggregates : "일일 요약"
+    users ||--o{ user_daily_aggregates : "1:N 일일 요약 집계"
     routine_task_logs }o..|| user_daily_aggregates : "배치 집계"
     quest_logs }o..|| user_daily_aggregates : "배치 집계"
 
     %% ==========================================
-    %% 엔티티 정의 및 인덱스 
+    %% 엔티티 상세 정의 (실제 DB 컬럼 동기화)
     %% ==========================================
     users {
         bigint id PK
-        varchar email UK "로그인 이메일"
-        varchar password_hash "암호화 비밀번호"
+        varchar email UK "Nullable (소셜 로그인 대응)"
+        varchar password_hash "BCrypt 해시 (Nullable)"
         varchar oauth_provider "LOCAL/GOOGLE/X/APPLE"
-        varchar oauth_id "소셜 고유식별자"
+        varchar oauth_id "소셜 고유 식별자 (UK 복합)"
         varchar status "ACTIVE/SUSPENDED/WITHDRAWN"
         datetime created_at
+        datetime updated_at
     }
 
     user_profiles {
@@ -101,14 +111,15 @@ erDiagram
         varchar nickname UK "1~30자 닉네임"
         varchar profile_image_url
         boolean is_location_permitted "위치권한 동의여부"
-        point last_known_location "최근 좌표"
+        point last_known_location "온보딩 GPS 좌표 (SRID 4326)"
+        int total_xp "누적 경험치 (O(1) 조회 캐시)"
         datetime updated_at
     }
 
     interest_categories {
         smallint id PK
-        varchar code UK "TASTE/CAFE/ACTIVITY 등"
-        varchar name "맛집/카페/액티비티 등"
+        varchar code UK "FOOD/CAFE/ACTIVITY 등 8종"
+        varchar name "#맛집/#카페 등"
         smallint sort_order
     }
 
@@ -118,144 +129,205 @@ erDiagram
         datetime created_at
     }
 
+    interest_routine_category_map {
+        smallint interest_category_id PK "FK interest_categories"
+        varchar routine_category_code PK "FK routine_categories"
+    }
+
+    place_categories {
+        varchar code PK "GYM/CAFE/PARK/LIBRARY/CULTURE"
+        varchar name "헬스장/카페/공원 등"
+        varchar emoji "아이콘 이모지"
+        smallint sort_order
+    }
+
     places {
         bigint id PK
+        varchar kakao_place_id UK "카카오 장소 고유 ID (Get-or-Create)"
         varchar name "장소명"
         varchar road_address "도로명 주소"
         varchar region_1depth_name "시/도"
         varchar region_2depth_name "구/군"
         varchar region_3depth_name "동/읍/면"
-        point coordinates "위경도 좌표 SRID 4326"
-        varchar category "카페/헬스장/공원 등"
+        point coordinates "공간 좌표 POINT(위도 경도) SRID 4326"
+        varchar category "place_categories.code 매핑"
+        datetime created_at
+    }
+
+    user_places {
+        bigint user_id PK "FK users"
+        bigint place_id PK "FK places"
+        datetime created_at
     }
 
     trips {
         bigint id PK
-        bigint user_id FK "IDX_user_trip (1)"
-        varchar title "부산 여행 등"
-        date start_date "IDX_user_trip (2)"
+        bigint user_id FK "IDX_trips_user_date"
+        varchar title "여행명"
+        date start_date
         date end_date
         varchar status "PLANNED/ONGOING/COMPLETED"
+        datetime created_at
+        datetime updated_at
     }
 
     quest_templates {
         bigint id PK
-        bigint creator_id FK
-        bigint place_id FK "Nullable (GPS유무)"
-        varchar title "퀘스트명"
+        bigint creator_id FK "Nullable (기본 제공 시 NULL)"
+        bigint place_id FK "Nullable (GPS 유무)"
+        varchar title "퀘스트 제목"
         text description
-        varchar category "사진/맛집/산책 등"
+        varchar category "테마 카테고리"
         int estimated_minutes "소요시간(분)"
         int reward_xp "보상 XP"
         varchar auth_type "NONE/PHOTO/LOCATION/TEXT"
         varchar visibility "PUBLIC/PRIVATE"
         varchar thumbnail_url
-        int bookmark_count "저장수"
+        int bookmark_count "북마크 저장 횟수"
+        int completion_count "누적 완료 횟수"
+        datetime created_at
     }
 
     user_quests {
         bigint id PK
-        bigint user_id FK "IDX_user_scheduled (1)"
+        bigint user_id FK "IDX_user_quests_calendar"
         bigint trip_id FK "Nullable"
-        bigint origin_template_id FK "Nullable (Fork)"
+        bigint origin_template_id FK "Nullable (Fork 원본 계보)"
         bigint place_id FK "Nullable"
         varchar title "수정 가능한 퀘스트명"
-        date scheduled_date "IDX_user_scheduled (2)"
-        time target_time "Nullable"
+        date scheduled_date "실천 예정일"
+        time target_time "목표 시간"
         varchar auth_type "인증 방식"
+        int auth_radius_m "위치 인증 허용 반경(100~1000m)"
         varchar status "TODO/COMPLETED/CANCELED"
-        int reward_xp
+        int reward_xp "완료 보상 XP"
+        varchar memo "개인 메모"
+        datetime created_at
+        datetime completed_at
     }
 
     user_quest_bookmarks {
         bigint user_id PK "FK users"
         bigint quest_template_id PK "FK quest_templates"
-        varchar folder_name "기본/사용자지정 폴더"
+        varchar folder_name "보관 폴더명"
         datetime created_at
+    }
+
+    quest_logs {
+        bigint id PK
+        bigint user_id FK
+        bigint user_quest_id FK "Nullable (완료 후 일정 삭제 시 보존)"
+        varchar title "완료 시점 퀘스트 제목 스냅샷"
+        datetime completed_at
+        varchar auth_type "수행된 인증 방식"
+        point authenticated_location "인증 당시 GPS 좌표"
+        varchar proof_image_url "사진 인증 URL"
+        text proof_text "텍스트 인증 소감"
+        int earned_xp "적립된 XP"
+    }
+
+    routine_categories {
+        varchar code PK "EXERCISE/MIRACLE_MORNING 등 7종"
+        varchar name "운동/미라클 모닝 등"
+        varchar emoji "칩 이모지"
+        smallint sort_order
     }
 
     routine_templates {
         bigint id PK
-        bigint creator_id FK
+        bigint creator_id FK "Nullable (NULL=기본제공, 값=공개사본)"
         bigint representative_place_id FK "Nullable"
         varchar title "루틴 패키지명"
         text description
-        varchar category "운동/자기계발/건강 등"
+        varchar category "대표 카테고리 코드"
         varchar visibility "PUBLIC/PRIVATE"
-        int adopted_count "수강/담기 횟수"
+        int adopted_count "담아간 횟수"
+        datetime created_at
+    }
+
+    routine_template_categories {
+        bigint routine_template_id PK "FK routine_templates"
+        varchar category_code PK "FK routine_categories"
+    }
+
+    routine_template_tags {
+        bigint routine_template_id PK "FK routine_templates"
+        varchar tag PK "자유 검색 태그 (최대 5개)"
+    }
+
+    routine_template_bookmarks {
+        bigint user_id PK "FK users"
+        bigint routine_template_id PK "FK routine_templates"
+        datetime created_at
     }
 
     routine_template_tasks {
         bigint id PK
         bigint routine_template_id FK
         bigint place_id FK "Nullable"
-        varchar content "Task 내용"
-        time default_time "권장 시간"
-        varchar category "세부 카테고리"
-        int sort_order
+        varchar content "세부 Task 내용"
+        time default_time "권장 실천 시간"
+        varchar category "세부 카테고리명"
+        int reward_xp "Task 보상 XP"
+        smallint sort_order "패키지 내 순서"
+        int allowed_radius_meters "방문 인증 허용 반경(m)"
     }
 
     user_routines {
         bigint id PK
         bigint user_id FK
-        bigint origin_template_id FK "Nullable (Fork)"
+        bigint origin_template_id FK "Nullable (Fork 원본/공개 사본)"
         varchar title "내 루틴 패키지명"
         date start_date "운영 시작일"
-        date end_date "운영 종료일"
-        boolean is_active "활성 여부"
+        date end_date "운영 종료일 (NULL=무기한)"
+        boolean is_active "활성 여부 (FALSE=소프트 삭제)"
+        datetime created_at
     }
 
     user_routine_tasks {
         bigint id PK
-        bigint user_routine_id FK "IDX_routine_task (1)"
-        bigint origin_template_task_id FK "Nullable"
+        bigint user_routine_id FK "IDX_tasks_user_time"
+        bigint origin_template_task_id FK "Nullable (Fork 원본 Task)"
         bigint place_id FK "Nullable"
         varchar content "Task 내용"
-        time target_time "타임테이블 시간"
+        time target_time "타임테이블 기준 시간"
         varchar category "카테고리"
-        varchar repeat_type "DAILY/WEEKDAY/WEEKEND/CUSTOM"
+        varchar repeat_type "DAILY/WEEKDAY/WEEKEND/CUSTOM/ONCE"
+        date once_date "Nullable (ONCE 1회성 실행일)"
         time alert_time "알림 시간"
-        varchar memo
-        boolean is_active
+        int reward_xp "완료 보상 XP"
+        varchar memo "개인 메모"
+        boolean is_active "활성 여부 (FALSE=소프트 삭제)"
+        int allowed_radius_meters "개인 설정 인증 반경(50~1000m)"
+        datetime created_at
     }
 
     routine_task_schedules {
         bigint id PK
-        bigint user_routine_task_id FK "IDX_task_day (1)"
-        varchar day_of_week "MON-SUN / IDX_task_day (2)"
+        bigint user_routine_task_id FK "IDX_schedules_day_task"
+        varchar day_of_week "MON/TUE/WED/THU/FRI/SAT/SUN"
     }
 
     routine_task_logs {
         bigint id PK
-        bigint user_id FK "IDX_user_log_date (1)"
+        bigint user_id FK "IDX_routine_logs_streak"
         bigint user_routine_task_id FK
-        date log_date "IDX_user_log_date (2)"
-        time completed_at
-        point authenticated_location "인증 GPS (Nullable)"
-        boolean is_success "성공 여부"
-    }
-
-    quest_logs {
-        bigint id PK
-        bigint user_id FK
-        bigint user_quest_id FK
-        datetime completed_at
-        varchar auth_type "인증 유형"
-        point authenticated_location "인증 GPS"
-        varchar proof_image_url "인증 사진 URL"
-        text proof_text "한줄 소감/인증 텍스트"
+        date log_date "실천 일자"
+        time completed_at "완료 시각"
+        point authenticated_location "인증 시점 GPS 좌표"
         int earned_xp "적립된 XP"
+        boolean is_success "성공 여부"
     }
 
     user_daily_aggregates {
         bigint id PK
-        bigint user_id FK "IDX_user_stat_date (1)"
-        date stat_date "IDX_user_stat_date (2)"
-        int routine_success_count "달성한 할 일 수"
-        int routine_total_count "전체 할 일 수"
-        int quest_success_count "달성한 퀘스트 수"
-        int earned_xp "당일 획득 XP"
-        int current_streak "당일 기준 연속 달성일"
+        bigint user_id FK "UK_daily_user_stat"
+        date stat_date "집계 기준 일자"
+        int routine_success_count
+        int routine_total_count
+        int quest_success_count
+        int earned_xp
+        int current_streak "연속 달성일수"
     }
 ```
 
