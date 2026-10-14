@@ -43,6 +43,9 @@ public class QuestLog {
 	@Column(name = "earned_xp", nullable = false)
 	private int earnedXp;
     
+	@Column(name = "title", length = 150)
+	private String title;
+	
     public QuestLog() {}
 
 	public QuestLog(Long id, Long userId, Long userQuestId, LocalDateTime completedAt, String authType,
@@ -129,5 +132,13 @@ public class QuestLog {
 
 	public void setEarnedXp(int earnedXp) {
 		this.earnedXp = earnedXp;
+	}
+	
+	public String getTitle() {
+	    return title;
+	}
+
+	public void setTitle(String title) {
+	    this.title = title;
 	}
 }
