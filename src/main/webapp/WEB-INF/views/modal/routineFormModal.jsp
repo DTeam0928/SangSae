@@ -2,7 +2,7 @@
     <div class="surface-white radius-lg width-full max-width-lg ds-p-6" onclick="event.stopPropagation()">
         <div class="layout-row justify-between align-center ds-mb-5">
             <h3 id="rfTitle" class="type-xl weight-heading">새 루틴 만들기</h3>
-            <button type="button" onclick="App.routine.hide('routineFormModal')" class="type-2xl color-muted">×</button>
+            <button type="button" onclick="App.routine.hide('routineFormModal')" class="type-2xl color-muted border-none surface-none">×</button>
         </div>
         <form onsubmit="App.routine.saveRoutineInfo(event)" class="space-y-4">
             <input type="hidden" id="rfRoutineId">
@@ -34,9 +34,9 @@
                 </div>
             </div>
             <div class="layout-row ds-gap-2">
-                <button type="submit" class="layout-grow surface-dark color-white ds-py-3 radius-md weight-bold">저장</button>
-                <button type="button" id="rfDeleteBtn" onclick="App.routine.deleteRoutine()" class="ds-px-4 border-default border-color-danger-bg color-danger radius-md is-hidden">루틴 삭제</button>
-                <button type="button" onclick="App.routine.hide('routineFormModal')" class="ds-px-5 surface-sub-bg radius-md weight-bold">취소</button>
+                <button type="submit" class="layout-grow surface-dark color-white ds-py-3 radius-md weight-bold border-none">저장</button>
+                <button type="button" id="rfDeleteBtn" onclick="App.routine.deleteRoutine()" class="ds-px-4 border-default border-color-danger-bg color-danger radius-md border-none is-hidden">루틴 삭제</button>
+                <button type="button" onclick="App.routine.hide('routineFormModal')" class="ds-px-5 surface-sub-bg radius-md weight-bold border-none">취소</button>
             </div>
         </form>
     </div></div>

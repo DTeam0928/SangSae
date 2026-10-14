@@ -96,6 +96,59 @@ public class HomeDashboardService {
             }
         }
 
+        // 오늘 완료한 퀘스트 수는 quest_logs에서 조회
+        if (userId != null) {
+            Number completedCount = tx.read(em ->
+                (Number) em.createNativeQuery(
+                    "SELECT COUNT(*) FROM quest_logs " +
+                    "WHERE user_id = ?1 " +
+                    "AND completed_at >= ?2 " +
+                    "AND completed_at < ?3"
+                )
+                .setParameter(1, userId)
+                .setParameter(2, today.atStartOfDay())
+                .setParameter(3, today.plusDays(1).atStartOfDay())
+                .getSingleResult()
+            );
+
+            questDoneCount = completedCount.intValue();
+        }
+        
+        // 오늘 완료한 퀘스트 목록 조회
+        if (userId != null) {
+            List<?> completedQuests = tx.read(em ->
+                em.createNativeQuery(
+                    "SELECT id, title, completed_at " +
+                    "FROM quest_logs " +
+                    "WHERE user_id = ?1 " +
+                    "AND completed_at >= ?2 " +
+                    "AND completed_at < ?3 " +
+                    "ORDER BY completed_at DESC"
+                )
+                .setParameter(1, userId)
+                .setParameter(2, today.atStartOfDay())
+                .setParameter(3, today.plusDays(1).atStartOfDay())
+                .getResultList()
+            );
+
+            for (Object result : completedQuests) {
+                Object[] row = (Object[]) result;
+
+                Long logId = ((Number) row[0]).longValue();
+                String title = row[1] != null
+                        ? row[1].toString()
+                        : "완료한 퀘스트";
+
+                model.getTrips().add(new HomeModel.ManagementItem(
+                    logId,
+                    title,
+                    today.toString(),
+                    today.toString(),
+                    "completed"
+                ));
+            }
+        }
+        
         // 3. 오늘의 루틴 현황 수집
         int routineTotal = 0;
         int routineSuccess = 0;

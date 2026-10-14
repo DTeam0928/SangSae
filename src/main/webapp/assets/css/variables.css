@@ -107,4 +107,28 @@
 
 :root { --color-overlay: rgba(20,30,40,.45); --shadow-modal: 0 20px 60px rgba(0,0,0,.18); }
 
+/* ---------- 3. 다크 모드 덮어쓰기 (Dark Mode Overrides) ---------- */
+[data-theme="dark"] {
+    /* 배경색을 어두운 네이비/차콜 톤으로 */
+    --color-bg: #12181F;
+    --color-white: #1E2631;
+    --color-sub-bg: #28323E;
+
+    /* 텍스트를 밝게 */
+    --color-text: #E2E8F0;
+    --color-muted: #94A3B8;
+
+    /* 테두리를 어둡게 */
+    --color-border: #334155;
+    --color-border2: #475569;
+
+    /* 기존 민트 컬러(--color-primary)는 다크 모드에서도 포인트 컬러로 어울리므로 그대로 두거나,
+       조금 더 쨍하게 만들고 싶다면 채도를 조정합니다. */
+    --color-primary: #86CBC9;
+    --color-dark: #6CA5A3;
+
+    /* 그림자 강도 조정 (어두운 배경에 맞게 수정) */
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
 .routine-container {width:min(1220px,calc(100% - 28px))}

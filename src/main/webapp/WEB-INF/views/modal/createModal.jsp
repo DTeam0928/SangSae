@@ -14,11 +14,11 @@
 
             <label class="form-label" for="newCategory">카테고리</label>
             <select id="newCategory" class="form-input">
-                <option value="WALK">산책</option>
-                <option value="CAFE">카페</option>
-                <option value="EXERCISE">운동</option>
-                <option value="CULTURE">문화</option>
-                <option value="OTHER">기타</option>
+				<option value="PARK">산책</option>
+				<option value="CAFE">카페</option>
+				<option value="CULTURE">문화</option>
+				<option value="GYM">운동</option>
+				<option value="EXPLORE">탐방</option>
             </select>
 
             <label class="form-label" for="newEstimatedMinutes">예상 소요 시간 (분)</label>
@@ -38,7 +38,7 @@
                 <option value="TEXT">텍스트 인증</option>
             </select>
 
-            <!-- LOCATION 선택 시에만 표시 -->
+            <!-- LOCATION 선택 시에만 표시 -->
             <div id="createPlaceSection" style="display:none;">
                 <label class="form-label" for="createPlaceQuery">장소 검색</label>
                 <div style="display:flex; gap:8px;">

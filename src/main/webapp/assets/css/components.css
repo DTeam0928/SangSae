@@ -344,7 +344,7 @@
     display: flex;
 }
 
-/* 임시 알림: 배치 기준 fixed, bottom 24px, right 24px, z-index 300, 안쪽 여백 14px 18px를 적용합니다. */
+/* 임시 알림: 배치 기준 fixed, bottom 24px, right 24px, z-index 300, 안쪽 여백 14px 18px를 적용 */
 .toast {
     position: fixed;
     bottom: 24px;
