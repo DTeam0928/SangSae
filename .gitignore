@@ -67,3 +67,14 @@ $RECYCLE.BIN/
 ### Mac OS ###
 .DS_Store
 /.idea
+/.idea
+
+#env
+.env
+/.idea
+/.idea
+
+# 개인 설정 (DB 비밀번호) - 커밋 금지
+src/main/resources/application.properties
+src/main/resources/application-local.properties
+GEMINI.md

@@ -1,0 +1,1656 @@
+/* utilities.css — 초기화, 레이아웃, 12칼럼 그리드와 단일 목적 유틸리티를 관리합니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
+
+/* *: box-sizing border-box를 적용합니다. */
+* {
+    box-sizing: border-box;
+}
+
+/* body: 글꼴 var(--font-body), 글자색 var(--color-text), 배경 var(--color-bg), 글자 크기 var(--fs-body), line-height var(--lh-body)를 적용합니다. */
+body {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background: var(--color-bg);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    word-break: keep-all;
+}
+
+/* html, body: 바깥 여백 0, 안쪽 여백 0를 적용합니다. */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/* a: 글자색 inherit, text-decoration none를 적용합니다. */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* img: 최대 너비 100%, 표시 방식 block를 적용합니다. */
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* 중앙 콘텐츠 영역: 너비 100%, 바깥 여백 0 auto, 안쪽 여백 0 16px, 최대 너비 var(--container-max)를 적용합니다. */
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+    max-width: var(--container-max);
+}
+
+/* 콘텐츠 제목: 글자 크기 var(--fs-h2), 글자 두께 var(--fw-h2)를 적용합니다. */
+.title {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-h2);
+}
+
+/* 콘텐츠 소제목: 글자 크기 var(--fs-h3), 글자 두께 var(--fw-h3)를 적용합니다. */
+.subtitle {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-h3);
+}
+
+/* 짧은 설명: 글자 크기 var(--fs-small), 글자 두께 var(--fw-body)를 적용합니다. */
+.desc {
+    font-size: var(--fs-small);
+    font-weight: var(--fw-body);
+}
+
+/* [hidden]: 표시 방식 none!important를 적용합니다. */
+[hidden] {
+    display: none!important;
+}
+
+/* button,input,select,textarea: font inherit, 글자색 inherit를 적용합니다. */
+button,input,select,textarea {
+    font: inherit;
+    color: inherit;
+}
+
+/* button: cursor pointer를 적용합니다. */
+button {
+    cursor: pointer;
+}
+
+/* button:disabled: cursor not-allowed, 불투명도 .6를 적용합니다. */
+button:disabled {
+    cursor: not-allowed;
+    opacity: .6;
+}
+
+/* :focus-visible: outline 2px solid var(--color-success), outline-offset 3px를 적용합니다. */
+:focus-visible {
+    outline: 2px solid var(--color-success);
+    outline-offset: 3px;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(prefers-reduced-motion:reduce) */
+@media(prefers-reduced-motion:reduce) {
+    /* *,*::before,*::after: animation none!important, 상태 전환 효과 none!important, scroll-behavior auto!important를 적용합니다. */
+    *,*::before,*::after {
+        animation: none!important;
+        transition: none!important;
+        scroll-behavior: auto!important;
+    }
+
+}
+/* .layout-row: 표시 방식 flex를 적용합니다. */
+.layout-row {
+    display: flex;
+}
+
+/* .layout-grid: 표시 방식 grid를 적용합니다. */
+.layout-grid {
+    display: grid;
+}
+
+/* .is-hidden: 표시 방식 none!important를 적용합니다. */
+.is-hidden {
+    display: none!important;
+}
+
+/* .display-block: 표시 방식 block를 적용합니다. */
+.display-block {
+    display: block;
+}
+
+/* .position-relative: 배치 기준 relative를 적용합니다. */
+.position-relative {
+    position: relative;
+}
+
+/* .position-absolute: 배치 기준 absolute를 적용합니다. */
+.position-absolute {
+    position: absolute;
+}
+
+/* .position-fixed: 배치 기준 fixed를 적용합니다. */
+.position-fixed {
+    position: fixed;
+}
+
+/* .layout-grow: flex 1 1 0%를 적용합니다. */
+.layout-grow {
+    flex: 1 1 0%;
+}
+
+/* .layout-column: 배치 방향 column를 적용합니다. */
+.layout-column {
+    flex-direction: column;
+}
+
+/* .layout-wrap: flex-wrap wrap를 적용합니다. */
+.layout-wrap {
+    flex-wrap: wrap;
+}
+
+/* .align-center: 교차축 정렬 center를 적용합니다. */
+.align-center {
+    align-items: center;
+}
+
+/* .align-start: 교차축 정렬 flex-start를 적용합니다. */
+.align-start {
+    align-items: flex-start;
+}
+
+/* .align-end: 교차축 정렬 flex-end를 적용합니다. */
+.align-end {
+    align-items: flex-end;
+}
+
+/* .justify-between: 주축 정렬 space-between를 적용합니다. */
+.justify-between {
+    justify-content: space-between;
+}
+
+/* .justify-center: 주축 정렬 center를 적용합니다. */
+.justify-center {
+    justify-content: center;
+}
+
+/* .margin-auto: 바깥 여백 left auto, 바깥 여백 right auto를 적용합니다. */
+.margin-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* .width-full: 너비 100%를 적용합니다. */
+.width-full {
+    width: 100%;
+}
+
+/* .min-width-zero: min-width 0를 적용합니다. */
+.min-width-zero {
+    min-width: 0;
+}
+
+/* .viewport-height: 최소 높이 100vh를 적용합니다. */
+.viewport-height {
+    min-height: 100vh;
+}
+
+/* .span-full: 그리드 점유 칸 1/-1를 적용합니다. */
+.span-full {
+    grid-column: 1/-1;
+}
+
+/* .clip-overflow: 넘친 내용 처리 hidden를 적용합니다. */
+.clip-overflow {
+    overflow: hidden;
+}
+
+/* .scroll-x: overflow-x auto를 적용합니다. */
+.scroll-x {
+    overflow-x: auto;
+}
+
+/* .scroll-y: overflow-y auto를 적용합니다. */
+.scroll-y {
+    overflow-y: auto;
+}
+
+/* .text-nowrap: white-space nowrap를 적용합니다. */
+.text-nowrap {
+    white-space: nowrap;
+}
+
+/* .cursor-pointer: cursor pointer를 적용합니다. */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* .cursor-grab: cursor grab를 적용합니다. */
+.cursor-grab {
+    cursor: grab;
+}
+
+/* .inset-zero: inset 0를 적용합니다. */
+.inset-zero {
+    inset: 0;
+}
+
+/* .letter-spacing-wide: letter-spacing .1em를 적용합니다. */
+.letter-spacing-wide {
+    letter-spacing: .1em;
+}
+
+/* .line-height-relaxed: line-height 1.75를 적용합니다. */
+.line-height-relaxed {
+    line-height: 1.75;
+}
+
+/* .input-accent: accent-color var(--color-dark)를 적용합니다. */
+.input-accent {
+    accent-color: var(--color-dark);
+}
+
+/* .surface-gradient: 배경 linear-gradient(135deg,var(--color-main),var(--color-sub-bg)), 글자색 var(--color-text)를 적용합니다. */
+.surface-gradient {
+    background: linear-gradient(135deg,var(--color-main),var(--color-sub-bg));
+    color: var(--color-text);
+}
+
+/* .weight-bold: 글자 두께 700를 적용합니다. */
+.weight-bold {
+    font-weight: 700;
+}
+
+/* .weight-heading: 글자 두께 var(--fw-h1)를 적용합니다. */
+.weight-heading {
+    font-weight: var(--fw-h1);
+}
+
+/* .font-monospace: 글꼴 ui-monospace,monospace를 적용합니다. */
+.font-monospace {
+    font-family: ui-monospace,monospace;
+}
+
+/* .border-default: 테두리 1px solid var(--color-border)를 적용합니다. */
+.border-default {
+    border: 1px solid var(--color-border);
+}
+
+/* .border-none: 테두리 0를 적용합니다. */
+.border-none {
+    border: 0;
+}
+
+/* .border-bottom: border-bottom 1px solid var(--color-border)를 적용합니다. */
+.border-bottom {
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* .border-top: border-top 1px solid var(--color-border)를 적용합니다. */
+.border-top {
+    border-top: 1px solid var(--color-border);
+}
+
+/* .border-bottom-strong: border-bottom 2px solid var(--color-border)를 적용합니다. */
+.border-bottom-strong {
+    border-bottom: 2px solid var(--color-border);
+}
+
+/* .shadow-card: 그림자 var(--shadow-card)를 적용합니다. */
+.shadow-card {
+    box-shadow: var(--shadow-card);
+}
+
+/* .shadow-modal: 그림자 var(--shadow-modal)를 적용합니다. */
+.shadow-modal {
+    box-shadow: var(--shadow-modal);
+}
+
+/* .radius-pill: 모서리 곡률 999px를 적용합니다. */
+.radius-pill {
+    border-radius: var(--radius-pill);
+}
+
+/* .type-xs: 글자 크기 var(--fs-small)를 적용합니다. */
+.type-xs {
+    font-size: var(--fs-small);
+}
+
+/* .type-sm: 글자 크기 var(--fs-body)를 적용합니다. */
+.type-sm {
+    font-size: var(--fs-body);
+}
+
+/* .type-base: 글자 크기 var(--fs-h3)를 적용합니다. */
+.type-base {
+    font-size: var(--fs-h3);
+}
+
+/* .type-lg: 글자 크기 var(--fs-h2)를 적용합니다. */
+.type-lg {
+    font-size: var(--fs-h2);
+}
+
+/* .type-xl: 글자 크기 var(--fs-h2)를 적용합니다. */
+.type-xl {
+    font-size: var(--fs-h2);
+}
+
+/* .type-2xl: 글자 크기 var(--fs-h1)를 적용합니다. */
+.type-2xl {
+    font-size: var(--fs-h1);
+}
+
+/* .type-3xl: 글자 크기 var(--fs-b)를 적용합니다. */
+.type-3xl {
+    font-size: var(--fs-b);
+}
+
+/* .type-4xl: 글자 크기 var(--fs-b)를 적용합니다. */
+.type-4xl {
+    font-size: var(--fs-b);
+}
+
+/* .type-10px: 글자 크기 var(--fs-small)를 적용합니다. */
+.type-10px {
+    font-size: var(--fs-small);
+}
+
+/* .radius-sm: 모서리 곡률 var(--radius-sm)를 적용합니다. */
+.radius-sm {
+    border-radius: var(--radius-sm);
+}
+
+/* .radius-md: 모서리 곡률 var(--radius-md)를 적용합니다. */
+.radius-md {
+    border-radius: var(--radius-md);
+}
+
+/* .radius-lg: 모서리 곡률 var(--radius-lg)를 적용합니다. */
+.radius-lg {
+    border-radius: var(--radius-lg);
+}
+
+/* .max-width-lg: 최대 너비 32rem를 적용합니다. */
+.max-width-lg {
+    max-width: 32rem;
+}
+
+/* .max-width-xl: 최대 너비 36rem를 적용합니다. */
+.max-width-xl {
+    max-width: 36rem;
+}
+
+/* .max-width-2xl: 최대 너비 42rem를 적용합니다. */
+.max-width-2xl {
+    max-width: 42rem;
+}
+
+/* .max-width-3xl: 최대 너비 48rem를 적용합니다. */
+.max-width-3xl {
+    max-width: 48rem;
+}
+
+/* .surface-white: 배경색 var(--color-white)를 적용합니다. */
+.surface-white {
+    background-color: var(--color-white);
+}
+
+/* .surface-sub-bg: 배경색 var(--color-sub-bg)를 적용합니다. */
+.surface-sub-bg {
+    background-color: var(--color-sub-bg);
+}
+
+/* .surface-text: 배경색 var(--color-text)를 적용합니다. */
+.surface-text {
+    background-color: var(--color-text);
+}
+
+/* .surface-main: 배경색 var(--color-main)를 적용합니다. */
+.surface-main {
+    background-color: var(--color-main);
+}
+
+/* .surface-dark: 배경색 var(--color-dark)를 적용합니다. */
+.surface-dark {
+    background-color: var(--color-dark);
+}
+
+/* .surface-success: 배경색 var(--color-success)를 적용합니다. */
+.surface-success {
+    background-color: var(--color-success);
+}
+
+/* .color-white: 글자색 var(--color-white)를 적용합니다. */
+.color-white {
+    color: var(--color-white);
+}
+
+/* .color-sub-bg: 글자색 var(--color-sub-bg)를 적용합니다. */
+.color-sub-bg {
+    color: var(--color-sub-bg);
+}
+
+/* .color-muted: 글자색 var(--color-muted)를 적용합니다. */
+.color-muted {
+    color: var(--color-muted);
+}
+
+/* .color-text: 글자색 var(--color-text)를 적용합니다. */
+.color-text {
+    color: var(--color-text);
+}
+
+/* .color-main: 글자색 var(--color-main)를 적용합니다. */
+.color-main {
+    color: var(--color-main);
+}
+
+/* .color-dark: 글자색 var(--color-dark)를 적용합니다. */
+.color-dark {
+    color: var(--color-dark);
+}
+
+/* .color-danger: 글자색 var(--color-danger)를 적용합니다. */
+.color-danger {
+    color: var(--color-danger);
+}
+
+/* .border-color-white: border-color var(--color-white)를 적용합니다. */
+.border-color-white {
+    border-color: var(--color-white);
+}
+
+/* .border-color-sub-bg: border-color var(--color-sub-bg)를 적용합니다. */
+.border-color-sub-bg {
+    border-color: var(--color-sub-bg);
+}
+
+/* .border-color-border: border-color var(--color-border)를 적용합니다. */
+.border-color-border {
+    border-color: var(--color-border);
+}
+
+/* .border-color-muted: border-color var(--color-muted)를 적용합니다. */
+.border-color-muted {
+    border-color: var(--color-muted);
+}
+
+/* .border-color-danger-bg: border-color var(--color-danger-bg)를 적용합니다. */
+.border-color-danger-bg {
+    border-color: var(--color-danger-bg);
+}
+
+/* .border-color-success: border-color var(--color-success)를 적용합니다. */
+.border-color-success {
+    border-color: var(--color-success);
+}
+
+/* .surface-overlay: 배경 var(--color-overlay)를 적용합니다. */
+.surface-overlay {
+    background: var(--color-overlay);
+}
+
+/* .surface-glass: 배경 var(--color-white)를 적용합니다. */
+.surface-glass {
+    background: var(--color-white);
+}
+
+/* .surface-soft: 배경 var(--color-sub-bg)를 적용합니다. */
+.surface-soft {
+    background: var(--color-sub-bg);
+}
+
+.surface-none {
+    background: none;
+}
+
+/* .ds-py-7: 안쪽 여백 top 1.75rem, 안쪽 여백 bottom 1.75rem를 적용합니다. */
+.ds-py-7 {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem;
+}
+
+/* .ds-gap-2: 요소 간 간격 0.5rem를 적용합니다. */
+.ds-gap-2 {
+    gap: 0.5rem;
+}
+
+/* .ds-pb-2: 안쪽 여백 bottom 0.5rem를 적용합니다. */
+.ds-pb-2 {
+    padding-bottom: 0.5rem;
+}
+
+/* .ds-px-4: 안쪽 여백 left 1rem, 안쪽 여백 right 1rem를 적용합니다. */
+.ds-px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* .ds-py-2_5: 안쪽 여백 top 0.625rem, 안쪽 여백 bottom 0.625rem를 적용합니다. */
+.ds-py-2_5 {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+}
+
+/* .ds-bottom-6: bottom 1.5rem를 적용합니다. */
+.ds-bottom-6 {
+    bottom: 1.5rem;
+}
+
+/* .ds-right-6: right 1.5rem를 적용합니다. */
+.ds-right-6 {
+    right: 1.5rem;
+}
+
+/* .ds-px-5: 안쪽 여백 left 1.25rem, 안쪽 여백 right 1.25rem를 적용합니다. */
+.ds-px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+}
+
+/* .ds-py-3: 안쪽 여백 top 0.75rem, 안쪽 여백 bottom 0.75rem를 적용합니다. */
+.ds-py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+/* .ds-z-100: z-index 100를 적용합니다. */
+.ds-z-100 {
+    z-index: 100;
+}
+
+/* .ds-p-6: 안쪽 여백 1.5rem를 적용합니다. */
+.ds-p-6 {
+    padding: 1.5rem;
+}
+
+/* .ds-p-8: 안쪽 여백 2rem를 적용합니다. */
+.ds-p-8 {
+    padding: 2rem;
+}
+
+/* .ds-mt-2: 바깥 여백 top 0.5rem를 적용합니다. */
+.ds-mt-2 {
+    margin-top: 0.5rem;
+}
+
+/* .ds-mt-3: 바깥 여백 top 0.75rem를 적용합니다. */
+.ds-mt-3 {
+    margin-top: 0.75rem;
+}
+
+/* .ds-mt-6: 바깥 여백 top 1.5rem를 적용합니다. */
+.ds-mt-6 {
+    margin-top: 1.5rem;
+}
+
+/* .ds-gap-3: 요소 간 간격 0.75rem를 적용합니다. */
+.ds-gap-3 {
+    gap: 0.75rem;
+}
+
+/* .ds-left-4: left 1rem를 적용합니다. */
+.ds-left-4 {
+    left: 1rem;
+}
+
+/* .ds-top-3_5: top 0.875rem를 적용합니다. */
+.ds-top-3_5 {
+    top: 0.875rem;
+}
+
+/* .ds-pl-11: 안쪽 여백 left 2.75rem를 적용합니다. */
+.ds-pl-11 {
+    padding-left: 2.75rem;
+}
+
+/* .ds-pr-10: 안쪽 여백 right 2.5rem를 적용합니다. */
+.ds-pr-10 {
+    padding-right: 2.5rem;
+}
+
+/* .ds-right-3: right 0.75rem를 적용합니다. */
+.ds-right-3 {
+    right: 0.75rem;
+}
+
+/* .ds-top-3: top 0.75rem를 적용합니다. */
+.ds-top-3 {
+    top: 0.75rem;
+}
+
+/* .ds-p-4: 안쪽 여백 1rem를 적용합니다. */
+.ds-p-4 {
+    padding: 1rem;
+}
+
+/* .ds-p-5: 안쪽 여백 1.25rem를 적용합니다. */
+.ds-p-5 {
+    padding: 1.25rem;
+}
+
+/* .ds-pb-1: 안쪽 여백 bottom 0.25rem를 적용합니다. */
+.ds-pb-1 {
+    padding-bottom: 0.25rem;
+}
+
+/* .ds-px-3: 안쪽 여백 left 0.75rem, 안쪽 여백 right 0.75rem를 적용합니다. */
+.ds-px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+/* .ds-mb-3: 바깥 여백 bottom 0.75rem를 적용합니다. */
+.ds-mb-3 {
+    margin-bottom: 0.75rem;
+}
+
+/* .ds-mt-1: 바깥 여백 top 0.25rem를 적용합니다. */
+.ds-mt-1 {
+    margin-top: 0.25rem;
+}
+
+/* .ds-gap-5: 요소 간 간격 1.25rem를 적용합니다. */
+.ds-gap-5 {
+    gap: 1.25rem;
+}
+
+/* .ds-gap-4: 요소 간 간격 1rem를 적용합니다. */
+.ds-gap-4 {
+    gap: 1rem;
+}
+
+/* .ds-mb-4: 바깥 여백 bottom 1rem를 적용합니다. */
+.ds-mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* .ds-py-2: 안쪽 여백 top 0.5rem, 안쪽 여백 bottom 0.5rem를 적용합니다. */
+.ds-py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* .ds-bottom-3: bottom 0.75rem를 적용합니다. */
+.ds-bottom-3 {
+    bottom: 0.75rem;
+}
+
+/* .ds-left-3: left 0.75rem를 적용합니다. */
+.ds-left-3 {
+    left: 0.75rem;
+}
+
+/* .ds-py-1_5: 안쪽 여백 top 0.375rem, 안쪽 여백 bottom 0.375rem를 적용합니다. */
+.ds-py-1_5 {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+}
+
+/* .ds-z-10: z-index 10를 적용합니다. */
+.ds-z-10 {
+    z-index: 10;
+}
+
+/* .ds-w-2: 너비 0.5rem를 적용합니다. */
+.ds-w-2 {
+    width: 0.5rem;
+}
+
+/* .ds-h-2: 높이 0.5rem를 적용합니다. */
+.ds-h-2 {
+    height: 0.5rem;
+}
+
+/* .ds-mt-4: 바깥 여백 top 1rem를 적용합니다. */
+.ds-mt-4 {
+    margin-top: 1rem;
+}
+
+/* .ds-gap-6: 요소 간 간격 1.5rem를 적용합니다. */
+.ds-gap-6 {
+    gap: 1.5rem;
+}
+
+/* .ds-z-50: z-index 50를 적용합니다. */
+.ds-z-50 {
+    z-index: 50;
+}
+
+/* .ds-max-h-92vh: max-height 92vh를 적용합니다. */
+.ds-max-h-92vh {
+    max-height: 92vh;
+}
+
+/* .ds-mb-2: 바깥 여백 bottom 0.5rem를 적용합니다. */
+.ds-mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+/* .ds-max-h-64vh: max-height 64vh를 적용합니다. */
+.ds-max-h-64vh {
+    max-height: 64vh;
+}
+
+/* .ds-p-3: 안쪽 여백 0.75rem를 적용합니다. */
+.ds-p-3 {
+    padding: 0.75rem;
+}
+
+/* .ds-max-h-90vh: max-height 90vh를 적용합니다. */
+.ds-max-h-90vh {
+    max-height: 90vh;
+}
+
+/* .ds-max-h-60vh: max-height 60vh를 적용합니다. */
+.ds-max-h-60vh {
+    max-height: 60vh;
+}
+
+/* .ds-mb-5: 바깥 여백 bottom 1.25rem를 적용합니다. */
+.ds-mb-5 {
+    margin-bottom: 1.25rem;
+}
+
+/* .ds-mt-5: 바깥 여백 top 1.25rem를 적용합니다. */
+.ds-mt-5 {
+    margin-top: 1.25rem;
+}
+
+/* .ds-ml-1: 바깥 여백 left 0.25rem를 적용합니다. */
+.ds-ml-1 {
+    margin-left: 0.25rem;
+}
+
+/* .ds-min-w-260px: min-width 260px를 적용합니다. */
+.ds-min-w-260px {
+    min-width: 260px;
+}
+
+/* .ds-gap-1: 요소 간 간격 0.25rem를 적용합니다. */
+.ds-gap-1 {
+    gap: 0.25rem;
+}
+
+/* .ds-w-9: 너비 2.25rem를 적용합니다. */
+.ds-w-9 {
+    width: 2.25rem;
+}
+
+/* .ds-h-9: 높이 2.25rem를 적용합니다. */
+.ds-h-9 {
+    height: 2.25rem;
+}
+
+/* .ds-pb-3: 안쪽 여백 bottom 0.75rem를 적용합니다. */
+.ds-pb-3 {
+    padding-bottom: 0.75rem;
+}
+
+/* .ds-top-24: top 6rem를 적용합니다. */
+.ds-top-24 {
+    top: 6rem;
+}
+
+/* .ds-px-2: 안쪽 여백 left 0.5rem, 안쪽 여백 right 0.5rem를 적용합니다. */
+.ds-px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* .ds-h-28: 높이 7rem를 적용합니다. */
+.ds-h-28 {
+    height: 7rem;
+}
+
+/* .ds-pt-3: 안쪽 여백 top 0.75rem를 적용합니다. */
+.ds-pt-3 {
+    padding-top: 0.75rem;
+}
+
+/* .position-sticky: 배치 기준 sticky를 적용합니다. */
+.position-sticky {
+    position: sticky;
+}
+
+/* .columns-1: 그리드 열 구성 repeat(1,minmax(0,1fr))를 적용합니다. */
+.columns-1 {
+    grid-template-columns: repeat(1,minmax(0,1fr));
+}
+
+/* .columns-2: 그리드 열 구성 repeat(2,minmax(0,1fr))를 적용합니다. */
+.columns-2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+}
+
+/* .columns-3: 그리드 열 구성 repeat(3,minmax(0,1fr))를 적용합니다. */
+.columns-3 {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-layout-row: 표시 방식 flex를 적용합니다. */
+    .medium-layout-row {
+        display: flex;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-layout-row: 표시 방식 flex를 적용합니다. */
+    .large-layout-row {
+        display: flex;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-layout-grid: 표시 방식 grid를 적용합니다. */
+    .medium-layout-grid {
+        display: grid;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-layout-grid: 표시 방식 grid를 적용합니다. */
+    .large-layout-grid {
+        display: grid;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-align-center: 교차축 정렬 center를 적용합니다. */
+    .medium-align-center {
+        align-items: center;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-align-center: 교차축 정렬 center를 적용합니다. */
+    .large-align-center {
+        align-items: center;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-align-end: 교차축 정렬 flex-end를 적용합니다. */
+    .large-align-end {
+        align-items: flex-end;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-type-base: 글자 크기 var(--fs-h3)를 적용합니다. */
+    .medium-type-base {
+        font-size: var(--fs-h3);
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-type-4xl: 글자 크기 var(--fs-b)를 적용합니다. */
+    .medium-type-4xl {
+        font-size: var(--fs-b);
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-ds-p-8: 안쪽 여백 2rem를 적용합니다. */
+    .medium-ds-p-8 {
+        padding: 2rem;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-ds-p-5: 안쪽 여백 1.25rem를 적용합니다. */
+    .medium-ds-p-5 {
+        padding: 1.25rem;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-ds-top-24: top 6rem를 적용합니다. */
+    .large-ds-top-24 {
+        top: 6rem;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-position-sticky: 배치 기준 sticky를 적용합니다. */
+    .large-position-sticky {
+        position: sticky;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-columns-1: 그리드 열 구성 repeat(1,minmax(0,1fr))를 적용합니다. */
+    .large-columns-1 {
+        grid-template-columns: repeat(1,minmax(0,1fr));
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-columns-3: 그리드 열 구성 repeat(3,minmax(0,1fr))를 적용합니다. */
+    .medium-columns-3 {
+        grid-template-columns: repeat(3,minmax(0,1fr));
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-span-4: 그리드 점유 칸 span 4를 적용합니다. */
+    .large-span-4 {
+        grid-column: span 4;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-span-8: 그리드 점유 칸 span 8를 적용합니다. */
+    .large-span-8 {
+        grid-column: span 8;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-layout-horizontal: 배치 방향 row를 적용합니다. */
+    .medium-layout-horizontal {
+        flex-direction: row;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-layout-horizontal: 배치 방향 row를 적용합니다. */
+    .large-layout-horizontal {
+        flex-direction: row;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:768px) */
+@media(min-width:768px) {
+    /* .medium-columns-2: 그리드 열 구성 repeat(2,minmax(0,1fr))를 적용합니다. */
+    .medium-columns-2 {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-columns-2: 그리드 열 구성 repeat(2,minmax(0,1fr))를 적용합니다. */
+    .large-columns-2 {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(min-width:1024px) */
+@media(min-width:1024px) {
+    /* .large-columns-3: 그리드 열 구성 repeat(3,minmax(0,1fr))를 적용합니다. */
+    .large-columns-3 {
+        grid-template-columns: repeat(3,minmax(0,1fr));
+    }
+
+}
+/* .text-clamp-two: 표시 방식 -webkit-box, -webkit-line-clamp 2, -webkit-box-orient vertical, 넘친 내용 처리 hidden를 적용합니다. */
+.text-clamp-two {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* .surface-gradient / .color-white: 글자색 var(--color-text)를 적용합니다. */
+.surface-gradient .color-white {
+    color: var(--color-text);
+}
+
+/* ul, ol: list-style none, 바깥 여백 0, 안쪽 여백 0를 적용합니다. */
+ul, ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* 12칼럼 그리드: 표시 방식 grid, 그리드 열 구성 repeat(12, minmax(0, 1fr)), 요소 간 간격 var(--grid-gap)를 적용합니다. */
+.grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+}
+
+/* .col-1: 그리드 점유 칸 span 1 / span 1를 적용합니다. */
+.col-1 {
+    grid-column: span 1 / span 1;
+}
+
+/* .col-2: 그리드 점유 칸 span 2 / span 2를 적용합니다. */
+.col-2 {
+    grid-column: span 2 / span 2;
+}
+
+/* .col-3: 그리드 점유 칸 span 3 / span 3를 적용합니다. */
+.col-3 {
+    grid-column: span 3 / span 3;
+}
+
+/* .col-4: 그리드 점유 칸 span 4 / span 4를 적용합니다. */
+.col-4 {
+    grid-column: span 4 / span 4;
+}
+
+/* .col-6: 그리드 점유 칸 span 6 / span 6를 적용합니다. */
+.col-6 {
+    grid-column: span 6 / span 6;
+}
+
+/* .col-8: 그리드 점유 칸 span 8 / span 8를 적용합니다. */
+.col-8 {
+    grid-column: span 8 / span 8;
+}
+
+/* .col-12: 그리드 점유 칸 span 12 / span 12를 적용합니다. */
+.col-12 {
+    grid-column: span 12 / span 12;
+}
+
+/* .flex: 표시 방식 flex를 적용합니다. */
+.flex {
+    display: flex;
+}
+
+/* .inline-flex: 표시 방식 inline-flex를 적용합니다. */
+.inline-flex {
+    display: inline-flex;
+}
+
+/* .flex-col: 배치 방향 column를 적용합니다. */
+.flex-col {
+    flex-direction: column;
+}
+
+/* .flex-wrap: flex-wrap wrap를 적용합니다. */
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+/* .justify-start: 주축 정렬 flex-start를 적용합니다. */
+.justify-start {
+    justify-content: flex-start;
+}
+
+/* .justify-end: 주축 정렬 flex-end를 적용합니다. */
+.justify-end {
+    justify-content: flex-end;
+}
+
+/* .items-start: 교차축 정렬 flex-start를 적용합니다. */
+.items-start {
+    align-items: flex-start;
+}
+
+/* .items-center: 교차축 정렬 center를 적용합니다. */
+.items-center {
+    align-items: center;
+}
+
+/* .items-end: 교차축 정렬 flex-end를 적용합니다. */
+.items-end {
+    align-items: flex-end;
+}
+
+/* .items-stretch: 교차축 정렬 stretch를 적용합니다. */
+.items-stretch {
+    align-items: stretch;
+}
+
+/* .m-0: 바깥 여백 0를 적용합니다. */
+.m-0 {
+    margin: 0;
+}
+
+/* .mt-8: 바깥 여백 top 8px를 적용합니다. */
+.mt-8 {
+    margin-top: 8px;
+}
+
+/* .mt-16: 바깥 여백 top 16px를 적용합니다. */
+.mt-16 {
+    margin-top: 16px;
+}
+
+/* .mt-24: 바깥 여백 top 24px를 적용합니다. */
+.mt-24 {
+    margin-top: 24px;
+}
+
+/* .mt-32: 바깥 여백 top 32px를 적용합니다. */
+.mt-32 {
+    margin-top: 32px;
+}
+
+/* .mb-8: 바깥 여백 bottom 8px를 적용합니다. */
+.mb-8 {
+    margin-bottom: 8px;
+}
+
+/* .mb-16: 바깥 여백 bottom 16px를 적용합니다. */
+.mb-16 {
+    margin-bottom: 16px;
+}
+
+/* .mb-24: 바깥 여백 bottom 24px를 적용합니다. */
+.mb-24 {
+    margin-bottom: 24px;
+}
+
+/* .mb-32: 바깥 여백 bottom 32px를 적용합니다. */
+.mb-32 {
+    margin-bottom: 32px;
+}
+
+/* .ml-auto: 바깥 여백 left auto를 적용합니다. */
+.ml-auto {
+    margin-left: auto;
+}
+
+/* .mr-auto: 바깥 여백 right auto를 적용합니다. */
+.mr-auto {
+    margin-right: auto;
+}
+
+/* .mx-auto: 바깥 여백 left auto, 바깥 여백 right auto를 적용합니다. */
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* .p-0: 안쪽 여백 0를 적용합니다. */
+.p-0 {
+    padding: 0;
+}
+
+/* .p-8: 안쪽 여백 8px를 적용합니다. */
+.p-8 {
+    padding: 8px;
+}
+
+/* .p-16: 안쪽 여백 16px를 적용합니다. */
+.p-16 {
+    padding: 16px;
+}
+
+/* .p-24: 안쪽 여백 24px를 적용합니다. */
+.p-24 {
+    padding: 24px;
+}
+
+/* .px-16: 안쪽 여백 left 16px, 안쪽 여백 right 16px를 적용합니다. */
+.px-16 {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+/* .px-24: 안쪽 여백 left 24px, 안쪽 여백 right 24px를 적용합니다. */
+.px-24 {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* .py-16: 안쪽 여백 top 16px, 안쪽 여백 bottom 16px를 적용합니다. */
+.py-16 {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+/* .py-24: 안쪽 여백 top 24px, 안쪽 여백 bottom 24px를 적용합니다. */
+.py-24 {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+/* .text-xs: 글자 크기 12px를 적용합니다. */
+.text-xs {
+    font-size: 12px;
+}
+
+/* .text-sm: 글자 크기 14px를 적용합니다. */
+.text-sm {
+    font-size: 14px;
+}
+
+/* .text-md: 글자 크기 16px를 적용합니다. */
+.text-md {
+    font-size: 16px;
+}
+
+/* .text-lg: 글자 크기 18px를 적용합니다. */
+.text-lg {
+    font-size: 18px;
+}
+
+/* .text-xl: 글자 크기 24px를 적용합니다. */
+.text-xl {
+    font-size: 24px;
+}
+
+/* .text-2xl: 글자 크기 32px를 적용합니다. */
+.text-2xl {
+    font-size: 32px;
+}
+
+/* .font-regular: 글자 두께 400를 적용합니다. */
+.font-regular {
+    font-weight: 400;
+}
+
+/* .font-medium: 글자 두께 500를 적용합니다. */
+.font-medium {
+    font-weight: 500;
+}
+
+/* .font-bold: 글자 두께 700를 적용합니다. */
+.font-bold {
+    font-weight: 700;
+}
+
+/* .text-left: text-align left를 적용합니다. */
+.text-left {
+    text-align: left;
+}
+
+/* .text-center: text-align center를 적용합니다. */
+.text-center {
+    text-align: center;
+}
+
+/* .text-right: text-align right를 적용합니다. */
+.text-right {
+    text-align: right;
+}
+
+/* .text-primary: 글자색 var(--color-primary)를 적용합니다. */
+.text-primary {
+    color: var(--color-primary);
+}
+
+/* .text-secondary: 글자색 var(--color-text-secondary)를 적용합니다. */
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+/* .text-error: 글자색 var(--color-danger)를 적용합니다. */
+.text-error {
+    color: var(--color-danger);
+}
+
+/* .w-full: 너비 100%를 적용합니다. */
+.w-full {
+    width: 100%;
+}
+
+/* .h-full: 높이 100%를 적용합니다. */
+.h-full {
+    height: 100%;
+}
+
+/* .w-auto: 너비 auto를 적용합니다. */
+.w-auto {
+    width: auto;
+}
+
+/* .block: 표시 방식 block를 적용합니다. */
+.block {
+    display: block;
+}
+
+/* .inline-block: 표시 방식 inline-block를 적용합니다. */
+.inline-block {
+    display: inline-block;
+}
+
+/* .hidden: 표시 방식 none !important를 적용합니다. */
+.hidden {
+    display: none !important;
+}
+
+/* .invisible: visibility hidden를 적용합니다. */
+.invisible {
+    visibility: hidden;
+}
+
+/* .relative: 배치 기준 relative를 적용합니다. */
+.relative {
+    position: relative;
+}
+
+/* .absolute: 배치 기준 absolute를 적용합니다. */
+.absolute {
+    position: absolute;
+}
+
+/* .fixed: 배치 기준 fixed를 적용합니다. */
+.fixed {
+    position: fixed;
+}
+
+/* .sticky: 배치 기준 sticky, top 0를 적용합니다. */
+.sticky {
+    position: sticky;
+    top: 0;
+}
+
+/* .cursor-not-allowed: cursor not-allowed를 적용합니다. */
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+/* .overflow-hidden: 넘친 내용 처리 hidden를 적용합니다. */
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/* .rounded-md: 모서리 곡률 8px를 적용합니다. */
+.rounded-md {
+    border-radius: 8px;
+}
+
+/* .rounded-lg: 모서리 곡률 16px를 적용합니다. */
+.rounded-lg {
+    border-radius: 16px;
+}
+
+/* .rounded-full: 모서리 곡률 9999px를 적용합니다. */
+.rounded-full {
+    border-radius: 9999px;
+}
+
+/* 콘텐츠 소제목 / 짧은 설명: overflow-wrap anywhere를 적용합니다. */
+.subtitle,
+.desc {
+    overflow-wrap: anywhere;
+}
+
+/* .card-flex-col: 표시 방식 flex, 배치 방향 column, 주축 정렬 space-between, 높이 100%를 적용합니다. */
+.card-flex-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+/* .onboarding-detail-1: 표시 방식 none를 적용합니다. */
+.onboarding-detail-1 {
+    display: none;
+}
+
+/* .section: 바깥 여백 28px 0를 적용합니다. */
+.section {
+    margin: 28px 0;
+}
+
+/* .section-head: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 flex-end, 바깥 여백 bottom 13px를 적용합니다. */
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 13px;
+}
+
+/* .quest-detail-1: 안쪽 여백 15px, text-align center를 적용합니다. */
+.quest-detail-1 {
+    padding: 15px;
+    text-align: center;
+}
+
+/* .quest-detail-2: 너비 min(480px, 100%)를 적용합니다. */
+.quest-detail-2 {
+    width: min(480px, 100%);
+}
+
+/* .quest-detail-3: 바깥 여백 bottom 16px를 적용합니다. */
+.quest-detail-3 {
+    margin-bottom: 16px;
+}
+
+/* .quest-detail-4: 너비 100%를 적용합니다. */
+.quest-detail-4 {
+    width: 100%;
+}
+
+/* .quest-detail-5: 바깥 여백 bottom 8px를 적용합니다. */
+.quest-detail-5 {
+    margin-bottom: 8px;
+}
+
+/* .quest-detail-6: 바깥 여백 top 0를 적용합니다. */
+.quest-detail-6 {
+    margin-top: 0;
+}
+
+/* .quest-detail-7: 바깥 여백 bottom 14px를 적용합니다. */
+.quest-detail-7 {
+    margin-bottom: 14px;
+}
+
+/* .quest-detail-8: 바깥 여백 top 15px, 표시 방식 flex, 요소 간 간격 8px를 적용합니다. */
+.quest-detail-8 {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+/* .quest-detail-9: 최소 높이 auto, 안쪽 여백 14px를 적용합니다. */
+.quest-detail-9 {
+    min-height: auto;
+    padding: 14px;
+}
+
+/* .quest-detail-10: 글자색 var(--color-accent), 글자 두께 var(--fw-h3)를 적용합니다. */
+.quest-detail-10 {
+    color: var(--color-accent);
+    font-weight: var(--fw-h3);
+}
+
+/* .quest-detail-11: 글자색 var(--color-dark), cursor pointer를 적용합니다. */
+.quest-detail-11 {
+    color: var(--color-dark);
+    cursor: pointer;
+}
+
+/* .quest-detail-14: 바깥 여백 bottom 16px를 적용합니다. */
+.quest-detail-14 {
+    margin-bottom: 16px;
+}
+
+/* .quest-detail-16: 표시 방식 block, 바깥 여백 bottom 4px를 적용합니다. */
+.quest-detail-16 {
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* .quest-detail-17: 너비 40%를 적용합니다. */
+.quest-detail-17 {
+    width: 40%;
+}
+
+/* .logo-font: 글꼴 var(--font-logo), letter-spacing 0.5px를 적용합니다. */
+.logo-font {
+    font-family: var(--font-logo);
+    letter-spacing: 0.5px;
+}
+
+/* .col-5: 그리드 점유 칸 span 5 / span 5를 적용합니다. */
+.col-5 {
+    grid-column: span 5 / span 5;
+}
+
+/* .col-7: 그리드 점유 칸 span 7 / span 7를 적용합니다. */
+.col-7 {
+    grid-column: span 7 / span 7;
+}
+
+/* .col-9: 그리드 점유 칸 span 9 / span 9를 적용합니다. */
+.col-9 {
+    grid-column: span 9 / span 9;
+}
+
+/* .col-10: 그리드 점유 칸 span 10 / span 10를 적용합니다. */
+.col-10 {
+    grid-column: span 10 / span 10;
+}
+
+/* .col-11: 그리드 점유 칸 span 11 / span 11를 적용합니다. */
+.col-11 {
+    grid-column: span 11 / span 11;
+}
+
+/* .columns-12: 그리드 열 구성 repeat(12,minmax(0,1fr))를 적용합니다. */
+.columns-12 {
+    grid-template-columns: repeat(12,minmax(0,1fr));
+}
+
+/* 반응형 또는 사용자 동작 설정: @media (min-width: 768px) */
+@media (min-width: 768px) {
+    /* .medium-col-1: 그리드 점유 칸 span 1 / span 1를 적용합니다. */
+    .medium-col-1 {
+        grid-column: span 1 / span 1;
+    }
+
+    /* .medium-col-2: 그리드 점유 칸 span 2 / span 2를 적용합니다. */
+    .medium-col-2 {
+        grid-column: span 2 / span 2;
+    }
+
+    /* .medium-col-3: 그리드 점유 칸 span 3 / span 3를 적용합니다. */
+    .medium-col-3 {
+        grid-column: span 3 / span 3;
+    }
+
+    /* .medium-col-4: 그리드 점유 칸 span 4 / span 4를 적용합니다. */
+    .medium-col-4 {
+        grid-column: span 4 / span 4;
+    }
+
+    /* .medium-col-5: 그리드 점유 칸 span 5 / span 5를 적용합니다. */
+    .medium-col-5 {
+        grid-column: span 5 / span 5;
+    }
+
+    /* .medium-col-6: 그리드 점유 칸 span 6 / span 6를 적용합니다. */
+    .medium-col-6 {
+        grid-column: span 6 / span 6;
+    }
+
+    /* .medium-col-7: 그리드 점유 칸 span 7 / span 7를 적용합니다. */
+    .medium-col-7 {
+        grid-column: span 7 / span 7;
+    }
+
+    /* .medium-col-8: 그리드 점유 칸 span 8 / span 8를 적용합니다. */
+    .medium-col-8 {
+        grid-column: span 8 / span 8;
+    }
+
+    /* .medium-col-9: 그리드 점유 칸 span 9 / span 9를 적용합니다. */
+    .medium-col-9 {
+        grid-column: span 9 / span 9;
+    }
+
+    /* .medium-col-10: 그리드 점유 칸 span 10 / span 10를 적용합니다. */
+    .medium-col-10 {
+        grid-column: span 10 / span 10;
+    }
+
+    /* .medium-col-11: 그리드 점유 칸 span 11 / span 11를 적용합니다. */
+    .medium-col-11 {
+        grid-column: span 11 / span 11;
+    }
+
+    /* .medium-col-12: 그리드 점유 칸 span 12 / span 12를 적용합니다. */
+    .medium-col-12 {
+        grid-column: span 12 / span 12;
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media (min-width: 1024px) */
+@media (min-width: 1024px) {
+    /* .large-columns-12: 그리드 열 구성 repeat(12,minmax(0,1fr))를 적용합니다. */
+    .large-columns-12 {
+        grid-template-columns: repeat(12,minmax(0,1fr));
+    }
+
+    /* .large-col-1: 그리드 점유 칸 span 1 / span 1를 적용합니다. */
+    .large-col-1 {
+        grid-column: span 1 / span 1;
+    }
+
+    /* .large-col-2: 그리드 점유 칸 span 2 / span 2를 적용합니다. */
+    .large-col-2 {
+        grid-column: span 2 / span 2;
+    }
+
+    /* .large-col-3: 그리드 점유 칸 span 3 / span 3를 적용합니다. */
+    .large-col-3 {
+        grid-column: span 3 / span 3;
+    }
+
+    /* .large-col-4: 그리드 점유 칸 span 4 / span 4를 적용합니다. */
+    .large-col-4 {
+        grid-column: span 4 / span 4;
+    }
+
+    /* .large-col-5: 그리드 점유 칸 span 5 / span 5를 적용합니다. */
+    .large-col-5 {
+        grid-column: span 5 / span 5;
+    }
+
+    /* .large-col-6: 그리드 점유 칸 span 6 / span 6를 적용합니다. */
+    .large-col-6 {
+        grid-column: span 6 / span 6;
+    }
+
+    /* .large-col-7: 그리드 점유 칸 span 7 / span 7를 적용합니다. */
+    .large-col-7 {
+        grid-column: span 7 / span 7;
+    }
+
+    /* .large-col-8: 그리드 점유 칸 span 8 / span 8를 적용합니다. */
+    .large-col-8 {
+        grid-column: span 8 / span 8;
+    }
+
+    /* .large-col-9: 그리드 점유 칸 span 9 / span 9를 적용합니다. */
+    .large-col-9 {
+        grid-column: span 9 / span 9;
+    }
+
+    /* .large-col-10: 그리드 점유 칸 span 10 / span 10를 적용합니다. */
+    .large-col-10 {
+        grid-column: span 10 / span 10;
+    }
+
+    /* .large-col-11: 그리드 점유 칸 span 11 / span 11를 적용합니다. */
+    .large-col-11 {
+        grid-column: span 11 / span 11;
+    }
+
+    /* .large-col-12: 그리드 점유 칸 span 12 / span 12를 적용합니다. */
+    .large-col-12 {
+        grid-column: span 12 / span 12;
+    }
+
+}

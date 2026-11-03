@@ -1,0 +1,226 @@
+/* quest.css — 퀘스트 탐색·여행 관리 화면의 고유 배치와 모달 규격입니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
+
+/* 모달 배경: 배경 var(--color-overlay-strong), 안쪽 여백 15px, z-index var(--z-modal-large)를 적용합니다. */
+.modal-bg {
+    background: var(--color-overlay-strong);
+    padding: 15px;
+    z-index: var(--z-modal-large);
+}
+
+/* 모달 본체: 너비 min(760px,100%), 안쪽 여백 25px를 적용합니다. */
+.modal {
+    width: min(760px,100%);
+    padding: 25px;
+}
+
+/* .hero: 배경 var(--color-sub-bg), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 28px, 표시 방식 flex를 적용합니다. */
+.hero {
+    background: var(--color-sub-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* .hero-actions: 표시 방식 flex, 요소 간 간격 9px, flex-wrap wrap를 적용합니다. */
+.hero-actions {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+/* .quick: 표시 방식 flex, 요소 간 간격 9px, overflow-x auto, 안쪽 여백 bottom 5px, 바깥 여백 bottom 22px를 적용합니다. */
+.quick {
+    display: flex;
+    gap: 9px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    margin-bottom: 22px;
+}
+
+/* .search-results: 표시 방식 none를 적용합니다. */
+.search-results {
+    display: none;
+}
+
+/* .search-results / .active 활성 상태: 표시 방식 block를 적용합니다. */
+.search-results.active {
+    display: block;
+}
+
+/* .explore-home / .is-hidden: 표시 방식 none를 적용합니다. */
+.explore-home.is-hidden {
+    display: none;
+}
+
+/* .feature: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 20px, 표시 방식 grid를 적용합니다. */
+.feature {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 20px;
+}
+
+/* .feature-main: 최소 높이 220px, 모서리 곡률 var(--radius-md), 배경 var(--color-main), 안쪽 여백 24px, 표시 방식 flex를 적용합니다. */
+.feature-main {
+    min-height: 220px;
+    border-radius: var(--radius-md);
+    background: var(--color-main);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* .feature-side: 표시 방식 flex, 배치 방향 column, 요소 간 간격 10px, 주축 정렬 space-between를 적용합니다. */
+.feature-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+/* .layout-grid / 12칼럼 그리드 / 퀘스트 코스 카드 배치: 표시 방식 grid, 그리드 열 구성 repeat(3, 1fr), 요소 간 간격 14px를 적용합니다. */
+.layout-grid:not(.grid-12), .course-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+/* .map-layout: 표시 방식 grid, 그리드 열 구성 1.2fr .8fr, 요소 간 간격 15px를 적용합니다. */
+.map-layout {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 15px;
+}
+
+/* .map: 높이 380px, 모서리 곡률 var(--radius-lg), 배경 var(--color-sub-bg), 배치 기준 relative, 테두리 1px solid var(--color-border)를 적용합니다. */
+.map {
+    height: 380px;
+    border-radius: var(--radius-lg);
+    background: var(--color-sub-bg);
+    position: relative;
+    border: 1px solid var(--color-border);
+}
+
+/* .map-list: 배경 var(--color-white), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-lg), 안쪽 여백 16px, max-height 380px를 적용합니다. */
+.map-list {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(max-width: 850px) */
+@media(max-width: 850px) {
+    /* .feature / .map-layout: 그리드 열 구성 1fr를 적용합니다. */
+    .feature, .map-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* .layout-grid / 퀘스트 코스 카드 배치: 그리드 열 구성 repeat(2, 1fr)를 적용합니다. */
+    .layout-grid, .course-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+/* 반응형 또는 사용자 동작 설정: @media(max-width: 600px) */
+@media(max-width: 600px) {
+    /* .layout-grid / 퀘스트 코스 카드 배치: 그리드 열 구성 1fr를 적용합니다. */
+    .layout-grid, .course-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* .trip-header: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 flex-end, 바깥 여백 bottom 18px를 적용합니다. */
+.trip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 18px;
+}
+
+/* .trip-selector: 테두리 1px solid var(--color-border), 배경 var(--color-white), 모서리 곡률 var(--radius-md), 안쪽 여백 12px 18px, min-width 260px를 적용합니다. */
+.trip-selector {
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    min-width: 260px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* .management-grid: 표시 방식 grid, 그리드 열 구성 1.2fr .8fr, 요소 간 간격 16px를 적용합니다. */
+.management-grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 16px;
+}
+
+/* .quest-row: 표시 방식 flex, 요소 간 간격 12px, 교차축 정렬 center, 안쪽 여백 14px 0, border-bottom 1px solid var(--color-border2)를 적용합니다. */
+.quest-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border2);
+}
+
+/* .quest-row: border-bottom 0를 적용합니다. */
+.quest-row:last-child {
+    border-bottom: 0;
+}
+
+/* .quest-info: flex 1를 적용합니다. */
+.quest-info {
+    flex: 1;
+}
+
+/* 반응형 또는 사용자 동작 설정: @media(max-width: 850px) */
+@media(max-width: 850px) {
+    /* .management-grid: 그리드 열 구성 1fr를 적용합니다. */
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* .quest-detail-12: 배치 기준 absolute, top 12px, left 12px, 배경 var(--color-white), 안쪽 여백 6px 12px를 적용합니다. */
+.quest-detail-12 {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--color-white);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+}
+
+/* .quest-detail-13: 글자 크기 var(--fs-b), 글자 두께 var(--fw-h1), 바깥 여백 top 10px, 글자색 var(--color-dark)를 적용합니다. */
+.quest-detail-13 {
+    font-size: var(--fs-b);
+    font-weight: var(--fw-h1);
+    margin-top: 10px;
+    color: var(--color-dark);
+}
+
+/* .quest-detail-15: 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-md), 안쪽 여백 14px, 배경 var(--color-bg)를 적용합니다. */
+.quest-detail-15 {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    background: var(--color-bg);
+}
+

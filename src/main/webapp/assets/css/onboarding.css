@@ -1,0 +1,305 @@
+/* onboarding.css — 온보딩 단계 구성과 인증·프로필·위치 화면의 고유 변형입니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
+
+/* body: 표시 방식 flex, 주축 정렬 center, 교차축 정렬 center, 최소 높이 100vh를 적용합니다. */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* #onboarding-viewport: 너비 100%, 표시 방식 flex, 주축 정렬 center, 교차축 정렬 center를 적용합니다. */
+#onboarding-viewport {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 온보딩 단계 화면: 표시 방식 none, 너비 100%, animation fadeIn 0.3s ease-in-out를 적용합니다. */
+.step-section {
+    display: none;
+    width: 100%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 온보딩 단계 화면 / .active 활성 상태: 표시 방식 block를 적용합니다. */
+.step-section.active {
+    display: block;
+}
+
+/* 화면 전환 애니메이션: @keyframes fadeIn */
+@keyframes fadeIn {
+    /* from: 불투명도 0, 위치·크기 변환 translateY(6px)를 적용합니다. */
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    /* to: 불투명도 1, 위치·크기 변환 translateY(0)를 적용합니다. */
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+/* .auth-container: 너비 min(400px, calc(100% - 40px)), 바깥 여백 0 auto, 안쪽 여백 40px 30px를 적용합니다. */
+.auth-container {
+    width: min(400px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 40px 30px;
+}
+
+/* .auth-container / 브랜드 로고: 표시 방식 flex, 너비 100%, 주축 정렬 center, 교차축 정렬 center, text-align center를 적용합니다. */
+.auth-container .logo {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: var(--font-logo);
+    font-size: 44px;
+    font-weight: 400;
+    color: var(--color-dark);
+    margin: 0 auto 30px auto;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* .auth-container / 브랜드 로고: 높이 50px, 너비 auto, 바깥 여백 right 10px, object-fit contain를 적용합니다. */
+.auth-container .logo img {
+    height: 50px;
+    width: auto;
+    margin-right: 10px;
+    object-fit: contain;
+}
+
+/* .dup-btn: 안쪽 여백 0 16px, 배경 var(--color-sub-bg), 테두리 1px solid var(--color-border), 모서리 곡률 var(--radius-sm), 글자 크기 var(--fs-small)를 적용합니다. */
+.dup-btn {
+    padding: 0 16px;
+    background: var(--color-sub-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--color-text);
+    white-space: nowrap;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+/* .dup-btn 마우스 호버 상태: 배경 var(--color-border)를 적용합니다. */
+.dup-btn:hover {
+    background: var(--color-border);
+}
+
+/* .location-container: 너비 min(440px, calc(100% - 40px)), 바깥 여백 0 auto, 안쪽 여백 40px 30px를 적용합니다. */
+.location-container {
+    width: min(440px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 40px 30px;
+}
+
+/* .location-container / .step-indicator: 글자 크기 var(--fs-small), 글자 두께 700, 글자색 var(--color-primary), 바깥 여백 bottom 8px, text-transform uppercase를 적용합니다. */
+.location-container .step-indicator {
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+/* .icon-wrapper: 너비 72px, 높이 72px, 배경 var(--color-main), 글자색 var(--color-primary), 모서리 곡률 50%를 적용합니다. */
+.icon-wrapper {
+    width: 72px;
+    height: 72px;
+    background: var(--color-main);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 24px;
+}
+
+/* .location-container / 콘텐츠 제목: 글자 크기 var(--fs-h1), 글자 두께 var(--fw-h1), 바깥 여백 bottom 6px, text-align center를 적용합니다. */
+.location-container .title {
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-h1);
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+/* .location-container / 짧은 설명: 글자 크기 var(--fs-body), 글자색 var(--color-muted), 바깥 여백 bottom 28px, text-align center를 적용합니다. */
+.location-container .desc {
+    font-size: var(--fs-body);
+    color: var(--color-muted);
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+/* .location-container / .btn-group: 표시 방식 flex, 배치 방향 column, 요소 간 간격 12px를 적용합니다. */
+.location-container .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* .location-container / .btn-group / 기본 버튼: 너비 100%, 높이 50px, 바깥 여백 top 0, 상태 전환 효과 background-color 0.2s, cursor pointer를 적용합니다. */
+.location-container .btn-group .btn {
+    width: 100%;
+    height: 50px;
+    margin-top: 0;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+/* .profile-container: 너비 min(440px, calc(100% - 40px)), 바깥 여백 0 auto, 안쪽 여백 40px 30px를 적용합니다. */
+.profile-container {
+    width: min(440px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 40px 30px;
+}
+
+/* .profile-container / .step-indicator: 글자 크기 var(--fs-small), 글자 두께 700, 글자색 var(--color-primary), 바깥 여백 bottom 8px, text-transform uppercase를 적용합니다. */
+.profile-container .step-indicator {
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* .profile-container / 콘텐츠 제목: 글자 크기 var(--fs-h1), 글자 두께 var(--fw-h1), 바깥 여백 bottom 6px를 적용합니다. */
+.profile-container .title {
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-h1);
+    margin-bottom: 6px;
+}
+
+/* .profile-container / 짧은 설명: 글자 크기 var(--fs-body), 글자색 var(--color-muted), 바깥 여백 bottom 28px를 적용합니다. */
+.profile-container .desc {
+    font-size: var(--fs-body);
+    color: var(--color-muted);
+    margin-bottom: 28px;
+}
+
+/* .profile-container / 폼 항목 묶음: 바깥 여백 bottom 24px를 적용합니다. */
+.profile-container .form-group {
+    margin-bottom: 24px;
+}
+
+/* .profile-container / 폼 항목 이름: 표시 방식 flex, 주축 정렬 space-between, 교차축 정렬 center를 적용합니다. */
+.profile-container .form-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* .profile-container / 폼 항목 이름: 글자 두께 400, 글자색 var(--color-muted)를 적용합니다. */
+.profile-container .form-label span {
+    font-weight: 400;
+    color: var(--color-muted);
+}
+
+/* .profile-container / 입력 오류 메시지: 표시 방식 none, 글자 크기 var(--fs-small), 글자 두께 600, 글자색 var(--color-danger), 배경색 var(--color-danger-bg)를 적용합니다. */
+.profile-container .error-msg {
+    display: none;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--color-danger);
+    background-color: var(--color-danger-bg);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    margin-top: 8px;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+/* .profile-container / .btn-group: 표시 방식 flex, 요소 간 간격 10px, 바깥 여백 top 32px를 적용합니다. */
+.profile-container .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 32px;
+}
+
+/* .profile-container / .btn-group / 기본 버튼: flex 1, 높이 48px, 바깥 여백 top 0, 너비 auto, 상태 전환 효과 background-color 0.2s를 적용합니다. */
+.profile-container .btn-group .btn {
+    flex: 1;
+    height: 48px;
+    margin-top: 0;
+    width: auto;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+/* .btn-primary: 글자색 var(--color-white)를 적용합니다. */
+#onboarding-viewport .btn-primary {
+    color: var(--color-white);
+}
+
+/* .onboarding-container: 최대 너비 400px, 바깥 여백 0 auto, 안쪽 여백 20px를 적용합니다. */
+.onboarding-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* .onboarding-container / 콘텐츠 소제목: 글자색 var(--color-text), 글꼴 var(--font-logo), 글자 크기 var(--fs-b), 글자 두께 var(--fw-body), text-align center를 적용합니다. */
+.onboarding-container .subtitle {
+    color: var(--color-text);
+    font-family: var(--font-logo);
+    font-size: var(--fs-b);
+    font-weight: var(--fw-body);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* .onboarding-container / 브랜드 로고: 표시 방식 block, 너비 100%, 글자색 var(--color-dark), 글꼴 var(--font-logo), 글자 크기 var(--fs-a)를 적용합니다. */
+.onboarding-container .logo {
+    display: block;
+    width: 100%;
+    color: var(--color-dark);
+    font-family: var(--font-logo);
+    font-size: var(--fs-a);
+    font-weight: 400;
+    text-align: center;
+    margin: 0 auto 30px auto;
+    line-height: 1;
+    letter-spacing: normal;
+}
+
+/* .social-login-group: 표시 방식 flex, 배치 방향 column, 요소 간 간격 10px를 적용합니다. */
+.social-login-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* .sub-links: 바깥 여백 top 24px, 글자 크기 var(--fs-small), 글자색 var(--color-muted), text-align center를 적용합니다. */
+.sub-links {
+    margin-top: 24px;
+    font-size: var(--fs-small);
+    color: var(--color-muted);
+    text-align: center;
+}
+
+/* .sub-links: 글자색 var(--color-dark), text-decoration none, 글자 두께 700, 바깥 여백 left 6px, cursor pointer를 적용합니다. */
+.sub-links a {
+    color: var(--color-dark);
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+/* .sub-links 마우스 호버 상태: text-decoration underline를 적용합니다. */
+.sub-links a:hover {
+    text-decoration: underline;
+}
+

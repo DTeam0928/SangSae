@@ -1,0 +1,134 @@
+/* variables.css — 디자인 시스템 토큰과 폰트 등록만 관리합니다.
+ * 로드 순서: variables.css → utilities.css → components.css → 현재 페이지 CSS
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap');
+
+/* ---------- 1. 폰트 정의 (fonts) ---------- */
+@font-face {
+    font-family: 'NalnaRiji';
+    src: url('nelnalizzychae2020.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- 2. 디자인 정의 (style guide) ---------- */
+:root {
+    /* 컬러 팔레트 */
+    /* 1. 핵심 포인트 컬러 (요청하신 톤 유지) */
+    --color-primary: #BDDEDD;     /* 메인 포인트 / 연한 민트 */
+    --color-dark: #87BBBE;        /* 프라이머리 다크 버전 / 버튼 호버용 */
+    --color-bg: #EFFAFA;          /* 기본 배경색 / 매우 연한 민트빛 화이트 */
+
+    --color-dark-hover: #75a7a9;    /* --color-dark보다 살짝 짙은 호버용 민트 */
+    --color-danger-border: #f7a3a6; /* --color-danger와 어울리는 연한 에러 테두리 선 */
+
+    /* 2. 조화로운 서브 및 배경 컬러 */
+    --color-main: #E2F5F5;        /* 기존 메인 컬러를 배경 톤에 맞게 은은하게 조율 */
+    --color-sub-bg: #E8F4F4;      /* 배경 박스 및 연한 서브 배경 */
+    --color-white: #ffffff;       /* 카드 및 컴포넌트 흰색 배경 */
+
+    /* 3. 텍스트 및 보조 컬러 (민트 톤과 어울리는 차분한 차콜/그레이) */
+    --color-text: #2C3E42;        /* 기본 텍스트 (너무 진한 블랙 대신 푸른빛이 감도는 다크 톤) */
+    --color-muted: #6C8287;       /* 보조 텍스트 (톤 다운된 그레이민트) */
+    --color-surface: var(--color-white);
+
+    /* 4. 테두리 및 경계선 */
+    --color-border: #D1E5E5;      /* 기본 테두리 (민트빛이 살짝 감도는 부드러운 선) */
+    --color-border2: #D8ECEC;     /* 헤더 등 보조 테두리 */
+
+    /* 5. 강조, 뱃지 및 상태 컬러 */
+    --color-accent: #E59B21;      /* 경고/뱃지/보조 포인트 (따뜻한 오렌지/골드 톤으로 포인트) */
+    --color-danger: #E56B6F;      /* 삭제/에러 (채도를 살짝 낮춘 세련된 레드) */
+    --color-danger-bg: #FDE8E8;   /* 에러 배경 연한 톤 */
+    --color-success: #2A9D8F;     /* 성공/완료 (민트 계열과 찰떡궁합인 딥 그린) */
+
+    --font-logo: 'NalnaRiji', sans-serif;
+    --font-body: 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* 온보딩 대형 로고 크기 (--fs-a) */
+    --fs-a: 128px;
+    /* 대형 강조 글자 크기 (--fs-b) */
+    --fs-b: 36px;
+
+    --fs-h1: 25px;  --fw-h1: 850;
+    --fs-h2: 19px;  --fw-h2: 800;
+    --fs-h3: 16px; --fw-h3: 730;
+    --fs-body: 14px; --fw-body: 450; --lh-body: 1.5;
+    --fs-small: 12px; --fw-small: 600;
+
+    /* 라운드/그림자 */
+    /* 카드, 모달 곡률 (--radius-lg) */
+    --radius-lg: 16px;
+    /* 내부 패널 곡률 (--radius-md) */
+    --radius-md: 12px;
+    /* 버튼과 입력란 곡률 (--radius-sm) */
+    --radius-sm: 8px;
+    /* 카드 그림자 (--shadow-card) */
+    --shadow-card: 0 4px 20px rgba(30, 70, 90, 0.04);
+
+    /* 기본 모달 배경 덮개 (--color-overlay) */
+    --color-overlay: rgba(20,30,40,.45);
+    /* 모달 그림자 (--shadow-modal) */
+    --shadow-modal: 0 20px 60px rgba(0,0,0,.18);
+    /* 기존 보조 글자색 변수의 호환 별칭 (--color-text-secondary) */
+    --color-text-secondary: var(--color-muted);
+    /* --color-overlay-strong 디자인 기준값 */
+    --color-overlay-strong: rgba(18,38,48,.6);
+    /* --radius-pill 디자인 기준값 */
+    --radius-pill: 999px;
+    /* --radius-xs 디자인 기준값 */
+    --radius-xs: 6px;
+    /* --fs-label 디자인 기준값 */
+    --fs-label: 13px;
+    /* --fs-stat 디자인 기준값 */
+    --fs-stat: 20px;
+    /* --shadow-pin 디자인 기준값 */
+    --shadow-pin: 0 4px 14px rgba(15,23,42,.22);
+    /* --color-pulse 디자인 기준값 */
+    --color-pulse: rgba(14,165,233,.4);
+    /* --color-pulse-clear 디자인 기준값 */
+    --color-pulse-clear: var(--color-pulse-clear);
+    /* --z-header 디자인 기준값 */
+    --z-header: 30;
+    /* --z-modal 디자인 기준값 */
+    --z-modal: 100;
+    /* --z-menu 디자인 기준값 */
+    --z-menu: 150;
+    /* --z-modal-large 디자인 기준값 */
+    --z-modal-large: 200;
+    /* --z-toast 디자인 기준값 */
+    --z-toast: 300;
+    /* 공통 콘텐츠 최대 너비 (--container-max) */
+    --container-max: 1200px;
+    /* 12칼럼 기본 간격 (--grid-gap) */
+    --grid-gap: 24px;}
+
+:root { --color-overlay: rgba(20,30,40,.45); --shadow-modal: 0 20px 60px rgba(0,0,0,.18); }
+
+/* ---------- 3. 다크 모드 덮어쓰기 (Dark Mode Overrides) ---------- */
+[data-theme="dark"] {
+    /* 배경색을 어두운 네이비/차콜 톤으로 */
+    --color-bg: #12181F;
+    --color-white: #1E2631;
+    --color-sub-bg: #28323E;
+
+    /* 텍스트를 밝게 */
+    --color-text: #E2E8F0;
+    --color-muted: #94A3B8;
+
+    /* 테두리를 어둡게 */
+    --color-border: #334155;
+    --color-border2: #475569;
+
+    /* 기존 민트 컬러(--color-primary)는 다크 모드에서도 포인트 컬러로 어울리므로 그대로 두거나,
+       조금 더 쨍하게 만들고 싶다면 채도를 조정합니다. */
+    --color-primary: #86CBC9;
+    --color-dark: #6CA5A3;
+
+    /* 그림자 강도 조정 (어두운 배경에 맞게 수정) */
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.routine-container {width:min(1220px,calc(100% - 28px))}
